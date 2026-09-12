@@ -32,7 +32,7 @@
 |:---:|:---|:---:|:---|
 | **1** | **Database Schema (`database/orms_schema.sql`)** | **COMPLETED** | 12 tables, 3NF normalized, constraints, indexes & seed data |
 | **2** | **PDO Connection Class (`config/database.php`)** | **COMPLETED** | Thread-safe Singleton, UTF-8, native prepared statements |
-| 3 | Authentication & User Management (`auth/`) | Pending | Register with ID proof, login, logout, password reset |
+| **3** | **Authentication & User Management (`auth/`)** | **COMPLETED** | Register (magic-bytes), Login, Logout, Forgot/Reset password, Dual-Role |
 | 4 | Product Listing Module (Owner) (`owner/`) | Pending | Multi-image upload, condition, pricing, CRUD |
 | 5 | Search & Discovery Module (`renter/`, `index.php`) | Pending | Public catalog, category/price/location filters |
 | 6 | Rental Request Module (`renter/`, `owner/`) | Pending | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject |
@@ -228,7 +228,104 @@ C:\xampp\php\php.exe test_db.php
 
 ---
 
-## 5. Default Seed Credentials Reference
+## 5. Step 3: Authentication & User Management Module (`auth/`) Testing Guide
+
+### 5.1 Architecture & Security Implemented
+1. **Multi-Role User Architecture (`USER_ROLES`):**
+   - Users can register as **Owner**, **Renter**, or **Both**.
+   - Dual-role users can toggle their active workspace dynamically via the navbar pill or [`auth/switch_role.php`](file:///c:/Users/Dell/Desktop/Projects/ORMS/auth/switch_role.php) without having to re-authenticate (Synopsis Rule 14).
+2. **Strict Magic-Byte MIME Validation:**
+   - Identity proof documents are validated using PHP `finfo_file(FILEINFO_MIME_TYPE)` inspecting true file header bytes, not easily spoofed client-side extensions or `Content-Type` headers. Allowed types: PDF, PNG, JPEG.
+   - Uploaded files are renamed using cryptographically secure random names (`id_[16-bytes-hex].[ext]`) and stored in `uploads/id_proofs/`, protected by `.htaccess`.
+3. **Session Security & Fixation Prevention:**
+   - Calls `session_regenerate_id(true)` upon successful authentication and role switching (Prompt Guide Section 7).
+   - Cookies configured with `HttpOnly`, `SameSite=Lax`, and strict cookie parameters.
+4. **Hashed, Time-Limited Password Reset Tokens:**
+   - Generates 64-character cryptographically secure hex tokens via `bin2hex(random_bytes(32))`.
+   - The raw token is sent to the user/simulation link, while **only the SHA-256 hash** (`hash('sha256', $rawToken)`) is stored in `USER.reset_token`.
+   - Expires strictly after 1 hour (`DATE_ADD(NOW(), INTERVAL 1 HOUR)`).
+   - Once used, the token is permanently invalidated (`reset_token = NULL, reset_token_expiry = NULL`).
+5. **Anti-CSRF Protection & Generic Failure Messages:**
+   - Every state-changing POST form embeds `<?= csrf_field() ?>` and verifies it server-side.
+   - Login failures display generic messages ("Invalid email/username or password") to prevent username enumeration attacks.
+
+---
+
+### 5.2 How to Test the Auth Module
+
+#### Method A: Automated Test Suite (Instant Verification)
+Run the automated verification script in PowerShell:
+```powershell
+C:\xampp\php\php.exe test_auth.php
+```
+Or view the visual dashboard in your browser:
+```
+http://localhost/orms/test_auth.php
+```
+**Expected Output:** All 8 automated tests pass with green badges:
+1. `[ PASS ]` User Registration & Dual-Role Junction Insert
+2. `[ PASS ]` Multi-Role Junction Integrity Check
+3. `[ PASS ]` Authentication Rejection (Wrong Password)
+4. `[ PASS ]` User Login & Session Regeneration Test
+5. `[ PASS ]` Admin Login & Role Verification
+6. `[ PASS ]` Password Reset Token Hashing & Expiry (Rule 3)
+7. `[ PASS ]` Password Reset Execution & Single-Use Invalidation
+8. `[ PASS ]` File Upload `finfo_file` Magic-Byte Security Check
+
+---
+
+#### Method B: Manual Interactive Browser Walkthrough
+
+##### Test 1: User Registration
+1. Go to: `http://localhost/orms/auth/register.php`
+2. Fill out the form:
+   - **Full Name:** `Amit Verma`
+   - **Email:** `amit@example.com`
+   - **Phone:** `9876501234`
+   - **Address:** `Flat 101, Palm Grove, Sector 14, Gurgaon`
+   - **Password:** `Amit@123` / Confirm: `Amit@123`
+   - **ID Proof Document:** Attach any sample JPG, PNG, or PDF file.
+   - **Role Checkboxes:** Check both **Owner** and **Renter**.
+3. Click **Create My Account**.
+4. **Expected Result:** Redirected to `auth/login.php` with a green banner: *"Registration successful! Your account has been created."*
+
+##### Test 2: User Login & Dual-Role Switching
+1. On `http://localhost/orms/auth/login.php`, enter:
+   - **Email:** `rahul@example.com` (or your newly registered email)
+   - **Password:** `Password@123` (or `Amit@123`)
+2. Click **Sign In**.
+3. **Expected Result:**
+   - Logged in and redirected to `owner/dashboard.php`.
+   - In the top navbar, you will see your name and an **Active Role** switcher pill: `[Owner] [Renter]`.
+   - Click on **Renter** in the navbar: instantly switches to `renter/dashboard.php` without re-login!
+   - Click on **Owner**: switches back to `owner/dashboard.php`.
+
+##### Test 3: Admin Login
+1. Click **Logout** in the top navbar.
+2. Go to `http://localhost/orms/auth/login.php` and enter:
+   - **Email or Admin Username:** `admin` (or `admin@orms.com`)
+   - **Password:** `Admin@123`
+3. Click **Sign In**.
+4. **Expected Result:**
+   - Redirected to `admin/dashboard.php` showing the Administrator Portal and live metrics.
+
+##### Test 4: Forgot & Reset Password Flow
+1. Log out, then click **Forgot password?** on the login page or go to:
+   ```
+   http://localhost/orms/auth/forgot_password.php
+   ```
+2. Enter `priya@example.com` and click **Generate Reset Link**.
+3. **Expected Result:**
+   - A green confirmation box appears with a direct testing link (e.g. `http://localhost/orms/auth/reset_password.php?token=...`).
+4. Click the link to open the reset password screen.
+5. Enter a new password (e.g. `NewPriya@123`), confirm it, and submit.
+6. **Expected Result:**
+   - Redirected to `login.php` with message *"Your password has been reset successfully!"*
+   - Log in with `priya@example.com` and `NewPriya@123` &rarr; Successfully signed in!
+
+---
+
+## 6. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -240,7 +337,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 6. Troubleshooting Common Issues
+## 7. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.
@@ -248,7 +345,7 @@ Save these credentials for future testing during the upcoming modules:
    - The script contains `DROP TABLE IF EXISTS` in safe order with `FOREIGN_KEY_CHECKS = 0`. Re-importing will cleanly recreate the database.
 3. **Foreign key error on import:**
    - Always run the entire file as a single script so `SET FOREIGN_KEY_CHECKS = 0;` runs first.
-4. **Database connection failed in `test_db.php`:**
-   - Ensure the MySQL service is started in XAMPP Control Panel.
-   - Verify `orms_db` exists by checking phpMyAdmin (`http://localhost/phpmyadmin/`).
+4. **File upload error ("File format not allowed"):**
+   - Ensure the uploaded file has genuine magic bytes of JPEG (`FF D8 FF`), PNG (`89 50 4E 47`), or PDF (`%PDF`). Renaming a text file to `.jpg` will be rejected by `finfo_file` for security.
+
 
