@@ -33,7 +33,7 @@
 | **1** | **Database Schema (`database/orms_schema.sql`)** | **COMPLETED** | 12 tables, 3NF normalized, constraints, indexes & seed data |
 | **2** | **PDO Connection Class (`config/database.php`)** | **COMPLETED** | Thread-safe Singleton, UTF-8, native prepared statements |
 | **3** | **Authentication & User Management (`auth/`)** | **COMPLETED** | Register (magic-bytes), Login, Logout, Forgot/Reset password, Dual-Role |
-| 4 | Product Listing Module (Owner) (`owner/`) | Pending | Multi-image upload, condition, pricing, CRUD |
+| **4** | **Product Listing Module (Owner) (`owner/`)** | **COMPLETED** | Multi-image upload (magic-bytes), CRUD, condition, deposit, toggle status |
 | 5 | Search & Discovery Module (`renter/`, `index.php`) | Pending | Public catalog, category/price/location filters |
 | 6 | Rental Request Module (`renter/`, `owner/`) | Pending | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject |
 | 7 | Financial / Transaction Module (`renter/`) | Pending | Dynamic rental amount calculation, deposit hold/refund |
@@ -325,7 +325,105 @@ http://localhost/orms/test_auth.php
 
 ---
 
-## 6. Default Seed Credentials Reference
+## 6. Step 4: Product Listing Module (Owner) (`owner/`) Testing Guide
+
+### 6.1 Architecture & Security Implemented
+1. **Product OOP Entity ([`classes/Product.php`](file:///c:/Users/Dell/Desktop/Projects/ORMS/classes/Product.php)):**
+   - Implements all methods from Synopsis Section 11.1: `checkAvailability($start, $end)`, `updateStatus($status)`, `getImages()`, `getPrimaryImagePath()`, `save()`, `addImage()`, `findById()`, `findByOwner()`.
+   - Strictly enforces CHECK constraints (`rent_per_day > 0`, `security_deposit >= 0`) at both OOP and MySQL levels.
+2. **Owner Entity Integration ([`classes/Owner.php`](file:///c:/Users/Dell/Desktop/Projects/ORMS/classes/Owner.php)):**
+   - `addProduct(...)`: Persists product and associates multi-image records within an atomic transaction.
+   - `editProduct(...)`: Verifies product ownership before saving updates (`owner_id === current_user_id()`).
+   - `calculateTotalEarnings()`: Computes completed rental earnings directly from `TRANSACTION`.
+3. **Multi-Image Magic-Byte Validation & Randomization:**
+   - Validates each uploaded file using `finfo_file()` to inspect genuine binary magic bytes for JPEG, PNG, and WEBP.
+   - Saves files to `uploads/products/` with cryptographically random filenames (`prod_[16-bytes-hex].[ext]`) to prevent path traversal or filename collision attacks (Prompt Guide Section 5 Rule 4 & Section 7).
+   - Automatically marks the first image as Primary (`is_primary = 1`), and subsequent images as Secondary (`is_primary = 0`).
+4. **Owner Inventory Dashboard ([`owner/dashboard.php`](file:///c:/Users/Dell/Desktop/Projects/ORMS/owner/dashboard.php)):**
+   - Displays dynamic metrics: Total Listings, Available, Rented Out, and Total Earnings.
+   - Interactive inventory table showing primary image thumbnails, category, daily rent, deposit, condition, availability badges (`Available`, `Rented`, `Unavailable`), and quick action links (Edit, Activate/Deactivate).
+
+---
+
+### 6.2 How to Test the Product Listing Module
+
+#### Method A: Automated Test Suite (Instant Verification)
+Run the automated verification script in PowerShell:
+```powershell
+C:\xampp\php\php.exe test_product.php
+```
+Or view the visual dashboard in your browser:
+```
+http://localhost/orms/test_product.php
+```
+**Expected Output:** All 8 automated tests pass with green badges:
+1. `[ PASS ]` Product Model Check Constraint Validation
+2. `[ PASS ]` Multi-Image Magic-Byte Verification (JPEG & PNG binaries)
+3. `[ PASS ]` Product Creation & DB Insertion (`PRODUCT` Table)
+4. `[ PASS ]` `PRODUCT_IMAGES` DB Rows & Files On Disk Check (2 images verified)
+5. `[ PASS ]` `Product::getImages()` & Primary Image Retrieval
+6. `[ PASS ]` `Owner::editProduct()` Update Verification
+7. `[ PASS ]` `checkAvailability()` & `updateStatus()` Logic
+8. `[ PASS ]` `Product::findByOwner()` Inventory Query
+
+---
+
+#### Method B: Manual Interactive Browser Walkthrough
+
+##### Test 1: List a New Product with Multiple Images
+1. Open your browser and log in as an Owner:
+   - Go to: `http://localhost/orms/auth/login.php`
+   - Email: `rahul@example.com`
+   - Password: `Password@123`
+2. Once logged in, click **List New Product** or visit:
+   ```
+   http://localhost/orms/owner/add_product.php
+   ```
+3. Fill in the product details:
+   - **Product Title:** `Sony Alpha A7 III Full Frame Camera Kit`
+   - **Category:** Select `Electronics`
+   - **Detailed Description:** `Includes 28-70mm lens, 2 rechargeable batteries, 128GB high-speed SD card, and carrying case. Ideal for weddings and video shoots.`
+   - **Daily Rent (₹/day):** `850`
+   - **Security Deposit (₹):** `10000`
+   - **Location:** `Indiranagar, Bangalore`
+   - **Condition:** Select `Good` or `New`
+   - **Product Images:** Select **2 or more image files** (JPG or PNG) from your computer.
+4. Click **Publish Product Listing**.
+5. **Expected Result:**
+   - Redirected to `owner/dashboard.php` with a green banner: *"Product ... was listed successfully with 2 images!"*
+   - The product card/row appears in the inventory table showing the primary photo thumbnail, category, ₹850/day rent, ₹10,000 deposit, and green **Available** badge.
+
+##### Test 2: Verify in Database & File System
+1. Open phpMyAdmin (`http://localhost/phpmyadmin/`), select `orms_db`:
+   - Run query: `SELECT * FROM PRODUCT ORDER BY product_id DESC LIMIT 1;` &rarr; Your newly added product row is present.
+   - Run query: `SELECT * FROM PRODUCT_IMAGES WHERE product_id = [NEW_ID];` &rarr; Exactly 2 (or more) image rows with `is_primary = 1` for the first image and `0` for the rest.
+2. In File Explorer, check folder `C:\xampp\htdocs\orms\uploads\products\` &rarr; Notice the randomized filenames (e.g. `prod_...jpg`) corresponding to the database records.
+
+##### Test 3: Edit Product & Manage Photos
+1. In the Owner Dashboard (`owner/dashboard.php`), click **Edit** next to your product or visit:
+   ```
+   http://localhost/orms/owner/edit_product.php?id=[PRODUCT_ID]
+   ```
+2. Verify all current details and photos are pre-loaded.
+3. In the **Current Photos** gallery:
+   - Click **Make Primary** on the second photo &rarr; Notice it now becomes the primary thumbnail.
+   - Test deleting a non-primary photo &rarr; Image is cleanly removed from both database and disk.
+4. Change the **Daily Rent** to `950.00` and change **Condition** to `New`.
+5. Click **Save Changes**.
+6. **Expected Result:**
+   - Redirected to `owner/dashboard.php` with success notification.
+   - Updated daily rate (₹950.00) is reflected on the dashboard table.
+
+##### Test 4: Toggle Availability (Deactivate / Activate)
+1. On `owner/dashboard.php`, click **Deactivate** next to the product.
+2. **Expected Result:**
+   - Status badge turns to amber/gray **Unavailable**.
+   - The button label changes to **Activate**.
+3. Click **Activate** &rarr; Status returns to green **Available**.
+
+---
+
+## 7. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -337,7 +435,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 7. Troubleshooting Common Issues
+## 8. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.
@@ -347,5 +445,8 @@ Save these credentials for future testing during the upcoming modules:
    - Always run the entire file as a single script so `SET FOREIGN_KEY_CHECKS = 0;` runs first.
 4. **File upload error ("File format not allowed"):**
    - Ensure the uploaded file has genuine magic bytes of JPEG (`FF D8 FF`), PNG (`89 50 4E 47`), or PDF (`%PDF`). Renaming a text file to `.jpg` will be rejected by `finfo_file` for security.
+5. **Product images not showing in browser:**
+   - Ensure `uploads/products/` exists and has standard read permissions. Relative paths are stored as `uploads/products/filename.jpg` and resolved via `base_url()`.
+
 
 

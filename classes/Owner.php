@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/BaseUser.php';
+require_once __DIR__ . '/Product.php';
 
 class Owner extends BaseUser {
     private array $products = [];
@@ -68,14 +69,70 @@ class Owner extends BaseUser {
         return $this->totalEarnings;
     }
 
-    public function addProduct(): bool {
-        // Implemented fully in Step 4 (Product Listing Module)
-        return true;
+    public function addProduct(
+        int $categoryId,
+        string $title,
+        string $description,
+        float $rentPerDay,
+        float $securityDeposit,
+        string $location,
+        string $condition = 'Good',
+        array $imagePaths = []
+    ): ?Product {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Owner must be authenticated to add products.");
+        }
+
+        $product = new Product(
+            null,
+            $this->userID,
+            $categoryId,
+            $title,
+            $description,
+            $rentPerDay,
+            $securityDeposit,
+            $location,
+            'Available',
+            $condition
+        );
+
+        if ($product->save()) {
+            foreach ($imagePaths as $idx => $path) {
+                $product->addImage($path, $idx === 0);
+            }
+            $this->products[] = $product;
+            return $product;
+        }
+
+        return null;
     }
 
-    public function editProduct(int $id): bool {
-        // Implemented fully in Step 4
-        return true;
+    public function editProduct(
+        int $id,
+        int $categoryId,
+        string $title,
+        string $description,
+        float $rentPerDay,
+        float $securityDeposit,
+        string $location,
+        string $condition,
+        string $availStatus = 'Available'
+    ): bool {
+        $product = Product::findById($id);
+        if (!$product || $product->getOwnerID() !== $this->userID) {
+            throw new UnauthorizedActionException("You do not have permission to edit this product.");
+        }
+
+        $product->setCategoryID($categoryId);
+        $product->setTitle($title);
+        $product->setDescription($description);
+        $product->setRentPerDay($rentPerDay);
+        $product->setSecurityDeposit($securityDeposit);
+        $product->setLocation($location);
+        $product->setCondition($condition);
+        $product->setAvailStatus($availStatus);
+
+        return $product->save();
     }
 
     public function manageRentalRequest(int $id, string $decision): bool {
