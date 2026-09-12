@@ -13,6 +13,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../classes/Owner.php';
 require_once __DIR__ . '/../classes/Product.php';
+require_once __DIR__ . '/../classes/RentalRequest.php';
 
 require_role('Owner');
 
@@ -21,6 +22,10 @@ $ownerId = (int) current_user_id();
 
 // Fetch Owner's products
 $products = Product::findByOwner($ownerId);
+
+// Fetch Pending Requests
+$pendingRequests = RentalRequest::findByOwner($ownerId, 'Pending');
+$pendingCount = count($pendingRequests);
 
 // Compute Dashboard Metrics
 $totalProducts = count($products);
@@ -53,7 +58,17 @@ require_once __DIR__ . '/../includes/header.php';
             <h1 class="text-3xl font-extrabold mt-3">Welcome, <?= htmlspecialchars(current_user_name()) ?>!</h1>
             <p class="text-blue-200 text-sm mt-1">Manage your rental inventory, monitor product bookings, and track your revenue.</p>
         </div>
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 flex items-center space-x-3">
+            <a href="<?= base_url('owner/manage_requests.php') ?>" 
+               class="inline-flex items-center space-x-2 px-5 py-3.5 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-400/40 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                <span>📬</span>
+                <span>Manage Requests</span>
+                <?php if ($pendingCount > 0): ?>
+                    <span class="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-extrabold text-[10px] ml-1">
+                        <?= $pendingCount ?>
+                    </span>
+                <?php endif; ?>
+            </a>
             <a href="<?= base_url('owner/add_product.php') ?>" 
                class="inline-flex items-center space-x-2 px-6 py-3.5 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg transition">
                 <span>➕</span>
@@ -61,6 +76,19 @@ require_once __DIR__ . '/../includes/header.php';
             </a>
         </div>
     </div>
+
+    <?php if ($pendingCount > 0): ?>
+        <div class="mb-8 p-4 rounded-2xl bg-amber-950/40 border border-amber-600/50 text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
+            <div class="flex items-center space-x-3">
+                <span class="w-3 h-3 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="text-sm font-semibold">You have <strong><?= $pendingCount ?></strong> pending rental request(s) awaiting your decision.</span>
+            </div>
+            <a href="<?= base_url('owner/manage_requests.php?status=Pending') ?>" 
+               class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition self-start sm:self-auto">
+                Review Pending Requests &rarr;
+            </a>
+        </div>
+    <?php endif; ?>
 
     <!-- Metrics Cards Grid -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">

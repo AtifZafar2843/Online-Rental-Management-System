@@ -35,7 +35,7 @@
 | **3** | **Authentication & User Management (`auth/`)** | **COMPLETED** | Register (magic-bytes), Login, Logout, Forgot/Reset password, Dual-Role |
 | **4** | **Product Listing Module (Owner) (`owner/`)** | **COMPLETED** | Multi-image upload (magic-bytes), CRUD, condition, deposit, toggle status |
 | **5** | **Search & Discovery Module (`renter/`, `index.php`)** | **COMPLETED** | Public catalog (Guest), filters (category/price/location), product details |
-| 6 | Rental Request Module (`renter/`, `owner/`) | Pending | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject |
+| **6** | **Rental Request Module (`renter/`, `owner/`)** | **COMPLETED** | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject, free cancel, 3NF compliant |
 | 7 | Financial / Transaction Module (`renter/`) | Pending | Dynamic rental amount calculation, deposit hold/refund |
 | 8 | Fine Module (`owner/`, `admin/`) | Pending | Late return auto-calc, damage fines, deposit deduction |
 | 9 | Review & Rating Module (`renter/`) | Pending | Post-completion check, duplicate review prevention |
@@ -507,11 +507,130 @@ http://localhost/orms/test_search.php
 1. Log in as `rahul@example.com` / `Password@123`.
 2. Open a product that Rahul created (e.g. `http://localhost/orms/renter/product_details.php?id=[RAHUL_PRODUCT_ID]`).
 3. **Expected Result:**
-   - Instead of a rental booking button, the card displays: *"You own this product listing. [Edit Listing Details & Photos]"*.
+    - Instead of a rental booking button, the card displays: *"You own this product listing. [Edit Listing Details & Photos]"*.
 
 ---
 
-## 8. Default Seed Credentials Reference
+## 8. Step 6: Rental Request & Concurrency Module Testing Guide
+
+### 8.1 What Was Built
+1. **`classes/RentalRequest.php`**: Complete entity class with `createWithLock()`, `approve()`, `reject()`, `cancel()`, dynamic runtime calculation methods `getTotalDays()` and `getTotalAmount()`, and static query finders (`findById()`, `findByRenter()`, `findByOwner()`).
+2. **`classes/Notification.php`**: Entity class for database-driven notifications (`create()`, `send()`, `countUnread()`, `findByUser()`, `markAsRead()`, `markAllReadByUser()`).
+3. **`classes/Owner.php` & `classes/Renter.php`**: Integrated with `manageRentalRequest()`, `sendRequest()`, and `cancelRequest()`.
+4. **`renter/request_rental.php`**: Interactive rental booking UI with live JavaScript cost calculator (Days, Rent, Deposit, Total), date pickers, CSRF protection, and atomic booking submission.
+5. **`owner/manage_requests.php`**: Owner decision workspace with status filter tabs (All, Pending, Approved, Active, Completed, Rejected, Cancelled), Approve button, and modal Reject dialog with mandatory reason.
+6. **`renter/my_rentals.php`**: Renter rental history with status filter tabs, action buttons (Proceed to Pay for Step 7, Cancel Booking modal with reason), and dynamic price breakdowns.
+7. **`renter/cancel_request.php`**: Secure POST endpoint for renter cancellations with CSRF verification.
+8. **`notifications/view_notifications.php`**: Notification feed with unread badges, mark single/all as read, and filter by event type.
+9. **`test_rental.php`**: Automated test suite covering 8 critical verification tests, including double-booking concurrency race condition tests and 3NF schema compliance.
+
+---
+
+### 8.2 Automated Verification (Instant Test)
+
+Run the automated verification suite from your project folder:
+
+#### Method A: Via Command Line (CLI)
+```powershell
+C:\xampp\php\php.exe test_rental.php
+```
+
+**Expected CLI Output:**
+```
+=======================================================
+  ORMS Automated Verification — Step 6: Rental Requests
+=======================================================
+1. [ PASS ] 3NF Schema Compliance (No Redundant Computed Columns)
+   -> PASS: Verified RENTAL_REQUEST table conforms to 3NF — total_days and total_amount are NOT stored in the database table and are computed dynamically.
+
+2. [ PASS ] Date Range Validation (Rejects Past & Reversed Dates)
+   -> PASS: InvalidDateRangeException properly thrown for both past dates and end_date <= start_date.
+
+3. [ PASS ] Owner Self-Rental Prevention
+   -> PASS: Owner cannot book their own listing; rejected with ORMSException.
+
+4. [ PASS ] Atomic Rental Request Submission (SELECT ... FOR UPDATE Locking)
+   -> PASS: Request #1 created in 'Pending' status. Dynamic days=4, Dynamic total=₹4800. Owner notified.
+
+5. [ PASS ] Owner Approval Workflow & Status Transition
+   -> PASS: Request #1 transitioned from 'Pending' to 'Approved'. Renter received notification to pay.
+
+6. [ PASS ] Double-Booking Prevention (Overlapping Booking Race Condition)
+   -> PASS: Overlapping dates rejected with ProductUnavailableException ("The product has already been reserved or rented for the selected dates.").
+
+7. [ PASS ] Owner Rejection with Mandatory Reason
+   -> PASS: Request #2 rejected. Reason 'Equipment is reserved for scheduled maintenance.' successfully persisted.
+
+8. [ PASS ] Renter Cancellation Workflow
+   -> PASS: Request #3 cancelled by renter. Reason 'Personal plans changed.' persisted. Owner notified.
+
+-------------------------------------------------------
+OVERALL RESULT: ALL 8 TESTS PASSED! Rental Request module is 100% operational.
+=======================================================
+```
+
+#### Method B: Via Browser
+Open your browser and navigate to:
+```
+http://localhost/orms/test_rental.php
+```
+You will see a Tailwind-styled status dashboard displaying all 8 test badges marked as `PASS` in green.
+
+---
+
+### 8.3 Step-by-Step Manual Browser Walkthrough
+
+##### Test 1: Dynamic Pricing Calculator & Booking Request Submission (Renter)
+1. Log in as Renter: `priya@example.com` / `Password@123`.
+2. Go to Catalog: `http://localhost/orms/renter/search.php`.
+3. Click on any product listed by Rahul (e.g. Camera or MacBook) to view its details.
+4. Click **"Request Rental Booking &rarr;"** (or visit `http://localhost/orms/renter/request_rental.php?product_id=[ID]`).
+5. **Interactive Calculator Test:**
+   - Change the **Start Date** and **End Date**.
+   - Watch the **Price Breakdown** card dynamically update in real time without refreshing the page.
+   - Notice that the rent multiplies by the duration, adds the refundable deposit, and calculates the total payable.
+   - Set an invalid date (e.g., End Date before Start Date) &rarr; The submit button is automatically disabled and warns of invalid range.
+6. Select valid future dates (e.g. 3 days from now for a 4-day rental), type a short message, and click **"Submit Booking Request &rarr;"**.
+7. **Expected Result:**
+   - You are redirected to `http://localhost/orms/renter/my_rentals.php`.
+   - A green notification banner appears: *"Rental request #[ID] submitted successfully! The owner will review your booking."*
+   - The booking card is displayed with an amber **Pending** badge.
+
+##### Test 2: Owner Review & Approval Workflow
+1. Log in as Owner: `rahul@example.com` / `Password@123`.
+2. Go to **Owner Dashboard** (`http://localhost/orms/owner/dashboard.php`).
+   - Notice the amber notification banner: *"You have X pending rental request(s) awaiting your decision."*
+3. Click **"Manage Requests"** in the top navbar or banner (or visit `http://localhost/orms/owner/manage_requests.php`).
+4. Click the **Pending** tab.
+5. You will see Priya's booking card with her requested dates, duration, total amounts, contact details, and message.
+6. Click the green **"✓ Approve"** button and confirm.
+7. **Expected Result:**
+   - The status updates immediately to **Approved**.
+   - A green flash message confirms approval.
+   - The card now displays: *"Awaiting Renter Payment"*.
+
+##### Test 3: Notification Verification
+1. Log back in as Renter: `priya@example.com` / `Password@123`.
+2. Click the 🔔 **Notification Icon** in the top navbar (or visit `http://localhost/orms/notifications/view_notifications.php`).
+3. **Expected Result:**
+   - An unread notification is shown: *"Your rental request for '[Item]' has been approved! Please proceed with payment to confirm your booking."*
+   - Go to `http://localhost/orms/renter/my_rentals.php`.
+   - Priya's booking now displays a blue **Approved** badge and a prominent green **"💳 Proceed to Pay &rarr;"** button (ready for Step 7).
+
+##### Test 4: Concurrency & Double-Booking Prevention Test
+1. While Priya's request is **Approved** for specific dates, try to book the exact same product for overlapping dates (as another renter or via `test_rental.php`).
+2. **Expected Result:**
+   - The system intercepts the transaction during `SELECT ... FOR UPDATE` row inspection and prevents double-booking, throwing a `ProductUnavailableException` ("The product has already been reserved or rented for the selected dates.").
+
+##### Test 5: Rejection and Cancellation Flow
+1. Submit another test request as Renter.
+2. In Owner workspace (`owner/manage_requests.php`), click **"✕ Reject"** &rarr; Enter a decline reason in the modal and submit.
+3. Renter will see the status updated to **Rejected** with the reason displayed.
+4. Submit a third test request as Renter. In `renter/my_rentals.php`, click **"✕ Cancel Request"** &rarr; The booking transitions to **Cancelled** with zero penalty per Section 5 Rule 6.
+
+---
+
+## 9. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -523,7 +642,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 9. Troubleshooting Common Issues
+## 10. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.
@@ -535,6 +654,8 @@ Save these credentials for future testing during the upcoming modules:
    - Ensure the uploaded file has genuine magic bytes of JPEG (`FF D8 FF`), PNG (`89 50 4E 47`), or PDF (`%PDF`). Renaming a text file to `.jpg` will be rejected by `finfo_file` for security.
 5. **Product images not showing in browser:**
    - Ensure `uploads/products/` exists and has standard read permissions. Relative paths are stored as `uploads/products/filename.jpg` and resolved via `base_url()`.
+6. **Booking Error ("The product has already been reserved or rented for the selected dates"):**
+   - This indicates that `SELECT ... FOR UPDATE` concurrency protection is actively working. Check existing bookings under `RENTAL_REQUEST` or choose non-overlapping dates.
 
 
 

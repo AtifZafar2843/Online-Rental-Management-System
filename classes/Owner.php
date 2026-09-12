@@ -135,9 +135,20 @@ class Owner extends BaseUser {
         return $product->save();
     }
 
-    public function manageRentalRequest(int $id, string $decision): bool {
-        // Implemented in Step 6 (Rental Request Module)
-        return true;
+    public function manageRentalRequest(int $id, string $decision, string $reason = ''): bool {
+        require_once __DIR__ . '/RentalRequest.php';
+        $request = RentalRequest::findById($id);
+        if (!$request || $request->getOwnerID() !== $this->userID) {
+            throw new UnauthorizedActionException("You do not have permission to manage this rental request.");
+        }
+
+        if (strtolower($decision) === 'approve') {
+            return $request->approve();
+        } elseif (strtolower($decision) === 'reject') {
+            return $request->reject($reason);
+        }
+
+        return false;
     }
 
     public function confirmReturn(int $requestId): bool {

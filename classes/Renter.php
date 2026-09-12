@@ -66,9 +66,14 @@ class Renter extends BaseUser {
         return $this->totalSpent;
     }
 
-    public function sendRequest(int $productId, string $start, string $end): mixed {
-        // Implemented in Step 6
-        return null;
+    public function sendRequest(int $productId, string $start, string $end, ?string $message = null): RentalRequest {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Renter must be authenticated to submit rental requests.");
+        }
+        require_once __DIR__ . '/RentalRequest.php';
+        $request = RentalRequest::createWithLock($productId, $this->userID, $start, $end, $message);
+        $this->activeRentals[] = $request;
+        return $request;
     }
 
     public function makePayment(int $requestId): mixed {
@@ -76,9 +81,13 @@ class Renter extends BaseUser {
         return null;
     }
 
-    public function cancelRequest(int $requestId): bool {
-        // Implemented in Step 6
-        return true;
+    public function cancelRequest(int $requestId, string $reason = ''): bool {
+        require_once __DIR__ . '/RentalRequest.php';
+        $request = RentalRequest::findById($requestId);
+        if (!$request || $request->getRenterID() !== $this->userID) {
+            throw new UnauthorizedActionException("You do not have permission to cancel this rental request.");
+        }
+        return $request->cancel($reason);
     }
 
     public function submitReview(int $requestId, int $rating, string $comment): mixed {
