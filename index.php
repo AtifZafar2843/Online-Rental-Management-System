@@ -41,8 +41,20 @@ require_once __DIR__ . '/includes/header.php';
             The modern digital platform connecting product owners with trusted renters. Earn from idle assets or rent premium electronics, furniture, and vehicles on demand.
         </p>
 
+        <!-- Quick Search Bar in Hero -->
+        <div class="mt-8 max-w-xl mx-auto">
+            <form action="<?= base_url('renter/search.php') ?>" method="GET" class="flex items-center bg-slate-900/90 border border-slate-700/80 rounded-2xl p-2 shadow-2xl backdrop-blur-md">
+                <span class="pl-3 text-slate-400">🔍</span>
+                <input type="text" name="query" placeholder="Search cameras, laptops, furniture, bikes..." 
+                       class="w-full bg-transparent px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none">
+                <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow transition flex-shrink-0">
+                    Search
+                </button>
+            </form>
+        </div>
+
         <!-- CTA Buttons -->
-        <div class="mt-10 flex flex-wrap justify-center gap-4">
+        <div class="mt-8 flex flex-wrap justify-center gap-4">
             <?php if (!is_logged_in()): ?>
                 <a href="<?= base_url('auth/register.php') ?>" 
                    class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-xl shadow-blue-500/25 transition">

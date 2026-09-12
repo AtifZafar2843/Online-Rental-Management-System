@@ -29,6 +29,9 @@ class Product {
     // Additional helper data
     private ?string $categoryName = null;
     private ?string $ownerName = null;
+    private float $ownerRating = 0.00;
+    private ?string $ownerPhone = null;
+    private ?string $ownerEmail = null;
     private array $images = [];
 
     private PDO $db;
@@ -100,6 +103,15 @@ class Product {
 
     public function getOwnerName(): ?string { return $this->ownerName; }
     public function setOwnerName(string $name): void { $this->ownerName = $name; }
+
+    public function getOwnerRating(): float { return $this->ownerRating; }
+    public function setOwnerRating(float $r): void { $this->ownerRating = $r; }
+
+    public function getOwnerPhone(): ?string { return $this->ownerPhone; }
+    public function setOwnerPhone(?string $p): void { $this->ownerPhone = $p; }
+
+    public function getOwnerEmail(): ?string { return $this->ownerEmail; }
+    public function setOwnerEmail(?string $e): void { $this->ownerEmail = $e; }
 
     /**
      * Check if product is available for booking within the requested date range.
@@ -184,6 +196,38 @@ class Product {
             return $imgs[0]['image_path'];
         }
         return 'assets/img/no-image.svg';
+    }
+
+    /**
+     * Retrieve verified reviews submitted for this product.
+     */
+    public function getReviews(): array {
+        if (!$this->productID) return [];
+
+        $stmt = $this->db->prepare("
+            SELECT r.*, u.name AS reviewer_name 
+            FROM `REVIEW` r 
+            JOIN `USER` u ON r.reviewer_id = u.user_id 
+            WHERE r.product_id = :pid 
+            ORDER BY r.review_date DESC
+        ");
+        $stmt->execute(['pid' => $this->productID]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Calculate average star rating from verified reviews.
+     */
+    public function getAverageRating(): float {
+        if (!$this->productID) return 0.00;
+
+        $stmt = $this->db->prepare("
+            SELECT COALESCE(AVG(rating), 0.00) 
+            FROM `REVIEW` 
+            WHERE product_id = :pid
+        ");
+        $stmt->execute(['pid' => $this->productID]);
+        return round((float) $stmt->fetchColumn(), 1);
     }
 
     /**
@@ -285,7 +329,7 @@ class Product {
     public static function findById(int $id): ?Product {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("
-            SELECT p.*, c.category_name, u.name AS owner_name 
+            SELECT p.*, c.category_name, u.name AS owner_name, u.rating AS owner_rating, u.email AS owner_email, u.phone AS owner_phone 
             FROM `PRODUCT` p 
             JOIN `CATEGORY` c ON p.category_id = c.category_id 
             JOIN `USER` u ON p.owner_id = u.user_id 
@@ -312,6 +356,9 @@ class Product {
         );
         $product->setCategoryName($row['category_name']);
         $product->setOwnerName($row['owner_name']);
+        $product->setOwnerRating((float)($row['owner_rating'] ?? 0.00));
+        $product->setOwnerEmail($row['owner_email'] ?? null);
+        $product->setOwnerPhone($row['owner_phone'] ?? null);
 
         return $product;
     }
@@ -350,5 +397,183 @@ class Product {
             $products[] = $prod;
         }
         return $products;
+    }
+
+    /**
+     * Search and filter products across the public catalog.
+     * Supports keyword search, category, min/max price, location, condition, and status.
+     *
+     * @param array $filters ['query' => '', 'category_id' => int, 'min_price' => float, 'max_price' => float, 'location' => '', 'condition' => '', 'status' => 'Available']
+     * @param string $sortBy 'newest' | 'price_asc' | 'price_desc' | 'title_asc'
+     */
+    public static function search(array $filters = [], string $sortBy = 'newest', int $limit = 20, int $offset = 0): array {
+        $db = Database::getInstance()->getConnection();
+
+        $whereClauses = [];
+        $params = [];
+
+        // Status Filter (default to Available if not explicitly overridden)
+        $status = $filters['status'] ?? 'Available';
+        if ($status !== 'all') {
+            $whereClauses[] = "p.avail_status = :status";
+            $params['status'] = $status;
+        }
+
+        // Keyword Search (Search in title or description)
+        if (!empty($filters['query'])) {
+            $searchTerm = trim((string)$filters['query']);
+            $whereClauses[] = "(p.title LIKE :kw1 OR p.description LIKE :kw2)";
+            $params['kw1'] = "%{$searchTerm}%";
+            $params['kw2'] = "%{$searchTerm}%";
+        }
+
+        // Category Filter
+        if (!empty($filters['category_id'])) {
+            $whereClauses[] = "p.category_id = :cat_id";
+            $params['cat_id'] = (int)$filters['category_id'];
+        }
+
+        // Min Price
+        if (isset($filters['min_price']) && is_numeric($filters['min_price']) && (float)$filters['min_price'] > 0) {
+            $whereClauses[] = "p.rent_per_day >= :min_price";
+            $params['min_price'] = (float)$filters['min_price'];
+        }
+
+        // Max Price
+        if (isset($filters['max_price']) && is_numeric($filters['max_price']) && (float)$filters['max_price'] > 0) {
+            $whereClauses[] = "p.rent_per_day <= :max_price";
+            $params['max_price'] = (float)$filters['max_price'];
+        }
+
+        // Location Filter
+        if (!empty($filters['location'])) {
+            $whereClauses[] = "p.location LIKE :loc";
+            $params['loc'] = "%" . trim((string)$filters['location']) . "%";
+        }
+
+        // Condition Filter
+        if (!empty($filters['condition']) && in_array($filters['condition'], ['New', 'Good', 'Fair', 'Poor'], true)) {
+            $whereClauses[] = "p.condition = :condition";
+            $params['condition'] = $filters['condition'];
+        }
+
+        $whereSql = !empty($whereClauses) ? "WHERE " . implode(" AND ", $whereClauses) : "";
+
+        // Sorting
+        $orderBySql = "ORDER BY p.product_id DESC";
+        switch ($sortBy) {
+            case 'price_asc':
+                $orderBySql = "ORDER BY p.rent_per_day ASC";
+                break;
+            case 'price_desc':
+                $orderBySql = "ORDER BY p.rent_per_day DESC";
+                break;
+            case 'title_asc':
+                $orderBySql = "ORDER BY p.title ASC";
+                break;
+            case 'newest':
+            default:
+                $orderBySql = "ORDER BY p.product_id DESC";
+                break;
+        }
+
+        $limit = max(1, min(100, $limit));
+        $offset = max(0, $offset);
+
+        $sql = "
+            SELECT p.*, c.category_name, u.name AS owner_name, u.rating AS owner_rating,
+                   (SELECT image_path FROM `PRODUCT_IMAGES` pi WHERE pi.product_id = p.product_id ORDER BY pi.is_primary DESC, pi.image_id ASC LIMIT 1) AS primary_image 
+            FROM `PRODUCT` p 
+            JOIN `CATEGORY` c ON p.category_id = c.category_id 
+            JOIN `USER` u ON p.owner_id = u.user_id 
+            {$whereSql} 
+            {$orderBySql} 
+            LIMIT {$limit} OFFSET {$offset}
+        ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll();
+
+        $results = [];
+        foreach ($rows as $row) {
+            $prod = new self(
+                (int)$row['product_id'],
+                (int)$row['owner_id'],
+                (int)$row['category_id'],
+                $row['title'],
+                $row['description'],
+                (float)$row['rent_per_day'],
+                (float)$row['security_deposit'],
+                $row['location'],
+                $row['avail_status'],
+                $row['condition'],
+                $row['listed_date']
+            );
+            $prod->setCategoryName($row['category_name']);
+            $prod->setOwnerName($row['owner_name']);
+            $prod->setOwnerRating((float)($row['owner_rating'] ?? 0.00));
+
+            $results[] = [
+                'product'       => $prod,
+                'primary_image' => $row['primary_image'] ?: 'assets/img/no-image.svg'
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Count total search results matching criteria (for pagination).
+     */
+    public static function countSearch(array $filters = []): int {
+        $db = Database::getInstance()->getConnection();
+
+        $whereClauses = [];
+        $params = [];
+
+        $status = $filters['status'] ?? 'Available';
+        if ($status !== 'all') {
+            $whereClauses[] = "p.avail_status = :status";
+            $params['status'] = $status;
+        }
+
+        if (!empty($filters['query'])) {
+            $searchTerm = trim((string)$filters['query']);
+            $whereClauses[] = "(p.title LIKE :kw1 OR p.description LIKE :kw2)";
+            $params['kw1'] = "%{$searchTerm}%";
+            $params['kw2'] = "%{$searchTerm}%";
+        }
+
+        if (!empty($filters['category_id'])) {
+            $whereClauses[] = "p.category_id = :cat_id";
+            $params['cat_id'] = (int)$filters['category_id'];
+        }
+
+        if (isset($filters['min_price']) && is_numeric($filters['min_price']) && (float)$filters['min_price'] > 0) {
+            $whereClauses[] = "p.rent_per_day >= :min_price";
+            $params['min_price'] = (float)$filters['min_price'];
+        }
+
+        if (isset($filters['max_price']) && is_numeric($filters['max_price']) && (float)$filters['max_price'] > 0) {
+            $whereClauses[] = "p.rent_per_day <= :max_price";
+            $params['max_price'] = (float)$filters['max_price'];
+        }
+
+        if (!empty($filters['location'])) {
+            $whereClauses[] = "p.location LIKE :loc";
+            $params['loc'] = "%" . trim((string)$filters['location']) . "%";
+        }
+
+        if (!empty($filters['condition']) && in_array($filters['condition'], ['New', 'Good', 'Fair', 'Poor'], true)) {
+            $whereClauses[] = "p.condition = :condition";
+            $params['condition'] = $filters['condition'];
+        }
+
+        $whereSql = !empty($whereClauses) ? "WHERE " . implode(" AND ", $whereClauses) : "";
+
+        $stmt = $db->prepare("SELECT COUNT(*) FROM `PRODUCT` p {$whereSql}");
+        $stmt->execute($params);
+        return (int) $stmt->fetchColumn();
     }
 }

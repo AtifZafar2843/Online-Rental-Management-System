@@ -34,7 +34,7 @@
 | **2** | **PDO Connection Class (`config/database.php`)** | **COMPLETED** | Thread-safe Singleton, UTF-8, native prepared statements |
 | **3** | **Authentication & User Management (`auth/`)** | **COMPLETED** | Register (magic-bytes), Login, Logout, Forgot/Reset password, Dual-Role |
 | **4** | **Product Listing Module (Owner) (`owner/`)** | **COMPLETED** | Multi-image upload (magic-bytes), CRUD, condition, deposit, toggle status |
-| 5 | Search & Discovery Module (`renter/`, `index.php`) | Pending | Public catalog, category/price/location filters |
+| **5** | **Search & Discovery Module (`renter/`, `index.php`)** | **COMPLETED** | Public catalog (Guest), filters (category/price/location), product details |
 | 6 | Rental Request Module (`renter/`, `owner/`) | Pending | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject |
 | 7 | Financial / Transaction Module (`renter/`) | Pending | Dynamic rental amount calculation, deposit hold/refund |
 | 8 | Fine Module (`owner/`, `admin/`) | Pending | Late return auto-calc, damage fines, deposit deduction |
@@ -423,7 +423,95 @@ http://localhost/orms/test_product.php
 
 ---
 
-## 7. Default Seed Credentials Reference
+## 7. Step 5: Search & Discovery Module (`renter/`, `index.php`) Testing Guide
+
+### 7.1 Architecture & Features Implemented
+1. **Public Catalog Access ([`renter/search.php`](file:///c:/Users/Dell/Desktop/Projects/ORMS/renter/search.php)):**
+   - Completely open to Guests (unauthenticated visitors) as well as registered Renters and Owners without requiring login.
+   - Live category count, responsive product cards, primary image thumbnail previews, location, and owner trust ratings.
+2. **Multi-Dimensional Filters & Sorting:**
+   - **Fulltext / Keyword Search:** Searches across product title and description.
+   - **Category Filter:** Dynamic dropdown populated from `CATEGORY` table.
+   - **Price Range Filter:** Min and max daily rental price (`rent_per_day`).
+   - **Location Filter:** Matches pickup area or city name.
+   - **Sorting:** Newest First, Rent: Low to High, Rent: High to Low, Title: A to Z.
+3. **Product Detail View ([`renter/product_details.php`](file:///c:/Users/Dell/Desktop/Projects/ORMS/renter/product_details.php)):**
+   - High-resolution interactive photo gallery with clickable thumbnails.
+   - Full specifications, rental terms, and refundable security deposit details.
+   - Verified Customer Reviews section pulling from `REVIEW` table with star ratings.
+   - **Role-Aware Smart CTA:**
+     - **If Guest:** Displays *"Sign In to Rent This Item"* &rarr; Redirects to login while preserving return path (`?redirect=...`).
+     - **If Listing Owner:** Displays *"You own this product listing — Edit Listing Details"*.
+     - **If Logged-in Renter:** Displays *"Request Rental Booking &rarr;"* (ready for Step 6).
+
+---
+
+### 7.2 How to Test the Search & Discovery Module
+
+#### Method A: Automated Test Suite (Instant Verification)
+Run the automated verification script in PowerShell:
+```powershell
+C:\xampp\php\php.exe test_search.php
+```
+Or view the visual dashboard in your browser:
+```
+http://localhost/orms/test_search.php
+```
+**Expected Output:** All 8 automated tests pass with green badges:
+1. `[ PASS ]` Public Guest Access State (No login required)
+2. `[ PASS ]` Test Product Inventory Ingestion (Electronics & Furniture items)
+3. `[ PASS ]` Category Filter Verification
+4. `[ PASS ]` Price Range Filter (`min_price` & `max_price`)
+5. `[ PASS ]` Location Substring Filter
+6. `[ PASS ]` Keyword Query Search
+7. `[ PASS ]` Catalog Sorting (Price: Low to High)
+8. `[ PASS ]` Product Details Entity & Relational Joins
+
+---
+
+#### Method B: Manual Interactive Browser Walkthrough (As Guest)
+
+##### Test 1: Public Catalog & Hero Search (Not Logged In)
+1. If you are currently logged in, click **Logout** in the top navbar.
+2. Visit the homepage:
+   ```
+   http://localhost/orms/index.php
+   ```
+3. Notice the top navbar shows **Sign In** and **Get Started** (confirming you are a Guest).
+4. In the hero section, type a keyword (e.g. `Camera` or `Sony`) into the search bar and press **Search** or Enter.
+5. **Expected Result:**
+   - Redirected to `renter/search.php?query=...` displaying matching items without asking for login.
+
+##### Test 2: Category, Price & Location Filtering
+1. On `http://localhost/orms/renter/search.php`:
+   - Change **Category** dropdown to `Electronics` &rarr; Catalog immediately filters to show only electronic products.
+   - Enter `Min Rent:` `500` and `Max Rent:` `2000` &rarr; Results update to items within this price band.
+   - Enter a location substring (e.g. `Indiranagar` or `Bangalore`) &rarr; Location-matched items appear.
+   - Change **Sort By** to `Rent: Low to High` &rarr; Lowest priced items appear first.
+   - Click **Reset** &rarr; Restores default full catalog view.
+
+##### Test 3: Product Details Page & Gallery Interaction
+1. Click on any product card or title in the catalog, or visit:
+   ```
+   http://localhost/orms/renter/product_details.php?id=[PRODUCT_ID]
+   ```
+2. **Gallery Test:** If the item has multiple photos, click on the thumbnail images below the main photo &rarr; The main view smoothly switches images.
+3. Verify that Daily Rent, Refundable Security Deposit, Condition, Description, and Owner details are displayed.
+4. **Guest Booking Prompt Test:**
+   - Since you are not logged in, you will see a prominent button: **"Sign In to Rent This Item &rarr;"**.
+   - Click this button &rarr; You are taken to `auth/login.php?redirect=...`.
+   - Log in with `priya@example.com` / `Password@123`.
+   - Notice that after login, you are redirected back to the product details page.
+
+##### Test 4: Owner Self-Listing View
+1. Log in as `rahul@example.com` / `Password@123`.
+2. Open a product that Rahul created (e.g. `http://localhost/orms/renter/product_details.php?id=[RAHUL_PRODUCT_ID]`).
+3. **Expected Result:**
+   - Instead of a rental booking button, the card displays: *"You own this product listing. [Edit Listing Details & Photos]"*.
+
+---
+
+## 8. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -435,7 +523,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 8. Troubleshooting Common Issues
+## 9. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.
@@ -447,6 +535,7 @@ Save these credentials for future testing during the upcoming modules:
    - Ensure the uploaded file has genuine magic bytes of JPEG (`FF D8 FF`), PNG (`89 50 4E 47`), or PDF (`%PDF`). Renaming a text file to `.jpg` will be rejected by `finfo_file` for security.
 5. **Product images not showing in browser:**
    - Ensure `uploads/products/` exists and has standard read permissions. Relative paths are stored as `uploads/products/filename.jpg` and resolved via `base_url()`.
+
 
 
 
