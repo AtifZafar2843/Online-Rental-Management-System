@@ -64,32 +64,44 @@ try {
     $renterStmt->execute(['owner_id' => $ownerId]);
     $renterId = (int) ($renterStmt->fetchColumn() ?: 2);
 
-    // Find or create an available test product
-    $prodStmt = $pdo->prepare("SELECT product_id FROM `PRODUCT` WHERE owner_id = :owner_id AND avail_status = 'Available' LIMIT 1");
-    $prodStmt->execute(['owner_id' => $ownerId]);
-    $testProductId = $prodStmt->fetchColumn();
-
-    if (!$testProductId) {
-        $catStmt = $pdo->query("SELECT category_id FROM `CATEGORY` LIMIT 1");
-        $catId = (int) ($catStmt->fetchColumn() ?: 1);
-
-        $newProd = new Product(
-            null,
-            $ownerId,
-            $catId,
-            'Canon EOS R50 Mirrorless Camera (Test Item)',
-            'Compact 4K camera for testing rental request module.',
-            1200.00,
-            5000.00,
-            'Bangalore',
-            'Available',
-            'New'
-        );
-        $newProd->save();
-        $testProductId = $newProd->getProductID();
-    } else {
-        $testProductId = (int) $testProductId;
+    // Clean up previous test suite products and associated requests/notifications
+    $oldProdsStmt = $pdo->query("SELECT product_id FROM `PRODUCT` WHERE title LIKE 'Automated Test Camera%'");
+    $oldProdIds = $oldProdsStmt->fetchAll(PDO::FETCH_COLUMN);
+    if (!empty($oldProdIds)) {
+        $inClause = implode(',', array_map('intval', $oldProdIds));
+        $pdo->exec("DELETE FROM `NOTIFICATION` WHERE related_id IN (SELECT request_id FROM `RENTAL_REQUEST` WHERE product_id IN ($inClause))");
+        $pdo->exec("DELETE FROM `RENTAL_REQUEST` WHERE product_id IN ($inClause)");
+        $pdo->exec("DELETE FROM `PRODUCT_IMAGES` WHERE product_id IN ($inClause)");
+        $pdo->exec("DELETE FROM `PRODUCT` WHERE product_id IN ($inClause)");
     }
+
+    // Also clean up any lingering test requests on general products from earlier versions
+    $cleanOldReqs = $pdo->query("SELECT request_id FROM `RENTAL_REQUEST` WHERE message LIKE 'Testing automated rental booking%' OR message LIKE 'Booking to be%'");
+    $oldReqIds = $cleanOldReqs->fetchAll(PDO::FETCH_COLUMN);
+    if (!empty($oldReqIds)) {
+        $reqInClause = implode(',', array_map('intval', $oldReqIds));
+        $pdo->exec("DELETE FROM `NOTIFICATION` WHERE related_id IN ($reqInClause)");
+        $pdo->exec("DELETE FROM `RENTAL_REQUEST` WHERE request_id IN ($reqInClause)");
+    }
+
+    // Create an isolated, dedicated test product for this test suite run
+    $catStmt = $pdo->query("SELECT category_id FROM `CATEGORY` LIMIT 1");
+    $catId = (int) ($catStmt->fetchColumn() ?: 1);
+
+    $testProd = new Product(
+        null,
+        $ownerId,
+        $catId,
+        'Automated Test Camera ' . bin2hex(random_bytes(4)),
+        'Dedicated temporary item for testing rental request module.',
+        1200.00,
+        5000.00,
+        'Bangalore',
+        'Available',
+        'New'
+    );
+    $testProd->save();
+    $testProductId = (int) $testProd->getProductID();
 
     // -------------------------------------------------------------
     // Test 1: 3NF Database Schema Compliance

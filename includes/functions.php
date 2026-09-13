@@ -57,6 +57,14 @@ function verify_csrf_token(?string $token): bool {
 }
 
 /**
+ * Convenience helper to verify CSRF token from POST request or passed parameter.
+ */
+function csrf_verify(?string $token = null): bool {
+    $tokenToVerify = $token ?? ($_POST['csrf_token'] ?? null);
+    return verify_csrf_token($tokenToVerify);
+}
+
+/**
  * Set a user flash message for display on next request.
  * Types: 'success', 'error', 'info', 'warning'
  */
