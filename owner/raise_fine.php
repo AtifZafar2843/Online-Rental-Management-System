@@ -70,7 +70,7 @@ $lateFee = $isLate ? (float) $lateDetection['amount'] : 0.00;
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf()) {
+    if (!csrf_verify()) {
         $errors[] = "Security validation failed. Please refresh and try again.";
     }
 
@@ -249,29 +249,26 @@ require_once __DIR__ . '/../includes/header.php';
                     </label>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <label class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
-                            <input type="radio" name="condition_assessment" value="Clean" <?= $conditionAssessment === 'Clean' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="sr-only peer">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-bold text-slate-200 peer-checked:text-emerald-400">Clean / Good</span>
-                                <span class="w-4 h-4 rounded-full border border-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 flex items-center justify-center"></span>
+                        <label id="card_clean" class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-bold text-slate-200">Clean / Good</span>
+                                <input type="radio" name="condition_assessment" value="Clean" <?= $conditionAssessment === 'Clean' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-emerald-500 accent-emerald-500 bg-slate-900 border-slate-700 cursor-pointer">
                             </div>
                             <span class="text-[11px] text-slate-400">Normal wear, no damages or missing parts.</span>
                         </label>
 
-                        <label class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
-                            <input type="radio" name="condition_assessment" value="Damage" <?= $conditionAssessment === 'Damage' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="sr-only peer">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-bold text-slate-200 peer-checked:text-amber-400">Damaged</span>
-                                <span class="w-4 h-4 rounded-full border border-slate-700 peer-checked:border-amber-500 peer-checked:bg-amber-500 flex items-center justify-center"></span>
+                        <label id="card_damage" class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-bold text-slate-200">Damaged</span>
+                                <input type="radio" name="condition_assessment" value="Damage" <?= $conditionAssessment === 'Damage' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-amber-500 accent-amber-500 bg-slate-900 border-slate-700 cursor-pointer">
                             </div>
                             <span class="text-[11px] text-slate-400">Repairable scratches, cracks, or broken parts.</span>
                         </label>
 
-                        <label class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
-                            <input type="radio" name="condition_assessment" value="Lost" <?= $conditionAssessment === 'Lost' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="sr-only peer">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-bold text-slate-200 peer-checked:text-rose-400">Lost / Total Loss</span>
-                                <span class="w-4 h-4 rounded-full border border-slate-700 peer-checked:border-rose-500 peer-checked:bg-rose-500 flex items-center justify-center"></span>
+                        <label id="card_lost" class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-bold text-slate-200">Lost / Total Loss</span>
+                                <input type="radio" name="condition_assessment" value="Lost" <?= $conditionAssessment === 'Lost' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-rose-500 accent-rose-500 bg-slate-900 border-slate-700 cursor-pointer">
                             </div>
                             <span class="text-[11px] text-slate-400">Item not returned or completely destroyed.</span>
                         </label>
@@ -370,6 +367,25 @@ function toggleDamageFields() {
             break;
         }
     }
+
+    const cardClean = document.getElementById('card_clean');
+    const cardDamage = document.getElementById('card_damage');
+    const cardLost = document.getElementById('card_lost');
+
+    if (cardClean && cardDamage && cardLost) {
+        cardClean.className = "relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition";
+        cardDamage.className = "relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition";
+        cardLost.className = "relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition";
+
+        if (selected === 'Clean') {
+            cardClean.className = "relative flex flex-col p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/30 cursor-pointer transition shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-500/50";
+        } else if (selected === 'Damage') {
+            cardDamage.className = "relative flex flex-col p-4 rounded-xl border-2 border-amber-500 bg-amber-950/30 cursor-pointer transition shadow-lg shadow-amber-950/40 ring-1 ring-amber-500/50";
+        } else if (selected === 'Lost') {
+            cardLost.className = "relative flex flex-col p-4 rounded-xl border-2 border-rose-500 bg-rose-950/30 cursor-pointer transition shadow-lg shadow-rose-950/40 ring-1 ring-rose-500/50";
+        }
+    }
+
     const box = document.getElementById('damageFieldsBox');
     if (selected === 'Damage' || selected === 'Lost') {
         box.classList.remove('hidden');
@@ -441,7 +457,7 @@ function calculateSummary() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    calculateSummary();
+    toggleDamageFields();
 });
 </script>
 

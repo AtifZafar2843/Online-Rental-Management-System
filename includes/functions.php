@@ -29,6 +29,14 @@ function base_url(string $path = ''): string {
 }
 
 /**
+ * Redirect to a relative path within the application and terminate execution.
+ */
+function redirect(string $path): void {
+    header("Location: " . base_url($path));
+    exit;
+}
+
+/**
  * Generate a cryptographically secure CSRF token and store it in session.
  */
 function generate_csrf_token(): string {
@@ -62,6 +70,13 @@ function verify_csrf_token(?string $token): bool {
 function csrf_verify(?string $token = null): bool {
     $tokenToVerify = $token ?? ($_POST['csrf_token'] ?? null);
     return verify_csrf_token($tokenToVerify);
+}
+
+/**
+ * Alias for csrf_verify.
+ */
+function verify_csrf(?string $token = null): bool {
+    return csrf_verify($token);
 }
 
 /**

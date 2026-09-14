@@ -45,7 +45,7 @@ $errors = [];
 $paymentMode = $_POST['payment_mode'] ?? 'UPI';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf()) {
+    if (!csrf_verify()) {
         $errors[] = "Security validation failed. Please try again.";
     }
 
