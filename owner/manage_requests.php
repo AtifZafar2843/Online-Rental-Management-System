@@ -27,8 +27,6 @@ if (!in_array($statusFilter, ['all', 'Pending', 'Approved', 'Active', 'Completed
 }
 
 $errors = [];
-$successMessage = get_flash('success');
-$errorMessage = get_flash('error');
 
 // Handle POST: Approve or Reject
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -122,21 +120,6 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         <?php endif; ?>
     </div>
-
-    <!-- Feedback Alerts -->
-    <?php if ($successMessage): ?>
-        <div class="mb-6 p-4 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-sm flex items-center space-x-2">
-            <span>✅</span>
-            <span><?= htmlspecialchars($successMessage) ?></span>
-        </div>
-    <?php endif; ?>
-
-    <?php if ($errorMessage): ?>
-        <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-sm flex items-center space-x-2">
-            <span>⚠️</span>
-            <span><?= htmlspecialchars($errorMessage) ?></span>
-        </div>
-    <?php endif; ?>
 
     <?php if (!empty($errors)): ?>
         <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-sm">
@@ -342,6 +325,16 @@ require_once __DIR__ . '/../includes/header.php';
                                 <div class="font-semibold">Active Rental</div>
                                 <div class="text-[10px] text-slate-400 mt-0.5">Due: <?= date('M d, Y', strtotime($req->getEndDate())) ?></div>
                             </div>
+                            <?php 
+                                require_once __DIR__ . '/../classes/Transaction.php';
+                                $ownerTx = Transaction::findByRequest($req->getRequestID());
+                                if ($ownerTx):
+                            ?>
+                                <a href="<?= base_url('renter/receipt.php?id=' . $ownerTx->getTransactionID()) ?>" 
+                                   class="text-xs text-blue-400 hover:text-blue-300 font-medium underline">
+                                    View Receipt &rarr;
+                                </a>
+                            <?php endif; ?>
                         <?php else: ?>
                             <span class="text-xs text-slate-500 italic">No actions pending</span>
                         <?php endif; ?>

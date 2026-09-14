@@ -79,10 +79,28 @@ function set_flash(string $type, string $message): void {
 }
 
 /**
- * Retrieve and clear all queued flash messages.
+ * Retrieve and clear queued flash messages.
+ * If $type is specified, returns the first message string for that type (or null).
+ * If $type is null, returns all messages array for universal display (e.g. in header.php).
  */
-function get_flash(): array {
-    $messages = $_SESSION['flash_messages'] ?? [];
+function get_flash(?string $type = null): array|string|null {
+    if (!isset($_SESSION['flash_messages']) || !is_array($_SESSION['flash_messages'])) {
+        return $type === null ? [] : null;
+    }
+
+    if ($type !== null) {
+        foreach ($_SESSION['flash_messages'] as $key => $flash) {
+            if (isset($flash['type'], $flash['message']) && $flash['type'] === $type) {
+                $msg = (string) $flash['message'];
+                unset($_SESSION['flash_messages'][$key]);
+                $_SESSION['flash_messages'] = array_values($_SESSION['flash_messages']);
+                return $msg;
+            }
+        }
+        return null;
+    }
+
+    $messages = $_SESSION['flash_messages'];
     unset($_SESSION['flash_messages']);
     return $messages;
 }

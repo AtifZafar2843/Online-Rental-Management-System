@@ -3,7 +3,7 @@
 > **Project:** Online Rental Management System (BCSP-064, IGNOU BCA Final Project)  
 > **Student:** Atif Zafar  
 > **Tech Stack:** PHP 8.1+, MySQL 8.0 / MariaDB 10.4+, Apache (XAMPP), Tailwind CSS  
-> **Status:** Updated with **Step 1 (Database Schema & Seed Data)**
+> **Status:** Updated with **Step 7 (Financial / Transaction Module)**
 
 ---
 
@@ -36,7 +36,7 @@
 | **4** | **Product Listing Module (Owner) (`owner/`)** | **COMPLETED** | Multi-image upload (magic-bytes), CRUD, condition, deposit, toggle status |
 | **5** | **Search & Discovery Module (`renter/`, `index.php`)** | **COMPLETED** | Public catalog (Guest), filters (category/price/location), product details |
 | **6** | **Rental Request Module (`renter/`, `owner/`)** | **COMPLETED** | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject, free cancel, 3NF compliant |
-| 7 | Financial / Transaction Module (`renter/`) | Pending | Dynamic rental amount calculation, deposit hold/refund |
+| **7** | **Financial / Transaction Module (`renter/`, `owner/`)** | **COMPLETED** | Dynamic snapshot amounts (Rule 7), escrow deposit, academic simulated checkout, tax receipts |
 | 8 | Fine Module (`owner/`, `admin/`) | Pending | Late return auto-calc, damage fines, deposit deduction |
 | 9 | Review & Rating Module (`renter/`) | Pending | Post-completion check, duplicate review prevention |
 | 10 | Notification System (`notifications/`) | Pending | Event-driven notifications, polling UI |
@@ -630,7 +630,89 @@ You will see a Tailwind-styled status dashboard displaying all 8 test badges mar
 
 ---
 
-## 9. Default Seed Credentials Reference
+## 9. Step 7: Financial & Transaction Module Testing Guide
+
+### 9.1 Automated Test Suite Execution
+
+We have built a dedicated automated verification test suite for Step 7 (`test_transaction.php`) that runs 8 assertions covering atomic payments, 3NF snapshot calculations, deposit escrow holds, lifecycle transitions, automated multi-party notifications, receipt generation, and refund logic.
+
+#### Method A: Via Command Line (PowerShell)
+Run the following command in the project root:
+```powershell
+C:\xampp\php\php.exe test_transaction.php
+```
+**Expected Output:**
+```
+=======================================================
+  ORMS Automated Verification — Step 7: Transactions
+=======================================================
+1. [ PASS ] Unapproved Request Payment Rejection
+2. [ PASS ] Unauthorized Payer Access Control
+3. [ PASS ] Atomic Payment Processing (Transaction Creation)
+4. [ PASS ] Financial Snapshot Calculation & Deposit Escrow (Rule 7)
+5. [ PASS ] Lifecycle Status Transitions (Request -> Active, Product -> Rented)
+6. [ PASS ] Multi-Party Payment Notifications (Rule 11)
+7. [ PASS ] Official Receipt Generation (getReceipt())
+8. [ PASS ] Security Deposit Refund Engine (Rule 8 Clean Return)
+-------------------------------------------------------
+OVERALL RESULT: ALL 8 TESTS PASSED!
+=======================================================
+```
+
+#### Method B: Via Web Browser
+Open your browser and navigate to:
+```
+http://localhost/orms/test_transaction.php
+```
+You will see an emerald badge: **"Ready for Step 8"** with all 8 tests passing with clean green badges.
+
+---
+
+### 9.2 Manual End-to-End Walkthrough (Renter & Owner Flow)
+
+##### Test 1: Payment Checkout Flow (Renter End)
+1. Log in as Renter: `priya@example.com` / `Password@123`.
+2. Ensure you have an **Approved** rental request (if not, request any item and approve it using `rahul@example.com` in `owner/manage_requests.php`).
+3. Navigate to **My Rentals** (`http://localhost/orms/renter/my_rentals.php`).
+4. Look for the card with the blue **Approved** badge.
+5. Click the green **"💳 Proceed to Pay &rarr;"** button.
+6. You will be redirected to the secure checkout page: `http://localhost/orms/renter/pay.php?request_id=...`
+7. Verify the itemized breakdown:
+   - Rental Charges: `Number of Days × Rent Per Day`
+   - Refundable Security Deposit: Held in Escrow
+   - **Total Payable Amount** = Rental Charges + Deposit
+8. Select an Academic Payment Mode (e.g., **UPI / QR Code**, **Debit Card**, **Credit Card**, or **Net Banking**).
+9. Click **"Confirm & Complete Payment"**.
+10. **Expected Result:**
+    - Payment is atomically processed within a database transaction.
+    - Renter is redirected to the official Tax & Rental Receipt (`renter/receipt.php`).
+    - The booking status transitions to **Active**.
+    - The product availability transitions to **Rented**.
+
+##### Test 2: Official Printable Invoice / Receipt Verification
+1. On the Receipt page (`renter/receipt.php?request_id=...`):
+   - Notice the unique receipt number (e.g., `ORMS-REC-000001`).
+   - Check the transaction timestamp, payment method, payer details, and lender details.
+   - Verify the itemized table displays the rent breakdown and deposit escrow term.
+   - Click the **"🖨️ Print / Download PDF"** button (triggers browser print dialog with print-optimized CSS).
+2. Go back to **My Rentals** (`renter/my_rentals.php`).
+   - The booking now shows an active green **Active** badge.
+   - A new button **"📄 View Receipt"** is displayed linking directly to the invoice.
+
+##### Test 3: Owner Financial Ledger & Earnings Review
+1. Log in as Owner: `rahul@example.com` / `Password@123`.
+2. Go to **Owner Earnings** (`http://localhost/orms/owner/earnings.php`) or click **Earnings** in the top navbar.
+3. **Expected Result:**
+   - **Lifetime Gross Earnings** metric card correctly sums rental charges earned.
+   - **Active Security Deposits** card tracks escrow funds held securely until item return.
+   - **Completed Transactions** count card updates.
+   - The **Transaction History Table** lists the transaction with date, receipt link, product name, payer, rental rent, and escrow deposit status (`Held`).
+4. Go to **Manage Requests** (`owner/manage_requests.php`).
+   - Under the **Active** tab, the booking appears with an **"Active & Paid"** badge and a **"Receipt"** link.
+
+---
+
+## 10. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -642,7 +724,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 10. Troubleshooting Common Issues
+## 11. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.

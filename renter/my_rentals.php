@@ -48,9 +48,6 @@ foreach ($allRequests as $r) {
     }
 }
 
-$successMessage = get_flash('success');
-$errorMessage = get_flash('error');
-
 $pageTitle = 'My Rental Bookings — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -80,21 +77,6 @@ require_once __DIR__ . '/../includes/header.php';
             <span>Explore More Items</span>
         </a>
     </div>
-
-    <!-- Feedback Alerts -->
-    <?php if ($successMessage): ?>
-        <div class="mb-6 p-4 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-sm flex items-center space-x-2">
-            <span>✅</span>
-            <span><?= htmlspecialchars($successMessage) ?></span>
-        </div>
-    <?php endif; ?>
-
-    <?php if ($errorMessage): ?>
-        <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-sm flex items-center space-x-2">
-            <span>⚠️</span>
-            <span><?= htmlspecialchars($errorMessage) ?></span>
-        </div>
-    <?php endif; ?>
 
     <!-- Filter Tabs -->
     <div class="flex items-center space-x-2 overflow-x-auto pb-4 mb-8 border-b border-slate-800 scrollbar-thin">
@@ -276,6 +258,16 @@ require_once __DIR__ . '/../includes/header.php';
                                 <div class="font-semibold">Currently Active</div>
                                 <div class="text-[10px] text-slate-400 mt-0.5">Return by <?= date('M d, Y', strtotime($req->getEndDate())) ?></div>
                             </div>
+                            <?php 
+                                require_once __DIR__ . '/../classes/Transaction.php';
+                                $activeTx = Transaction::findByRequest($req->getRequestID());
+                                if ($activeTx):
+                            ?>
+                                <a href="<?= base_url('renter/receipt.php?id=' . $activeTx->getTransactionID()) ?>" 
+                                   class="text-xs text-blue-400 hover:text-blue-300 font-medium underline">
+                                    View Receipt &rarr;
+                                </a>
+                            <?php endif; ?>
 
                         <?php elseif ($st === 'Completed'): ?>
                             <a href="<?= base_url('renter/submit_review.php?request_id=' . $req->getRequestID()) ?>" 

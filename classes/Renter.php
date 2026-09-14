@@ -76,9 +76,12 @@ class Renter extends BaseUser {
         return $request;
     }
 
-    public function makePayment(int $requestId): mixed {
-        // Implemented in Step 7
-        return null;
+    public function makePayment(int $requestId, string $paymentMode = 'UPI'): Transaction {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Renter must be authenticated to process payment.");
+        }
+        require_once __DIR__ . '/Transaction.php';
+        return Transaction::process($requestId, $this->userID, $paymentMode);
     }
 
     public function cancelRequest(int $requestId, string $reason = ''): bool {

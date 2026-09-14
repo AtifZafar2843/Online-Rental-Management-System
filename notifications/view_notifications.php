@@ -46,8 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_single_read'])) 
 $notifications = Notification::findByUser($userId, 50);
 $unreadCount = Notification::countUnread($userId);
 
-$flashSuccess = get_flash('success');
-
 $pageTitle = 'Notifications — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -83,13 +81,6 @@ require_once __DIR__ . '/../includes/header.php';
             </form>
         <?php endif; ?>
     </div>
-
-    <?php if ($flashSuccess): ?>
-        <div class="mb-6 p-4 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-sm flex items-center space-x-2">
-            <span>✅</span>
-            <span><?= htmlspecialchars($flashSuccess) ?></span>
-        </div>
-    <?php endif; ?>
 
     <!-- Notifications Feed -->
     <?php if (empty($notifications)): ?>
