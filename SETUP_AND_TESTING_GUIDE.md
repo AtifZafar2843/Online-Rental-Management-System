@@ -3,7 +3,7 @@
 > **Project:** Online Rental Management System (BCSP-064, IGNOU BCA Final Project)  
 > **Student:** Atif Zafar  
 > **Tech Stack:** PHP 8.1+, MySQL 8.0 / MariaDB 10.4+, Apache (XAMPP), Tailwind CSS  
-> **Status:** Updated with **Step 7 (Financial / Transaction Module)**
+> **Status:** Updated with **Step 8 (Fine & Return Management Module)**
 
 ---
 
@@ -37,7 +37,7 @@
 | **5** | **Search & Discovery Module (`renter/`, `index.php`)** | **COMPLETED** | Public catalog (Guest), filters (category/price/location), product details |
 | **6** | **Rental Request Module (`renter/`, `owner/`)** | **COMPLETED** | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject, free cancel, 3NF compliant |
 | **7** | **Financial / Transaction Module (`renter/`, `owner/`)** | **COMPLETED** | Dynamic snapshot amounts (Rule 7), escrow deposit, academic simulated checkout, tax receipts |
-| 8 | Fine Module (`owner/`, `admin/`) | Pending | Late return auto-calc, damage fines, deposit deduction |
+| **8** | **Fine Module (`owner/`, `admin/`, `renter/`)** | **COMPLETED** | Late auto-detection, Rule 9 2× deposit cap, Rule 8 deposit deductions, Rule 12 auto-refund |
 | 9 | Review & Rating Module (`renter/`) | Pending | Post-completion check, duplicate review prevention |
 | 10 | Notification System (`notifications/`) | Pending | Event-driven notifications, polling UI |
 | 11 | Dispute & Admin Management (`admin/`) | Pending | Dispute resolution, fine rate config, reports |
@@ -712,7 +712,97 @@ You will see an emerald badge: **"Ready for Step 8"** with all 8 tests passing w
 
 ---
 
-## 10. Default Seed Credentials Reference
+## 10. Step 8: Fine & Return Management Module Testing Guide
+
+### 10.1 Automated Test Suite Execution
+
+We have built a dedicated automated verification test suite for Step 8 (`test_fine.php`) covering 8 critical test cases: late return auto-detection, Rule 9 2× deposit statutory cap, clean return 100% deposit refund, fine $\le$ deposit deduction, fine $>$ deposit forfeiture with excess unpaid balance, renter fine payment via `payFine()`, security access controls, and Rule 12 7-day auto-refund timeout.
+
+#### Method A: Via Command Line (PowerShell)
+Run the following command in the project root:
+```powershell
+C:\xampp\php\php.exe test_fine.php
+```
+**Expected Output:**
+```
+=======================================================
+  ORMS Automated Verification — Step 8: Fine Module
+=======================================================
+1. [ PASS ] Late Return Formula & Calculation
+2. [ PASS ] Statutory Maximum Fine Cap Enforcement (Rule 9)
+3. [ PASS ] Clean Return Execution (100% Escrow Deposit Refund)
+4. [ PASS ] Fine <= Deposit Deduction (Partial Refund per Rule 8)
+5. [ PASS ] Fine > Deposit Handling (Deposit Forfeited & Excess Unpaid)
+6. [ PASS ] Renter Payment of Outstanding Fine (payFine())
+7. [ PASS ] Security & Authorization Access Control
+8. [ PASS ] Rule 12 Auto-Refund 7-Day Timeout Engine
+-------------------------------------------------------
+OVERALL RESULT: ALL 8 TESTS PASSED! Fine & Return module is 100% operational.
+=======================================================
+```
+
+#### Method B: Via Web Browser
+Open your browser and navigate to:
+```
+http://localhost/orms/test_fine.php
+```
+You will see an emerald badge: **"Ready for Step 9"** with all 8 tests passing with clean green badges.
+
+---
+
+### 10.2 Manual End-to-End Walkthrough (Owner, Renter & Admin Flows)
+
+##### Test 1: Clean Return Confirmation (100% Full Deposit Refund)
+1. Log in as Owner: `rahul@example.com` / `Password@123`.
+2. Go to **Manage Requests** (`http://localhost/orms/owner/manage_requests.php?status=Active`).
+3. Under an active rental card, click the blue button **"📦 Confirm Return"**.
+4. You will be redirected to the assessment page: `http://localhost/orms/owner/raise_fine.php?request_id=...`
+5. Keep the actual return date as today (or within scheduled dates) and select condition **"Clean / Good"**.
+6. Note the settlement preview showing **Net Refund to Renter: 100% of Security Deposit**.
+7. Click **"✓ Confirm Return & Finalize Settlement"**.
+8. **Expected Result:**
+   - Green flash confirmation message.
+   - Rental status transitions to **Completed**.
+   - Product status transitions back to **Available**.
+   - Transaction deposit status transitions to **Refunded**.
+   - Notifications sent to both Renter and Owner.
+
+##### Test 2: Overdue Return Assessment (Rule 9 Fine Calculation & Cap)
+1. On an active rental, navigate to `owner/raise_fine.php?request_id=...`.
+2. Pick an actual return date that is 3 days past the scheduled `end_date`.
+3. **Expected Result:**
+   - The late detection alert activates immediately: shows `3 Day(s) Late × ₹150.00/day = ₹450.00`.
+   - The fine preview updates in real-time.
+   - If test dates are pushed 20+ days into the future, verify the cap message: *(Capped at 2× Security Deposit)*.
+
+##### Test 3: Damage Assessment & Deposit Deduction (Rule 8)
+1. On the return page (`owner/raise_fine.php?request_id=...`), select condition radio **"Damaged"**.
+2. An assessment panel slides open. Enter assessed repair cost (e.g. ₹500) and notes.
+3. Observe the live settlement breakdown:
+   - Total Assessed Fines = Late Fee + Damage Fee.
+   - If Total Fine $\le$ Deposit: Net Refund = Deposit - Total Fine. Deposit status becomes **Partially_Refunded**.
+   - If Total Fine $>$ Deposit: Deposit is **Forfeited**. Net Refund is ₹0. Renter owes remaining balance with status **Unpaid**.
+4. Submit the form.
+5. In **My Rentals** (`renter/my_rentals.php`), Renter Priya will see the detailed breakdown. If there is an unpaid excess balance, a red **"⚠️ Pay Fine"** button is displayed.
+6. Clicking **Pay Fine** opens `renter/pay_fine.php`, where Priya can settle the balance using simulated UPI/Cards.
+
+##### Test 4: Admin Daily Late Rate Configuration
+1. Log in as Admin: `admin` / `Admin@123`.
+2. Go to `http://localhost/orms/admin/configure_fine_rate.php`.
+3. Update the daily late rate (e.g. from ₹150.00 to ₹200.00 / day).
+4. Click **"💾 Save Configuration"**.
+5. The new rate is persisted in `config/fine_settings.json` and will be applied to all future late return calculations.
+
+##### Test 5: Rule 12 Auto-Refund Timeout Script
+1. Run the auto-refund scheduled task:
+   ```powershell
+   C:\xampp\php\php.exe scripts/auto_refund_timeout.php
+   ```
+2. Any active rentals where `end_date` is older than 7 days without owner confirmation are automatically processed with 100% full deposit refunds.
+
+---
+
+## 11. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -724,7 +814,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 11. Troubleshooting Common Issues
+## 12. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.

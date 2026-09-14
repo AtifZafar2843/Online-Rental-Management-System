@@ -98,9 +98,16 @@ class Renter extends BaseUser {
         return null;
     }
 
-    public function payFine(int $fineId): bool {
-        // Implemented in Step 8
-        return true;
+    public function payFine(int $fineId, string $paymentMode = 'UPI'): bool {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Renter must be authenticated to pay fines.");
+        }
+        require_once __DIR__ . '/Fine.php';
+        $fine = Fine::findById($fineId);
+        if (!$fine || $fine->getRenterID() !== $this->userID) {
+            throw new UnauthorizedActionException("You are not authorized to pay this fine.");
+        }
+        return $fine->processPay($paymentMode);
     }
 
     public function fileDispute(int $requestId, string $reason): mixed {

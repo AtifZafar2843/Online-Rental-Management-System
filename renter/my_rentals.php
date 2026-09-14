@@ -270,6 +270,42 @@ require_once __DIR__ . '/../includes/header.php';
                             <?php endif; ?>
 
                         <?php elseif ($st === 'Completed'): ?>
+                            <?php
+                                require_once __DIR__ . '/../classes/Transaction.php';
+                                require_once __DIR__ . '/../classes/Fine.php';
+                                $compTx = Transaction::findByRequest($req->getRequestID());
+                                $fines = Fine::findByRequest($req->getRequestID());
+                            ?>
+                            <div class="text-center px-4 py-2 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
+                                <div class="font-bold text-emerald-400">Rental Completed</div>
+                                <?php if ($compTx): ?>
+                                    <div class="text-[10px] text-slate-400">
+                                        Deposit: <span class="text-slate-200 font-semibold"><?= str_replace('_', ' ', $compTx->getDepositStatus()) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <?php foreach ($fines as $fn): ?>
+                                <?php if ($fn->getStatus() === 'Unpaid'): ?>
+                                    <a href="<?= base_url('renter/pay_fine.php?fine_id=' . $fn->getFineID()) ?>" 
+                                       class="w-full sm:w-auto px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-rose-600/25 transition flex items-center justify-center space-x-1.5 animate-pulse">
+                                        <span>⚠️</span>
+                                        <span>Pay Fine ₹<?= number_format($fn->getAmount(), 2) ?></span>
+                                    </a>
+                                <?php else: ?>
+                                    <div class="text-[10px] px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                                        Fine: ₹<?= number_format($fn->getAmount(), 2) ?> (<?= str_replace('_', ' ', $fn->getStatus()) ?>)
+                                    </div>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+
+                            <?php if ($compTx): ?>
+                                <a href="<?= base_url('renter/receipt.php?id=' . $compTx->getTransactionID()) ?>" 
+                                   class="text-xs text-blue-400 hover:text-blue-300 font-medium underline">
+                                    View Receipt &rarr;
+                                </a>
+                            <?php endif; ?>
+
                             <a href="<?= base_url('renter/submit_review.php?request_id=' . $req->getRequestID()) ?>" 
                                class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold text-xs rounded-xl border border-slate-700 transition flex items-center space-x-1">
                                 <span>⭐</span>

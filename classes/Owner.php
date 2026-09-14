@@ -151,13 +151,34 @@ class Owner extends BaseUser {
         return false;
     }
 
-    public function confirmReturn(int $requestId): bool {
-        // Implemented in Step 7 / 8
-        return true;
+    public function confirmReturn(int $requestId, ?string $actualReturnDate = null): bool {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Owner must be authenticated to confirm return.");
+        }
+        require_once __DIR__ . '/Fine.php';
+        $result = Fine::processReturnAndFine(
+            $requestId,
+            $this->userID,
+            null,
+            0.00,
+            'Clean return confirmed by owner',
+            $actualReturnDate
+        );
+        return (bool) ($result['success'] ?? false);
     }
 
-    public function raiseFine(int $requestId, string $type, float $amount): mixed {
-        // Implemented in Step 8 (Fine Module)
-        return null;
+    public function raiseFine(int $requestId, string $type, float $amount, ?string $reason = '', ?string $actualReturnDate = null): array {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Owner must be authenticated to raise fines.");
+        }
+        require_once __DIR__ . '/Fine.php';
+        return Fine::processReturnAndFine(
+            $requestId,
+            $this->userID,
+            $type,
+            $amount,
+            $reason,
+            $actualReturnDate
+        );
     }
 }

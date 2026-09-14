@@ -325,6 +325,11 @@ require_once __DIR__ . '/../includes/header.php';
                                 <div class="font-semibold">Active Rental</div>
                                 <div class="text-[10px] text-slate-400 mt-0.5">Due: <?= date('M d, Y', strtotime($req->getEndDate())) ?></div>
                             </div>
+                            <a href="<?= base_url('owner/raise_fine.php?request_id=' . $req->getRequestID()) ?>" 
+                               class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-blue-600/20 transition flex items-center justify-center space-x-1.5">
+                                <span>📦</span>
+                                <span>Confirm Return</span>
+                            </a>
                             <?php 
                                 require_once __DIR__ . '/../classes/Transaction.php';
                                 $ownerTx = Transaction::findByRequest($req->getRequestID());

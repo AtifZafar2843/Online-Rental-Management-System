@@ -112,7 +112,8 @@ class Admin extends BaseUser {
     }
 
     public function configureFineRate(float $rate): void {
-        // Fine rate configuration
+        require_once __DIR__ . '/../config/fine_config.php';
+        set_fine_rate($rate);
     }
 
     public function resolveDispute(int $disputeId, string $notes): bool {
