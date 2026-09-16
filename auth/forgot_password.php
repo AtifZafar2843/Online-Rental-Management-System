@@ -53,26 +53,22 @@ $pageTitle = 'Forgot Password — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="py-16 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+<div class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
+    <div class="bg-white border border-stone-200/80 rounded-3xl shadow-soft overflow-hidden">
         <!-- Header Banner -->
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-8 text-center border-b border-slate-800">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center mb-3 shadow-inner">
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-white tracking-tight">Reset Password</h2>
-            <p class="mt-1 text-xs text-blue-200">Enter your email to receive a secure reset link</p>
+        <div class="p-8 pb-6 text-center border-b border-stone-100 bg-[#FAF8F5]">
+            <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-9 mx-auto mb-3 object-contain">
+            <h2 class="font-display text-2xl font-bold text-midnight tracking-tight">Reset Password</h2>
+            <p class="mt-1 text-xs text-stone-500">Enter your registered email to receive a secure password reset link</p>
         </div>
 
         <div class="p-8">
             <!-- Errors Alert -->
             <?php if (!empty($errors)): ?>
-                <div class="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-600/70 text-rose-200 text-xs space-y-1">
+                <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
                     <?php foreach ($errors as $error): ?>
                         <div class="flex items-center space-x-2">
-                            <span>⚠️</span>
+                            <i class="ri-error-warning-fill text-rose-500 text-base flex-shrink-0"></i>
                             <span><?= htmlspecialchars($error) ?></span>
                         </div>
                     <?php endforeach; ?>
@@ -81,23 +77,24 @@ require_once __DIR__ . '/../includes/header.php';
 
             <!-- Success Notification -->
             <?php if (!empty($successMessage)): ?>
-                <div class="mb-6 p-4 rounded-xl bg-emerald-950/80 border border-emerald-600/70 text-emerald-200 text-xs space-y-3">
-                    <div class="flex items-center space-x-2 font-semibold text-emerald-300">
-                        <span>✅</span>
+                <div class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs space-y-3">
+                    <div class="flex items-center space-x-2 font-semibold text-emerald-900">
+                        <i class="ri-checkbox-circle-fill text-emerald-600 text-base flex-shrink-0"></i>
                         <span><?= htmlspecialchars($successMessage) ?></span>
                     </div>
 
                     <?php if (!empty($generatedResetLink)): ?>
-                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 text-slate-300 space-y-2">
-                            <span class="block text-[11px] text-blue-400 font-semibold uppercase tracking-wider">
-                                Direct Reset Link (Testing Simulation):
+                        <div class="p-3.5 bg-[#FAF8F5] rounded-2xl border border-stone-200/80 text-stone-700 space-y-2">
+                            <span class="block text-[11px] text-stone-500 font-semibold uppercase tracking-wider">
+                                Direct Reset Link:
                             </span>
-                            <a href="<?= htmlspecialchars($generatedResetLink) ?>" class="text-xs text-indigo-400 hover:text-indigo-300 break-all underline">
+                            <a href="<?= htmlspecialchars($generatedResetLink) ?>" class="text-xs text-coral hover:text-coral-600 break-all underline font-medium block">
                                 <?= htmlspecialchars($generatedResetLink) ?>
                             </a>
                             <div class="pt-2">
-                                <a href="<?= htmlspecialchars($generatedResetLink) ?>" class="inline-block px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition">
-                                    Click here to Reset Password Now &rarr;
+                                <a href="<?= htmlspecialchars($generatedResetLink) ?>" class="inline-flex items-center space-x-1.5 px-4 py-2 bg-coral hover:bg-coral-600 text-white rounded-full text-xs font-semibold shadow-glow-coral transition">
+                                    <span>Reset Password Now</span>
+                                    <i class="ri-arrow-right-line"></i>
                                 </a>
                             </div>
                         </div>
@@ -109,26 +106,32 @@ require_once __DIR__ . '/../includes/header.php';
                 <?= csrf_field() ?>
 
                 <div>
-                    <label for="email" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                    <label for="email" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
                         Registered Email Address
                     </label>
-                    <input type="email" id="email" name="email" required autofocus
-                           value="<?= htmlspecialchars($email) ?>"
-                           placeholder="you@example.com"
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                            <i class="ri-mail-line text-base"></i>
+                        </span>
+                        <input type="email" id="email" name="email" required autofocus
+                               value="<?= htmlspecialchars($email) ?>"
+                               placeholder="you@example.com"
+                               class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                    </div>
                 </div>
 
-                <div>
+                <div class="pt-2">
                     <button type="submit" 
-                            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/25 transition duration-150">
-                        Generate Reset Link
+                            class="w-full bg-coral hover:bg-coral-600 text-white font-semibold py-3.5 px-6 rounded-full shadow-glow-coral transition duration-150 transform hover:-translate-y-0.5">
+                        Generate Reset Link &rarr;
                     </button>
                 </div>
             </form>
 
-            <div class="text-center mt-6 pt-4 border-t border-slate-800">
-                <a href="<?= base_url('auth/login.php') ?>" class="text-xs text-slate-400 hover:text-white transition">
-                    &larr; Back to Sign In
+            <div class="text-center mt-6 pt-4 border-t border-stone-100">
+                <a href="<?= base_url('auth/login.php') ?>" class="text-xs text-stone-500 hover:text-midnight transition inline-flex items-center space-x-1 font-medium">
+                    <i class="ri-arrow-left-line"></i>
+                    <span>Back to Sign In</span>
                 </a>
             </div>
         </div>

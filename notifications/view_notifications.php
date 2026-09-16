@@ -83,22 +83,22 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <!-- Breadcrumb -->
-    <nav class="flex text-xs text-slate-400 mb-6" aria-label="Breadcrumb">
+    <nav class="flex text-xs text-stone-400 mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2">
-            <li><a href="<?= base_url('index.php') ?>" class="hover:text-white transition">Home</a></li>
+            <li><a href="<?= base_url('index.php') ?>" class="hover:text-midnight transition">Home</a></li>
             <li><span>/</span></li>
-            <li class="text-slate-200 font-semibold">Notification Center</li>
+            <li class="text-stone-700 font-semibold">Notification Center</li>
         </ol>
     </nav>
 
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
-                <span>🔔</span>
+            <h1 class="font-display text-2xl sm:text-3xl font-bold text-midnight tracking-tight flex items-center space-x-3">
+                <i class="ri-notification-3-line text-coral"></i>
                 <span>Notification Center</span>
             </h1>
-            <p class="text-sm text-slate-400 mt-1">
+            <p class="text-sm text-stone-500 mt-1">
                 Real-time automated alerts for rental requests, payment confirmations, fines, returns, and disputes.
             </p>
         </div>
@@ -109,8 +109,8 @@ require_once __DIR__ . '/../includes/header.php';
                     <?= csrf_field() ?>
                     <input type="hidden" name="mark_all_read" value="1">
                     <button type="submit" 
-                            class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold rounded-xl border border-slate-700 transition shadow flex items-center space-x-2">
-                        <span>✓</span>
+                            class="px-4 py-2 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold rounded-full border border-stone-200/80 transition shadow-soft flex items-center space-x-2">
+                        <i class="ri-check-double-line text-emerald-600 text-sm"></i>
                         <span>Mark All as Read (<?= $unreadCount ?>)</span>
                     </button>
                 </form>
@@ -119,42 +119,41 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 
     <!-- Filters & Tabs -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div class="bg-white border border-stone-200/80 rounded-2xl p-3 sm:p-4 mb-6 shadow-soft flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <!-- Type Filter Tabs -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <?php 
                 $tabs = [
-                    'All'      => ['label' => 'All', 'icon' => '📁'],
-                    'Rental'   => ['label' => 'Rentals', 'icon' => '📦'],
-                    'Payment'  => ['label' => 'Payments', 'icon' => '💳'],
-                    'Fine'     => ['label' => 'Fines', 'icon' => '⚠️'],
-                    'Dispute'  => ['label' => 'Disputes', 'icon' => '⚖️'],
-                    'System'   => ['label' => 'System', 'icon' => '🔔']
+                    'All'      => ['label' => 'All', 'icon' => 'ri-stack-line'],
+                    'Rental'   => ['label' => 'Rentals', 'icon' => 'ri-box-3-line'],
+                    'Payment'  => ['label' => 'Payments', 'icon' => 'ri-bank-card-line'],
+                    'Fine'     => ['label' => 'Fines', 'icon' => 'ri-alert-line'],
+                    'Dispute'  => ['label' => 'Disputes', 'icon' => 'ri-scales-3-line'],
+                    'System'   => ['label' => 'System', 'icon' => 'ri-notification-3-line']
                 ];
                 foreach ($tabs as $key => $tab): 
                     $isActive = ($selectedType === $key);
                     $url = base_url('notifications/view_notifications.php?type=' . urlencode($key) . ($unreadOnly ? '&unread=1' : ''));
             ?>
                 <a href="<?= $url ?>" 
-                   class="px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 <?= $isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800' ?>">
-                    <span><?= $tab['icon'] ?></span>
+                   class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition flex items-center space-x-1.5 <?= $isActive ? 'bg-midnight text-white shadow-sm' : 'bg-stone-50 text-stone-600 hover:text-midnight hover:bg-stone-100' ?>">
+                    <i class="<?= $tab['icon'] ?>"></i>
                     <span><?= $tab['label'] ?></span>
                 </a>
             <?php endforeach; ?>
         </div>
 
         <!-- Read Status Filter Toggle -->
-        <div class="flex items-center space-x-2 text-xs">
-            <span class="text-slate-400 font-medium">Show:</span>
+        <div class="flex items-center space-x-1 bg-[#FAF8F5] p-1 rounded-full border border-stone-200/60 text-xs">
             <a href="<?= base_url('notifications/view_notifications.php?type=' . urlencode($selectedType)) ?>" 
-               class="px-2.5 py-1 rounded-lg font-medium transition <?= !$unreadOnly ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white' ?>">
+               class="px-3 py-1 rounded-full font-medium transition <?= !$unreadOnly ? 'bg-white text-midnight font-bold shadow-soft' : 'text-stone-500 hover:text-midnight' ?>">
                 All
             </a>
             <a href="<?= base_url('notifications/view_notifications.php?type=' . urlencode($selectedType) . '&unread=1') ?>" 
-               class="px-2.5 py-1 rounded-lg font-medium transition flex items-center space-x-1 <?= $unreadOnly ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white' ?>">
-                <span>Unread Only</span>
+               class="px-3 py-1 rounded-full font-medium transition flex items-center space-x-1.5 <?= $unreadOnly ? 'bg-coral text-white font-bold shadow-glow-coral' : 'text-stone-500 hover:text-midnight' ?>">
+                <span>Unread</span>
                 <?php if ($unreadCount > 0): ?>
-                    <span class="px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-bold rounded-full"><?= $unreadCount ?></span>
+                    <span class="px-1.5 py-0.2 <?= $unreadOnly ? 'bg-white text-coral' : 'bg-coral text-white' ?> text-[10px] font-extrabold rounded-full"><?= $unreadCount ?></span>
                 <?php endif; ?>
             </a>
         </div>
@@ -162,18 +161,19 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Notifications Feed -->
     <?php if (empty($notifications)): ?>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center shadow-xl">
-            <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-800/80 flex items-center justify-center text-2xl text-slate-400 mb-4">
-                🔕
+        <div class="bg-white border border-stone-200/80 rounded-3xl p-12 text-center shadow-soft">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-[#FAF8F5] border border-stone-200/60 flex items-center justify-center text-2xl text-stone-400 mb-4">
+                <i class="ri-notification-off-line"></i>
             </div>
-            <h3 class="text-base font-bold text-white">No notifications found</h3>
-            <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+            <h3 class="font-display text-base font-bold text-midnight">No notifications found</h3>
+            <p class="text-xs text-stone-500 mt-1 max-w-md mx-auto">
                 <?= $unreadOnly ? "You have no unread alerts in this category." : "You're all caught up! New alerts regarding bookings, returns, and settlements will appear here automatically." ?>
             </p>
             <?php if ($selectedType !== 'All' || $unreadOnly): ?>
                 <div class="mt-4">
-                    <a href="<?= base_url('notifications/view_notifications.php') ?>" class="text-xs text-blue-400 hover:text-blue-300 font-semibold">
-                        Reset Filters &rarr;
+                    <a href="<?= base_url('notifications/view_notifications.php') ?>" class="text-xs text-coral hover:text-coral-600 font-semibold inline-flex items-center space-x-1">
+                        <span>Reset Filters</span>
+                        <i class="ri-arrow-right-line"></i>
                     </a>
                 </div>
             <?php endif; ?>
@@ -187,52 +187,52 @@ require_once __DIR__ . '/../includes/header.php';
                 
                 switch ($type) {
                     case 'Rental':
-                        $icon = '📦';
-                        $badgeColor = 'text-blue-400 bg-blue-500/10 border-blue-500/30';
+                        $iconClass = 'ri-box-3-line';
+                        $badgeColor = 'text-blue-700 bg-blue-50 border-blue-200/70';
                         break;
                     case 'Payment':
-                        $icon = '💳';
-                        $badgeColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+                        $iconClass = 'ri-bank-card-line';
+                        $badgeColor = 'text-emerald-700 bg-emerald-50 border-emerald-200/70';
                         break;
                     case 'Fine':
-                        $icon = '⚠️';
-                        $badgeColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+                        $iconClass = 'ri-alert-line';
+                        $badgeColor = 'text-amber-800 bg-amber-50 border-amber-200/70';
                         break;
                     case 'Dispute':
-                        $icon = '⚖️';
-                        $badgeColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
+                        $iconClass = 'ri-scales-3-line';
+                        $badgeColor = 'text-rose-700 bg-rose-50 border-rose-200/70';
                         break;
                     default:
-                        $icon = '🔔';
-                        $badgeColor = 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30';
+                        $iconClass = 'ri-notification-3-line';
+                        $badgeColor = 'text-indigo-700 bg-indigo-50 border-indigo-200/70';
                 }
             ?>
-                <div class="group p-4 sm:p-5 rounded-2xl border transition flex items-start justify-between gap-4 <?= $isRead ? 'bg-slate-900/60 border-slate-800/80 text-slate-300' : 'bg-slate-900 border-indigo-500/40 text-white shadow-lg ring-1 ring-indigo-500/20' ?>">
+                <div class="group p-4 sm:p-5 rounded-3xl border transition flex items-start justify-between gap-4 <?= $isRead ? 'bg-white border-stone-200/80 text-stone-700 hover:border-stone-300' : 'bg-[#FAF8F5] border-coral/30 text-midnight shadow-soft ring-1 ring-coral/10' ?>">
                     <!-- Notification Content -->
                     <div class="flex items-start space-x-3.5 flex-1 min-w-0">
-                        <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border <?= $badgeColor ?> text-lg">
-                            <?= $icon ?>
+                        <div class="w-10 h-10 rounded-2xl flex-shrink-0 flex items-center justify-center border <?= $badgeColor ?> text-lg shadow-sm">
+                            <i class="<?= $iconClass ?>"></i>
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border <?= $badgeColor ?>">
+                                <span class="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border <?= $badgeColor ?>">
                                     <?= htmlspecialchars($type) ?>
                                 </span>
                                 <?php if (!$isRead): ?>
-                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-coral text-white shadow-sm">
                                         NEW
                                     </span>
                                 <?php endif; ?>
-                                <span class="text-[11px] text-slate-500 font-mono">
+                                <span class="text-[11px] text-stone-500 font-mono">
                                     <?= date('M d, Y • h:i A', strtotime($n->getCreatedAt() ?? 'now')) ?>
                                 </span>
-                                <span class="text-[11px] text-slate-600">&bull;</span>
-                                <span class="text-[11px] text-slate-400 font-medium">
+                                <span class="text-[11px] text-stone-300">&bull;</span>
+                                <span class="text-[11px] text-stone-500 font-medium">
                                     <?= $n->getFormattedTime() ?>
                                 </span>
                             </div>
 
-                            <p class="text-sm leading-relaxed <?= $isRead ? 'text-slate-300' : 'text-white font-medium' ?>">
+                            <p class="text-sm leading-relaxed <?= $isRead ? 'text-stone-600' : 'text-midnight font-medium' ?>">
                                 <?= htmlspecialchars($n->getMessage()) ?>
                             </p>
 
@@ -240,9 +240,9 @@ require_once __DIR__ . '/../includes/header.php';
                             <?php if ($targetUrl && $targetUrl !== 'notifications/view_notifications.php'): ?>
                                 <div class="mt-2.5">
                                     <a href="<?= base_url($targetUrl) ?>" 
-                                       class="inline-flex items-center space-x-1.5 text-xs text-blue-400 hover:text-blue-300 font-semibold group-hover:underline">
+                                       class="inline-flex items-center space-x-1.5 text-xs text-coral hover:text-coral-600 font-semibold group-hover:underline">
                                         <span>View Details</span>
-                                        <span>&rarr;</span>
+                                        <i class="ri-arrow-right-line"></i>
                                     </a>
                                 </div>
                             <?php endif; ?>
@@ -258,8 +258,8 @@ require_once __DIR__ . '/../includes/header.php';
                                 <input type="hidden" name="notif_id" value="<?= $n->getNotifID() ?>">
                                 <button type="submit" 
                                         title="Mark as read"
-                                        class="p-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-800/80 rounded-xl transition text-xs flex items-center space-x-1">
-                                    <span>✓</span>
+                                        class="p-2 text-stone-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition text-xs flex items-center space-x-1">
+                                    <i class="ri-check-line text-sm"></i>
                                     <span class="hidden sm:inline text-[11px]">Read</span>
                                 </button>
                             </form>
@@ -272,8 +272,8 @@ require_once __DIR__ . '/../includes/header.php';
                             <input type="hidden" name="notif_id" value="<?= $n->getNotifID() ?>">
                             <button type="submit" 
                                     title="Delete notification"
-                                    class="p-2 text-slate-500 hover:text-rose-400 hover:bg-slate-800/80 rounded-xl transition text-xs">
-                                🗑️
+                                    class="p-2 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition text-xs">
+                                <i class="ri-delete-bin-line text-sm"></i>
                             </button>
                         </form>
                     </div>

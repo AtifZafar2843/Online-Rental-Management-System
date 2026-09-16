@@ -113,30 +113,30 @@ $pageTitle = 'Request Rental — ' . htmlspecialchars($product->getTitle());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <nav class="flex text-xs text-slate-400 mb-6" aria-label="Breadcrumb">
+    <nav class="flex text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2">
-            <li><a href="<?= base_url('index.php') ?>" class="hover:text-white">Home</a></li>
+            <li><a href="<?= base_url('index.php') ?>" class="hover:text-coral transition">Home</a></li>
             <li><span>/</span></li>
-            <li><a href="<?= base_url('renter/search.php') ?>" class="hover:text-white">Catalog</a></li>
+            <li><a href="<?= base_url('renter/search.php') ?>" class="hover:text-coral transition">Catalog</a></li>
             <li><span>/</span></li>
-            <li><a href="<?= base_url('renter/product_details.php?id=' . $productId) ?>" class="hover:text-white truncate max-w-[150px]"><?= htmlspecialchars($product->getTitle()) ?></a></li>
+            <li><a href="<?= base_url('renter/product_details.php?id=' . $productId) ?>" class="hover:text-coral transition truncate max-w-[150px]"><?= htmlspecialchars($product->getTitle()) ?></a></li>
             <li><span>/</span></li>
-            <li class="text-slate-200 font-semibold">Request Rental</li>
+            <li class="text-midnight font-semibold">Request Rental</li>
         </ol>
     </nav>
 
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Book Rental Request</h1>
-        <p class="text-sm text-slate-400 mt-1">Select your desired rental duration. No immediate payment is required until the owner approves your request.</p>
+        <h1 class="text-2xl sm:text-3xl font-display font-bold text-midnight tracking-tight">Book Rental Request</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Select your desired rental duration. No immediate payment is required until the owner approves your request.</p>
     </div>
 
     <?php if (!empty($errors)): ?>
-        <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-sm">
+        <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
             <div class="font-bold flex items-center space-x-2 mb-1">
-                <span>⚠️</span>
+                <i class="ri-error-warning-line text-lg"></i>
                 <span>Booking Error:</span>
             </div>
             <ul class="list-disc list-inside space-y-1 text-xs">
@@ -150,41 +150,41 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Left: Product Summary Card -->
         <div class="lg:col-span-5 space-y-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <div class="aspect-video w-full rounded-xl overflow-hidden bg-slate-950 border border-slate-800 mb-4">
+            <div class="bg-white border border-[#E9E7FF] rounded-3xl p-6 shadow-sm">
+                <div class="aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-[#E9E7FF] mb-4">
                     <img src="<?= base_url($primaryImg) ?>" 
                          alt="<?= htmlspecialchars($product->getTitle()) ?>" 
                          class="w-full h-full object-cover"
                          onerror="this.src='<?= base_url('assets/img/no-image.svg') ?>'">
                 </div>
 
-                <span class="text-[11px] font-semibold text-blue-400 uppercase tracking-wider block">Product Overview</span>
-                <h2 class="text-lg font-bold text-white mt-1"><?= htmlspecialchars($product->getTitle()) ?></h2>
-                <div class="flex items-center space-x-2 text-xs text-slate-400 mt-1">
-                    <span>📍 <?= htmlspecialchars($product->getLocation()) ?></span>
+                <span class="text-[11px] font-semibold text-coral uppercase tracking-wider block">Product Overview</span>
+                <h2 class="text-lg font-display font-bold text-midnight mt-1"><?= htmlspecialchars($product->getTitle()) ?></h2>
+                <div class="flex items-center space-x-2 text-xs text-slate-500 mt-1">
+                    <span><i class="ri-map-pin-line text-slate-400"></i> <?= htmlspecialchars($product->getLocation()) ?></span>
                     <span>&bull;</span>
                     <span>Condition: <?= htmlspecialchars($product->getCondition()) ?></span>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-slate-800 space-y-2 text-xs">
+                <div class="mt-4 pt-4 border-t border-[#E9E7FF] space-y-2 text-xs">
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Daily Rental Rate:</span>
-                        <span class="font-bold text-white">₹<span id="ratePerDayDisplay"><?= number_format($product->getRentPerDay(), 2) ?></span>/day</span>
+                        <span class="text-slate-500">Daily Rental Rate:</span>
+                        <span class="font-bold text-midnight">₹<span id="ratePerDayDisplay"><?= number_format($product->getRentPerDay(), 2) ?></span>/day</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Refundable Deposit:</span>
-                        <span class="font-bold text-emerald-400">₹<span id="securityDepositDisplay"><?= number_format($product->getSecurityDeposit(), 2) ?></span></span>
+                        <span class="text-slate-500">Refundable Deposit:</span>
+                        <span class="font-bold text-emerald-600">₹<span id="securityDepositDisplay"><?= number_format($product->getSecurityDeposit(), 2) ?></span></span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Lender / Owner:</span>
-                        <span class="font-semibold text-slate-200"><?= htmlspecialchars($product->getOwnerName() ?? 'Owner') ?></span>
+                        <span class="text-slate-500">Lender / Owner:</span>
+                        <span class="font-semibold text-midnight"><?= htmlspecialchars($product->getOwnerName() ?? 'Owner') ?></span>
                     </div>
                 </div>
 
                 <!-- Trust Guarantee Box -->
-                <div class="mt-5 p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 space-y-1.5">
-                    <div class="flex items-center space-x-1.5 text-emerald-400 font-medium">
-                        <span>🛡️</span>
+                <div class="mt-5 p-4 rounded-2xl bg-[#FAF8F5] border border-[#E9E7FF] text-[11px] text-slate-500 space-y-1.5">
+                    <div class="flex items-center space-x-1.5 text-emerald-600 font-semibold">
+                        <i class="ri-shield-check-line text-base"></i>
                         <span>Zero Risk Booking</span>
                     </div>
                     <p>Free cancellation while request status is Pending. Security deposit is 100% refunded after satisfactory return.</p>
@@ -194,19 +194,19 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Right: Booking Form & Real-time Cost Breakdown -->
         <div class="lg:col-span-7 space-y-6">
-            <form action="<?= base_url('renter/request_rental.php?product_id=' . $productId) ?>" method="POST" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+            <form action="<?= base_url('renter/request_rental.php?product_id=' . $productId) ?>" method="POST" class="bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-8 shadow-sm">
                 <?= csrf_field() ?>
                 <input type="hidden" name="product_id" value="<?= $productId ?>">
 
-                <h3 class="text-base font-bold text-white mb-4 pb-2 border-b border-slate-800 flex items-center space-x-2">
-                    <span>📅</span>
+                <h3 class="text-base font-display font-bold text-midnight mb-5 pb-3 border-b border-[#E9E7FF] flex items-center space-x-2">
+                    <i class="ri-calendar-event-line text-coral text-lg"></i>
                     <span>Rental Schedule & Dates</span>
                 </h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label for="start_date" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                            Start Date <span class="text-rose-400">*</span>
+                        <label for="start_date" class="block text-xs font-semibold text-midnight mb-1.5">
+                            Start Date <span class="text-coral">*</span>
                         </label>
                         <input type="date" 
                                id="start_date" 
@@ -214,13 +214,13 @@ require_once __DIR__ . '/../includes/header.php';
                                value="<?= htmlspecialchars($startDate) ?>" 
                                min="<?= date('Y-m-d') ?>" 
                                required
-                               class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                        <span class="text-[10px] text-slate-500 mt-1 block">Earliest pickup / delivery date</span>
+                               class="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl text-midnight text-sm focus:ring-2 focus:ring-coral focus:border-transparent outline-none transition">
+                        <span class="text-[10px] text-slate-400 mt-1 block">Earliest pickup / delivery date</span>
                     </div>
 
                     <div>
-                        <label for="end_date" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                            End Date <span class="text-rose-400">*</span>
+                        <label for="end_date" class="block text-xs font-semibold text-midnight mb-1.5">
+                            End Date <span class="text-coral">*</span>
                         </label>
                         <input type="date" 
                                id="end_date" 
@@ -228,51 +228,51 @@ require_once __DIR__ . '/../includes/header.php';
                                value="<?= htmlspecialchars($endDate) ?>" 
                                min="<?= date('Y-m-d', strtotime('+1 day')) ?>" 
                                required
-                               class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                        <span class="text-[10px] text-slate-500 mt-1 block">Scheduled return date</span>
+                               class="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl text-midnight text-sm focus:ring-2 focus:ring-coral focus:border-transparent outline-none transition">
+                        <span class="text-[10px] text-slate-400 mt-1 block">Scheduled return date</span>
                     </div>
                 </div>
 
                 <!-- Message to Owner -->
                 <div class="mb-6">
-                    <label for="message" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Message to Owner <span class="text-slate-500 font-normal">(Optional)</span>
+                    <label for="message" class="block text-xs font-semibold text-midnight mb-1.5">
+                        Message to Owner <span class="text-slate-400 font-normal">(Optional)</span>
                     </label>
                     <textarea id="message" 
                               name="message" 
                               rows="3" 
                               placeholder="Introduce yourself or mention any specific pickup preferences..."
-                              class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"><?= htmlspecialchars($message) ?></textarea>
+                              class="w-full px-4 py-2.5 bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl text-midnight text-sm placeholder-slate-400 focus:ring-2 focus:ring-coral focus:border-transparent outline-none transition"><?= htmlspecialchars($message) ?></textarea>
                 </div>
 
                 <!-- Live Dynamic Pricing Card -->
-                <div class="bg-gradient-to-br from-slate-950 to-slate-900 border border-indigo-950 rounded-xl p-5 mb-6 space-y-3">
-                    <div class="flex items-center justify-between text-xs font-bold text-indigo-300 uppercase tracking-wider pb-2 border-b border-slate-800">
+                <div class="bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl p-5 mb-6 space-y-3">
+                    <div class="flex items-center justify-between text-xs font-bold text-midnight uppercase tracking-wider pb-2 border-b border-[#E9E7FF]">
                         <span>Price Breakdown</span>
                         <span class="text-[11px] font-normal lowercase text-slate-400">calculated in real-time</span>
                     </div>
 
-                    <div class="flex justify-between text-xs text-slate-300">
+                    <div class="flex justify-between text-xs text-slate-600">
                         <span>Duration:</span>
-                        <span class="font-bold text-white"><span id="calcDays">0</span> days</span>
+                        <span class="font-bold text-midnight"><span id="calcDays">0</span> days</span>
                     </div>
 
-                    <div class="flex justify-between text-xs text-slate-300">
+                    <div class="flex justify-between text-xs text-slate-600">
                         <span>Rental Charge (<span id="calcDaysFormula">0</span> × ₹<?= number_format($product->getRentPerDay(), 2) ?>):</span>
-                        <span class="font-bold text-white">₹<span id="calcRentalAmount">0.00</span></span>
+                        <span class="font-bold text-midnight">₹<span id="calcRentalAmount">0.00</span></span>
                     </div>
 
-                    <div class="flex justify-between text-xs text-slate-300">
+                    <div class="flex justify-between text-xs text-slate-600">
                         <span>Security Deposit (Refundable):</span>
-                        <span class="font-bold text-emerald-400">₹<span id="calcDeposit">0.00</span></span>
+                        <span class="font-bold text-emerald-600">₹<span id="calcDeposit">0.00</span></span>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-800 flex justify-between items-baseline">
+                    <div class="pt-3 border-t border-[#E9E7FF] flex justify-between items-baseline">
                         <div>
-                            <span class="text-sm font-bold text-white">Total Estimated:</span>
+                            <span class="text-sm font-bold text-midnight">Total Estimated:</span>
                             <span class="text-[10px] text-slate-400 block">Due only upon owner approval</span>
                         </div>
-                        <div class="text-xl font-extrabold text-blue-400">
+                        <div class="text-xl font-display font-extrabold text-coral">
                             ₹<span id="calcTotalPayable">0.00</span>
                         </div>
                     </div>
@@ -282,11 +282,11 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="flex items-center space-x-3">
                     <button type="submit" 
                             id="submitBtn"
-                            class="flex-1 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-blue-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="flex-1 py-3.5 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition disabled:opacity-50 disabled:cursor-not-allowed">
                         Submit Booking Request &rarr;
                     </button>
                     <a href="<?= base_url('renter/product_details.php?id=' . $productId) ?>" 
-                       class="px-5 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">
+                       class="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-midnight text-xs font-semibold rounded-full transition">
                         Cancel
                     </a>
                 </div>
@@ -346,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     startDateInput.addEventListener('change', () => {
-        // Automatically ensure end_date is at least 1 day after start_date
         if (startDateInput.value) {
             const nextDay = new Date(startDateInput.value);
             nextDay.setDate(nextDay.getDate() + 1);

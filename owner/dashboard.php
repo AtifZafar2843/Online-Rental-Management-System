@@ -48,85 +48,112 @@ $pageTitle = 'Owner Dashboard — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Top Welcome Banner -->
-    <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 rounded-2xl p-8 shadow-xl text-white mb-8 border border-blue-600/40 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-            <span class="px-3 py-1 bg-blue-500/30 rounded-full text-xs font-semibold tracking-wide uppercase border border-blue-400/30">
+    <div class="bg-gradient-to-br from-midnight via-[#131b33] to-midnight rounded-3xl p-6 sm:p-10 text-white mb-8 sm:mb-10 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-coral/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 text-lilac rounded-full text-xs font-semibold tracking-wider uppercase backdrop-blur-sm border border-white/10">
+                <i class="ri-store-2-line text-coral"></i>
                 Owner Workspace
             </span>
-            <h1 class="text-3xl font-extrabold mt-3">Welcome, <?= htmlspecialchars(current_user_name()) ?>!</h1>
-            <p class="text-blue-200 text-sm mt-1">Manage your rental inventory, monitor product bookings, and track your revenue.</p>
+            <h1 class="text-2xl sm:text-4xl font-display font-bold mt-3 tracking-tight">
+                Welcome back, <?= htmlspecialchars(current_user_name()) ?>!
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
+                Manage your rental inventory, respond to renter inquiries, monitor item returns, and track your revenue.
+            </p>
         </div>
-        <div class="flex-shrink-0 flex items-center space-x-3">
+        <div class="relative z-10 flex-shrink-0 flex flex-wrap items-center gap-3">
             <a href="<?= base_url('owner/manage_requests.php') ?>" 
-               class="inline-flex items-center space-x-2 px-5 py-3.5 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-400/40 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition">
-                <span>📬</span>
+               class="inline-flex items-center gap-2 px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-xs uppercase tracking-wider rounded-full transition">
+                <i class="ri-mail-line text-base"></i>
                 <span>Manage Requests</span>
                 <?php if ($pendingCount > 0): ?>
-                    <span class="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-extrabold text-[10px] ml-1">
+                    <span class="px-2 py-0.5 rounded-full bg-coral text-white font-bold text-[10px]">
                         <?= $pendingCount ?>
                     </span>
                 <?php endif; ?>
             </a>
             <a href="<?= base_url('owner/add_product.php') ?>" 
-               class="inline-flex items-center space-x-2 px-6 py-3.5 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg transition">
-                <span>➕</span>
+               class="inline-flex items-center gap-2 px-6 py-3.5 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition transform hover:-translate-y-0.5">
+                <i class="ri-add-line text-base"></i>
                 <span>List New Product</span>
             </a>
         </div>
     </div>
 
     <?php if ($pendingCount > 0): ?>
-        <div class="mb-8 p-4 rounded-2xl bg-amber-950/40 border border-amber-600/50 text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
+        <div class="mb-8 p-4 sm:p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
             <div class="flex items-center space-x-3">
-                <span class="w-3 h-3 rounded-full bg-amber-400 animate-pulse"></span>
-                <span class="text-sm font-semibold">You have <strong><?= $pendingCount ?></strong> pending rental request(s) awaiting your decision.</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-xs sm:text-sm font-semibold">You have <strong><?= $pendingCount ?></strong> pending rental request(s) awaiting your decision.</span>
             </div>
             <a href="<?= base_url('owner/manage_requests.php?status=Pending') ?>" 
-               class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition self-start sm:self-auto">
-                Review Pending Requests &rarr;
+               class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-midnight font-bold text-xs rounded-full transition self-start sm:self-auto">
+                Review Requests &rarr;
             </a>
         </div>
     <?php endif; ?>
 
     <!-- Metrics Cards Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Listings</span>
-            <div class="text-3xl font-bold text-white mt-2"><?= $totalProducts ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">In your inventory</span>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Listings</span>
+                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
+                    <i class="ri-archive-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3"><?= $totalProducts ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">In your inventory</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Available</span>
-            <div class="text-3xl font-bold text-emerald-400 mt-2"><?= $availableCount ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Ready for rent</span>
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Available</span>
+                <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i class="ri-checkbox-circle-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3"><?= $availableCount ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Ready for rent</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Rented Out</span>
-            <div class="text-3xl font-bold text-blue-400 mt-2"><?= $rentedCount ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Active on rent</span>
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Rented Out</span>
+                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="ri-key-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3"><?= $rentedCount ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Active on rent</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Total Earnings</span>
-            <div class="text-3xl font-bold text-white mt-2">₹<?= number_format($totalEarnings, 2) ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Completed rentals</span>
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Earnings</span>
+                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <i class="ri-wallet-3-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3">₹<?= number_format($totalEarnings, 2) ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Completed rentals</span>
         </div>
     </div>
 
-    <!-- Product Inventory Table / Section -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <div class="p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- Product Inventory Section -->
+    <div class="bg-white border border-[#E9E7FF] rounded-3xl shadow-sm overflow-hidden">
+        <div class="p-6 sm:p-8 border-b border-[#E9E7FF] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h2 class="text-lg font-bold text-white tracking-tight">Your Product Inventory</h2>
-                <p class="text-xs text-slate-400 mt-0.5">All products listed under your owner account.</p>
+                <h2 class="text-lg sm:text-xl font-display font-bold text-midnight tracking-tight">Your Product Inventory</h2>
+                <p class="text-xs text-slate-500 mt-0.5">All products currently listed under your owner account.</p>
             </div>
             <div class="flex items-center space-x-3">
-                <a href="<?= base_url('owner/add_product.php') ?>" class="text-xs font-semibold text-blue-400 hover:text-blue-300">
-                    + Add Another Listing
+                <a href="<?= base_url('owner/add_product.php') ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-coral hover:text-[#e04e53] transition">
+                    <i class="ri-add-circle-line text-base"></i>
+                    <span>Add Another Listing</span>
                 </a>
             </div>
         </div>
@@ -134,23 +161,23 @@ require_once __DIR__ . '/../includes/header.php';
         <?php if (empty($products)): ?>
             <!-- Empty State -->
             <div class="text-center py-16 px-4">
-                <div class="w-16 h-16 rounded-2xl bg-slate-850 border border-slate-800 mx-auto flex items-center justify-center text-3xl mb-4">
-                    📦
+                <div class="w-16 h-16 rounded-full bg-lilac/40 mx-auto flex items-center justify-center text-coral text-3xl mb-4">
+                    <i class="ri-box-3-line"></i>
                 </div>
-                <h3 class="text-base font-bold text-white">No products listed yet</h3>
-                <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-6">
-                    Start earning by listing your idle cameras, electronics, vehicles, or furniture for rent today.
+                <h3 class="text-base font-display font-bold text-midnight">No products listed yet</h3>
+                <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-6">
+                    Start earning by listing your idle cameras, electronics, vehicles, or equipment for rent today.
                 </p>
                 <a href="<?= base_url('owner/add_product.php') ?>" 
-                   class="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-blue-500/25 transition">
-                    <span>➕</span>
+                   class="inline-flex items-center gap-2 px-6 py-3 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition">
+                    <i class="ri-add-line"></i>
                     <span>List Your First Product</span>
                 </a>
             </div>
         <?php else: ?>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-slate-950/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+                <table class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-[#FAF8F5] text-slate-500 uppercase tracking-wider font-semibold border-b border-[#E9E7FF]">
                         <tr>
                             <th class="py-3.5 px-4">Product</th>
                             <th class="py-3.5 px-4">Category</th>
@@ -161,45 +188,46 @@ require_once __DIR__ . '/../includes/header.php';
                             <th class="py-3.5 px-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800">
+                    <tbody class="divide-y divide-[#E9E7FF]">
                         <?php foreach ($products as $prod): 
                             $primaryImg = $prod->getPrimaryImagePath();
                             $status = $prod->getAvailStatus();
 
-                            $statusBadge = 'bg-slate-800 text-slate-400 border border-slate-700';
+                            $statusBadge = 'bg-slate-100 text-slate-600 border border-slate-200';
                             if ($status === 'Available') {
-                                $statusBadge = 'bg-emerald-950 text-emerald-400 border border-emerald-700/60';
+                                $statusBadge = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
                             } elseif ($status === 'Rented') {
-                                $statusBadge = 'bg-blue-950 text-blue-400 border border-blue-700/60';
+                                $statusBadge = 'bg-blue-50 text-blue-700 border border-blue-200';
                             } elseif ($status === 'Unavailable') {
-                                $statusBadge = 'bg-amber-950 text-amber-400 border border-amber-700/60';
+                                $statusBadge = 'bg-amber-50 text-amber-700 border border-amber-200';
                             }
                         ?>
-                            <tr class="hover:bg-slate-850/60 transition">
+                            <tr class="hover:bg-[#FAF8F5] transition">
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center space-x-3">
                                         <img src="<?= base_url($primaryImg) ?>" alt="Product" 
-                                             class="w-12 h-12 rounded-lg object-cover bg-slate-950 border border-slate-800 flex-shrink-0">
+                                             class="w-12 h-12 rounded-xl object-cover bg-slate-100 border border-[#E9E7FF] flex-shrink-0"
+                                             onerror="this.src='<?= base_url('assets/img/no-image.svg') ?>'">
                                         <div>
-                                            <div class="font-bold text-white line-clamp-1"><?= htmlspecialchars($prod->getTitle()) ?></div>
+                                            <div class="font-display font-bold text-midnight line-clamp-1"><?= htmlspecialchars($prod->getTitle()) ?></div>
                                             <div class="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
-                                                <span>📍</span>
+                                                <i class="ri-map-pin-line"></i>
                                                 <span><?= htmlspecialchars($prod->getLocation()) ?></span>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="py-3.5 px-4 font-medium text-slate-300">
+                                <td class="py-3.5 px-4 font-medium text-slate-700">
                                     <?= htmlspecialchars($prod->getCategoryName() ?? 'Category') ?>
                                 </td>
-                                <td class="py-3.5 px-4 font-bold text-white">
+                                <td class="py-3.5 px-4 font-bold text-midnight">
                                     ₹<?= number_format($prod->getRentPerDay(), 2) ?>
                                 </td>
-                                <td class="py-3.5 px-4 text-slate-400">
+                                <td class="py-3.5 px-4 text-slate-500">
                                     ₹<?= number_format($prod->getSecurityDeposit(), 2) ?>
                                 </td>
                                 <td class="py-3.5 px-4">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                                         <?= htmlspecialchars($prod->getCondition()) ?>
                                     </span>
                                 </td>
@@ -212,7 +240,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <div class="inline-flex items-center space-x-2">
                                         <!-- Edit Link -->
                                         <a href="<?= base_url("owner/edit_product.php?id={$prod->getProductID()}") ?>" 
-                                           class="px-2.5 py-1.5 rounded-lg bg-blue-950/60 text-blue-400 hover:bg-blue-900/80 border border-blue-800/50 font-medium transition">
+                                           class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium transition">
                                             Edit
                                         </a>
 
@@ -220,7 +248,7 @@ require_once __DIR__ . '/../includes/header.php';
                                         <?php if ($status !== 'Rented'): ?>
                                             <a href="<?= base_url("owner/toggle_status.php?id={$prod->getProductID()}") ?>" 
                                                 title="Toggle Available / Unavailable"
-                                                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">
+                                                class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
                                                 <?= ($status === 'Available') ? 'Deactivate' : 'Activate' ?>
                                             </a>
 
@@ -228,14 +256,14 @@ require_once __DIR__ . '/../includes/header.php';
                                             <button type="button" 
                                                     onclick="openDeleteModal(<?= $prod->getProductID() ?>, '<?= htmlspecialchars(addslashes($prod->getTitle())) ?>')"
                                                     title="Permanently Delete Listing"
-                                                    class="px-2.5 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/50 font-medium transition">
+                                                    class="px-3 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-medium transition">
                                                 Delete
                                             </button>
                                         <?php else: ?>
                                             <button type="button" 
                                                     disabled 
                                                     title="Cannot delete item while rented"
-                                                    class="px-2.5 py-1.5 rounded-lg bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed font-medium text-xs">
+                                                    class="px-3 py-1.5 rounded-full bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed font-medium text-xs">
                                                 Delete
                                             </button>
                                         <?php endif; ?>
@@ -251,26 +279,26 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <!-- Delete Product Modal -->
-<div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
-    <div class="card max-w-md w-full p-6 border border-slate-800 bg-slate-900 rounded-2xl shadow-2xl space-y-4">
-        <div class="flex items-center space-x-3 text-rose-400">
-            <span class="text-2xl">🗑️</span>
-            <h3 class="text-lg font-bold text-white">Delete Product Listing</h3>
+<div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+    <div class="max-w-md w-full p-6 sm:p-8 border border-[#E9E7FF] bg-white rounded-3xl shadow-2xl space-y-4">
+        <div class="flex items-center space-x-3 text-rose-600">
+            <i class="ri-delete-bin-line text-2xl"></i>
+            <h3 class="text-lg font-display font-bold text-midnight">Delete Product Listing</h3>
         </div>
-        <p class="text-xs text-slate-300">
-            Are you sure you want to permanently delete <strong id="deleteProdTitle" class="text-white"></strong>?
+        <p class="text-xs text-slate-600">
+            Are you sure you want to permanently delete <strong id="deleteProdTitle" class="text-midnight"></strong>?
         </p>
-        <div class="p-3 bg-rose-950/30 border border-rose-800/50 rounded-xl text-[11px] text-rose-300 space-y-1">
+        <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-[11px] text-rose-700 space-y-1">
             <div>• This action will permanently remove the product and its uploaded images from disk.</div>
             <div>• Deletion will fail if there are any active, pending, or approved rental requests.</div>
         </div>
         <form method="POST" action="<?= base_url('owner/delete_product.php') ?>" class="flex items-center justify-end space-x-3 pt-2">
             <?= csrf_field() ?>
             <input type="hidden" name="product_id" id="deleteProdId" value="">
-            <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+            <button type="button" onclick="closeDeleteModal()" class="px-5 py-2.5 rounded-full text-xs font-semibold text-slate-600 hover:text-midnight bg-slate-100 transition">
                 Cancel
             </button>
-            <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition shadow-lg shadow-rose-600/20">
+            <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs uppercase tracking-wider rounded-full transition shadow-sm">
                 Delete Permanently
             </button>
         </form>

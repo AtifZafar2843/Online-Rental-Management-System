@@ -169,29 +169,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Register New Account — ORMS';
+$pageTitle = 'Create Account — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="py-12 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+<div class="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+    <div class="bg-white border border-stone-200/80 rounded-3xl shadow-soft overflow-hidden">
         <!-- Header Banner -->
-        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-8 border-b border-slate-800">
-            <h2 class="text-3xl font-extrabold text-white tracking-tight">Create an ORMS Account</h2>
-            <p class="mt-2 text-sm text-blue-200">
+        <div class="p-8 pb-6 text-center border-b border-stone-100 bg-[#FAF8F5]">
+            <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-9 mx-auto mb-3 object-contain">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-midnight tracking-tight">Create your account</h2>
+            <p class="mt-1 text-xs sm:text-sm text-stone-500">
                 Join our peer-to-peer rental community as an Owner, Renter, or both.
             </p>
         </div>
 
-        <div class="p-8">
+        <div class="p-6 sm:p-8">
             <!-- Display Validation Errors -->
             <?php if (!empty($errors)): ?>
-                <div class="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-600/70 text-rose-200 space-y-1">
-                    <div class="font-semibold flex items-center space-x-2 text-rose-300">
-                        <span>⚠️</span>
+                <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 space-y-1">
+                    <div class="font-semibold flex items-center space-x-2 text-rose-700 text-sm">
+                        <i class="ri-error-warning-fill text-rose-500 text-base"></i>
                         <span>Please correct the following issues:</span>
                     </div>
-                    <ul class="list-disc list-inside text-xs space-y-1 pl-1 text-rose-300/90">
+                    <ul class="list-disc list-inside text-xs space-y-1 pl-1 text-rose-700/90">
                         <?php foreach ($errors as $error): ?>
                             <li><?= htmlspecialchars($error) ?></li>
                         <?php endforeach; ?>
@@ -204,125 +205,160 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <!-- Full Name -->
                 <div>
-                    <label for="name" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Full Name <span class="text-rose-500">*</span>
+                    <label for="name" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                        Full Name <span class="text-coral">*</span>
                     </label>
-                    <input type="text" id="name" name="name" required
-                           value="<?= htmlspecialchars($name) ?>"
-                           placeholder="e.g. John Doe"
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                            <i class="ri-user-line text-base"></i>
+                        </span>
+                        <input type="text" id="name" name="name" required
+                               value="<?= htmlspecialchars($name) ?>"
+                               placeholder="e.g. John Doe"
+                               class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                    </div>
                 </div>
 
                 <!-- Email & Phone Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="email" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Email Address <span class="text-rose-500">*</span>
+                        <label for="email" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                            Email Address <span class="text-coral">*</span>
                         </label>
-                        <input type="email" id="email" name="email" required
-                               value="<?= htmlspecialchars($email) ?>"
-                               placeholder="you@example.com"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="ri-mail-line text-base"></i>
+                            </span>
+                            <input type="email" id="email" name="email" required
+                                   value="<?= htmlspecialchars($email) ?>"
+                                   placeholder="you@example.com"
+                                   class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                        </div>
                     </div>
 
                     <div>
-                        <label for="phone" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Phone Number <span class="text-rose-500">*</span>
+                        <label for="phone" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                            Phone Number <span class="text-coral">*</span>
                         </label>
-                        <input type="tel" id="phone" name="phone" required
-                               value="<?= htmlspecialchars($phone) ?>"
-                               placeholder="e.g. 9876543210"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="ri-phone-line text-base"></i>
+                            </span>
+                            <input type="tel" id="phone" name="phone" required
+                                   value="<?= htmlspecialchars($phone) ?>"
+                                   placeholder="e.g. 9876543210"
+                                   class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                        </div>
                     </div>
                 </div>
 
                 <!-- Physical Address -->
                 <div>
-                    <label for="address" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Physical Address <span class="text-rose-500">*</span>
+                    <label for="address" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                        Physical Address <span class="text-coral">*</span>
                     </label>
-                    <textarea id="address" name="address" rows="2" required
-                              placeholder="Complete address (for rental verification & logistics)"
-                              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"><?= htmlspecialchars($address) ?></textarea>
+                    <div class="relative">
+                        <textarea id="address" name="address" rows="2" required
+                                  placeholder="Complete address (for rental verification & logistics)"
+                                  class="w-full bg-white border border-stone-200/90 rounded-2xl p-3.5 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium"><?= htmlspecialchars($address) ?></textarea>
+                    </div>
                 </div>
 
                 <!-- Passwords Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Password <span class="text-rose-500">*</span>
+                        <label for="password" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                            Password <span class="text-coral">*</span>
                         </label>
-                        <input type="password" id="password" name="password" required minlength="6"
-                               placeholder="Minimum 6 characters"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="ri-lock-2-line text-base"></i>
+                            </span>
+                            <input type="password" id="password" name="password" required minlength="6"
+                                   placeholder="Minimum 6 characters"
+                                   class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                        </div>
                     </div>
 
                     <div>
-                        <label for="confirm_password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Confirm Password <span class="text-rose-500">*</span>
+                        <label for="confirm_password" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                            Confirm Password <span class="text-coral">*</span>
                         </label>
-                        <input type="password" id="confirm_password" name="confirm_password" required minlength="6"
-                               placeholder="Re-enter password"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="ri-lock-password-line text-base"></i>
+                            </span>
+                            <input type="password" id="confirm_password" name="confirm_password" required minlength="6"
+                                   placeholder="Re-enter password"
+                                   class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                        </div>
                     </div>
                 </div>
 
                 <!-- ID Proof Upload (Magic Byte Checked) -->
                 <div>
-                    <label for="id_proof" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Identity Verification Document (Aadhaar / DL / Passport) <span class="text-rose-500">*</span>
+                    <label for="id_proof" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                        Identity Verification Document (Govt ID / DL / Passport) <span class="text-coral">*</span>
                     </label>
                     <input type="file" id="id_proof" name="id_proof" required accept=".pdf,.png,.jpg,.jpeg"
-                           class="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 file:cursor-pointer bg-slate-950 border border-slate-800 rounded-xl p-2 focus:outline-none">
-                    <p class="text-[11px] text-slate-500 mt-1.5">
-                        Allowed: PDF, JPG, PNG (Max 5MB). Files are secured and validated via MIME magic bytes.
+                           class="w-full text-xs text-stone-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-coral file:text-white hover:file:bg-coral-600 file:cursor-pointer bg-stone-50 border border-stone-200 rounded-2xl p-2.5 focus:outline-none">
+                    <p class="text-[11px] text-stone-400 mt-1.5 flex items-center">
+                        <i class="ri-shield-check-line text-emerald-500 mr-1"></i>
+                        Allowed: PDF, JPG, PNG (Max 5MB). Files are validated securely via MIME magic bytes.
                     </p>
                 </div>
 
                 <!-- Role Selection Checkboxes -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                    <span class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        I want to register as: <span class="text-rose-500">*</span>
+                <div class="bg-[#FAF8F5] p-5 rounded-2xl border border-stone-200/80">
+                    <span class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-3">
+                        I want to register as: <span class="text-coral">*</span>
                     </span>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-slate-700 cursor-pointer transition">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <label class="flex items-start space-x-3.5 p-3.5 rounded-2xl border border-stone-200/90 bg-white hover:border-coral cursor-pointer transition shadow-sm">
                             <input type="checkbox" name="roles[]" value="Renter" 
                                    <?= in_array('Renter', $selectedRoles, true) ? 'checked' : '' ?>
-                                   class="w-4 h-4 text-blue-600 rounded bg-slate-950 border-slate-700 focus:ring-blue-500">
+                                   class="w-4 h-4 mt-1 text-coral rounded border-stone-300 focus:ring-coral accent-coral">
                             <div>
-                                <span class="text-sm font-semibold text-white">Renter</span>
-                                <p class="text-xs text-slate-400">Discover and rent items</p>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="ri-shopping-bag-3-line text-coral"></i>
+                                    <span class="text-sm font-semibold text-midnight">Renter</span>
+                                </div>
+                                <p class="text-xs text-stone-500 mt-0.5">Discover and rent items on demand</p>
                             </div>
                         </label>
 
-                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-slate-700 cursor-pointer transition">
+                        <label class="flex items-start space-x-3.5 p-3.5 rounded-2xl border border-stone-200/90 bg-white hover:border-coral cursor-pointer transition shadow-sm">
                             <input type="checkbox" name="roles[]" value="Owner" 
                                    <?= in_array('Owner', $selectedRoles, true) ? 'checked' : '' ?>
-                                   class="w-4 h-4 text-blue-600 rounded bg-slate-950 border-slate-700 focus:ring-blue-500">
+                                   class="w-4 h-4 mt-1 text-coral rounded border-stone-300 focus:ring-coral accent-coral">
                             <div>
-                                <span class="text-sm font-semibold text-white">Owner</span>
-                                <p class="text-xs text-slate-400">List items and earn rental fees</p>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="ri-store-2-line text-coral"></i>
+                                    <span class="text-sm font-semibold text-midnight">Owner</span>
+                                </div>
+                                <p class="text-xs text-stone-500 mt-0.5">List items and earn rental income</p>
                             </div>
                         </label>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2">
+                    <p class="text-[11px] text-stone-500 mt-2.5 flex items-center">
+                        <i class="ri-information-line mr-1 text-stone-400"></i>
                         Tip: You can select both roles to rent products and list your own items seamlessly.
                     </p>
                 </div>
 
                 <!-- Submit Button -->
-                <div>
+                <div class="pt-2">
                     <button type="submit" 
-                            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/20 transition duration-150">
-                        Create My Account
+                            class="w-full bg-coral hover:bg-coral-600 text-white font-semibold py-3.5 px-6 rounded-full shadow-glow-coral transition duration-150 transform hover:-translate-y-0.5">
+                        Create My Account &rarr;
                     </button>
                 </div>
 
                 <div class="text-center pt-2">
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs text-stone-500">
                         Already have an account? 
-                        <a href="<?= base_url('auth/login.php') ?>" class="text-blue-400 hover:text-blue-300 font-semibold underline underline-offset-2 ml-1">
-                            Sign in here
+                        <a href="<?= base_url('auth/login.php') ?>" class="text-coral hover:text-coral-600 font-semibold ml-1">
+                            Sign in here &rarr;
                         </a>
                     </p>
                 </div>

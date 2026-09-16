@@ -192,34 +192,34 @@ $pageTitle = 'List New Product — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumb & Back Link -->
     <div class="mb-6 flex items-center justify-between">
-        <a href="<?= base_url('owner/dashboard.php') ?>" class="text-xs text-slate-400 hover:text-white flex items-center space-x-1 transition">
-            <span>&larr;</span>
+        <a href="<?= base_url('owner/dashboard.php') ?>" class="text-xs text-slate-500 hover:text-coral flex items-center space-x-1.5 transition">
+            <i class="ri-arrow-left-line"></i>
             <span>Back to Owner Dashboard</span>
         </a>
-        <span class="text-xs text-blue-400 font-medium">Owner Portal &bull; Step 4</span>
+        <span class="text-xs text-slate-400 font-medium">Inventory Management</span>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+    <div class="bg-white border border-[#E9E7FF] rounded-3xl shadow-sm overflow-hidden">
         <!-- Banner Header -->
-        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-8 border-b border-slate-800">
-            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">List a Product for Rent</h1>
-            <p class="mt-1 text-xs sm:text-sm text-blue-200">
+        <div class="bg-gradient-to-br from-midnight via-[#131b33] to-midnight p-6 sm:p-10 text-white border-b border-[#E9E7FF]">
+            <h1 class="text-2xl sm:text-3xl font-display font-bold tracking-tight">List a Product for Rent</h1>
+            <p class="mt-1 text-xs sm:text-sm text-slate-300">
                 Provide comprehensive specifications, pricing, security deposit, and genuine photos of your rental item.
             </p>
         </div>
 
-        <div class="p-6 sm:p-8">
+        <div class="p-6 sm:p-10">
             <!-- Validation Errors Alert -->
             <?php if (!empty($errors)): ?>
-                <div class="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-600/70 text-rose-200 text-xs space-y-1">
-                    <div class="font-semibold flex items-center space-x-2 text-rose-300">
-                        <span>⚠️</span>
+                <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs space-y-1">
+                    <div class="font-semibold flex items-center space-x-2 text-rose-800">
+                        <i class="ri-error-warning-line text-base"></i>
                         <span>Please correct the following errors:</span>
                     </div>
-                    <ul class="list-disc list-inside space-y-1 pl-1 text-rose-300/90">
+                    <ul class="list-disc list-inside space-y-1 pl-1 text-rose-700">
                         <?php foreach ($errors as $err): ?>
                             <li><?= htmlspecialchars($err) ?></li>
                         <?php endforeach; ?>
@@ -233,21 +233,21 @@ require_once __DIR__ . '/../includes/header.php';
                 <!-- Title & Category Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div class="sm:col-span-2">
-                        <label for="title" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Product Title <span class="text-rose-500">*</span>
+                        <label for="title" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Product Title <span class="text-coral">*</span>
                         </label>
                         <input type="text" id="title" name="title" required
                                value="<?= htmlspecialchars($title) ?>"
                                placeholder="e.g. Sony Alpha A7 III Mirrorless Camera with 28-70mm Lens"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                               class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                     </div>
 
                     <div>
-                        <label for="category_id" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Category <span class="text-rose-500">*</span>
+                        <label for="category_id" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Category <span class="text-coral">*</span>
                         </label>
                         <select id="category_id" name="category_id" required
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                                class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                             <option value="">-- Choose Category --</option>
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?= $cat['category_id'] ?>" <?= ($categoryId === (int)$cat['category_id']) ? 'selected' : '' ?>>
@@ -260,92 +260,92 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <!-- Description -->
                 <div>
-                    <label for="description" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Detailed Description <span class="text-rose-500">*</span>
+                    <label for="description" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                        Detailed Description <span class="text-coral">*</span>
                     </label>
                     <textarea id="description" name="description" rows="4" required
                               placeholder="Describe the product specs, what is included in the package, usage guidelines, and any terms..."
-                              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"><?= htmlspecialchars($description) ?></textarea>
+                              class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition"><?= htmlspecialchars($description) ?></textarea>
                 </div>
 
                 <!-- Financial Rates & Location -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div>
-                        <label for="rent_per_day" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Daily Rent (₹/day) <span class="text-rose-500">*</span>
+                        <label for="rent_per_day" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Daily Rent (₹/day) <span class="text-coral">*</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 font-bold text-sm">₹</span>
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-bold text-sm">₹</span>
                             <input type="number" step="0.01" min="1" id="rent_per_day" name="rent_per_day" required
                                    value="<?= htmlspecialchars((string)$rentPerDayInput) ?>"
                                    placeholder="500.00"
-                                   class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                                   class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl pl-8 pr-4 py-3 text-sm text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                         </div>
-                        <p class="text-[10px] text-slate-500 mt-1">Rate charged per calendar day.</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Rate charged per calendar day.</p>
                     </div>
 
                     <div>
-                        <label for="security_deposit" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Security Deposit (₹) <span class="text-rose-500">*</span>
+                        <label for="security_deposit" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Security Deposit (₹) <span class="text-coral">*</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 font-bold text-sm">₹</span>
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-bold text-sm">₹</span>
                             <input type="number" step="0.01" min="0" id="security_deposit" name="security_deposit" required
                                    value="<?= htmlspecialchars((string)$securityDepositInput) ?>"
                                    placeholder="2000.00"
-                                   class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                                   class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl pl-8 pr-4 py-3 text-sm text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                         </div>
-                        <p class="text-[10px] text-slate-500 mt-1">Refundable upon undamaged return.</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Refundable upon undamaged return.</p>
                     </div>
 
                     <div>
-                        <label for="location" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Location / Area <span class="text-rose-500">*</span>
+                        <label for="location" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Location / Area <span class="text-coral">*</span>
                         </label>
                         <input type="text" id="location" name="location" required
                                value="<?= htmlspecialchars($location) ?>"
                                placeholder="e.g. Indiranagar, Bangalore"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                        <p class="text-[10px] text-slate-500 mt-1">Neighborhood / City for pickup.</p>
+                               class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
+                        <p class="text-[10px] text-slate-400 mt-1">Neighborhood / City for pickup.</p>
                     </div>
                 </div>
 
                 <!-- Condition -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Physical Condition <span class="text-rose-500">*</span>
+                    <label class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                        Physical Condition <span class="text-coral">*</span>
                     </label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <?php foreach (['New', 'Good', 'Fair', 'Poor'] as $c): ?>
-                            <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-slate-800 bg-slate-950/70 hover:border-slate-700 cursor-pointer transition">
+                            <label class="flex items-center space-x-2.5 p-3.5 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                                 <input type="radio" name="condition" value="<?= $c ?>" 
                                        <?= ($condition === $c) ? 'checked' : '' ?>
-                                       class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
-                                <span class="text-xs font-medium text-slate-200"><?= $c ?></span>
+                                       class="text-coral focus:ring-coral">
+                                <span class="text-xs font-semibold text-midnight"><?= $c ?></span>
                             </label>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
-                <!-- Multi-Image Upload (Magic Byte Checked) -->
+                <!-- Multi-Image Upload -->
                 <div>
-                    <label for="images" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Product Images (Select 1 or more) <span class="text-rose-500">*</span>
+                    <label for="images" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                        Product Images (Select 1 or more) <span class="text-coral">*</span>
                     </label>
                     <input type="file" id="images" name="images[]" multiple required accept=".jpg,.jpeg,.png,.webp"
-                           class="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 file:cursor-pointer bg-slate-950 border border-slate-800 rounded-xl p-2 focus:outline-none">
-                    <p class="text-[11px] text-slate-500 mt-1.5">
+                           class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-coral file:text-white hover:file:bg-[#e04e53] file:cursor-pointer bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl p-2.5 focus:outline-none">
+                    <p class="text-[11px] text-slate-400 mt-1.5">
                         Allowed: JPEG, PNG, WEBP (Max 5MB per file). First uploaded image will automatically be set as the <strong>Primary Display Image</strong>.
                     </p>
                 </div>
 
                 <!-- Submit Button -->
-                <div class="pt-4 border-t border-slate-800 flex items-center justify-end space-x-3">
-                    <a href="<?= base_url('owner/dashboard.php') ?>" class="px-5 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                <div class="pt-4 border-t border-[#E9E7FF] flex items-center justify-end space-x-3">
+                    <a href="<?= base_url('owner/dashboard.php') ?>" class="px-5 py-2.5 rounded-full bg-slate-100 text-xs font-semibold text-slate-600 hover:text-midnight transition">
                         Cancel
                     </a>
                     <button type="submit" 
-                            class="px-7 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-blue-500/20 transition">
+                            class="px-7 py-3 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition">
                         Publish Product Listing
                     </button>
                 </div>

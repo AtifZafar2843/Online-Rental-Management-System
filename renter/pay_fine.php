@@ -73,25 +73,29 @@ $page_title = "Pay Outstanding Fine — #" . $fineId;
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-2xl mx-auto px-4 py-8">
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <div class="mb-6 flex items-center space-x-2 text-xs text-slate-400">
-        <a href="<?= base_url('renter/my_rentals.php') ?>" class="hover:text-white transition">My Rentals</a>
-        <span>&rsaquo;</span>
-        <span class="text-slate-200">Pay Fine #<?= $fineId ?></span>
-    </div>
+    <nav class="flex text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-2">
+            <li><a href="<?= base_url('renter/my_rentals.php') ?>" class="hover:text-coral transition">My Rentals</a></li>
+            <li><span>/</span></li>
+            <li class="text-midnight font-semibold">Pay Fine #<?= $fineId ?></li>
+        </ol>
+    </nav>
 
-    <div class="card p-6 border border-slate-800 rounded-2xl bg-slate-900/60 shadow-xl space-y-6">
-        <div class="flex items-center space-x-3 pb-4 border-b border-slate-800">
-            <span class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xl">⚠️</span>
+    <div class="bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center space-x-3 pb-4 border-b border-[#E9E7FF]">
+            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <i class="ri-error-warning-line text-xl"></i>
+            </div>
             <div>
-                <h1 class="text-xl font-bold text-white tracking-tight">Pay Outstanding Fine</h1>
-                <p class="text-xs text-slate-400 mt-0.5">Settle unpaid balance for damages or late return on completed rental.</p>
+                <h1 class="text-xl font-display font-bold text-midnight tracking-tight">Pay Outstanding Fine</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Settle unpaid balance for damages or late return on completed rental.</p>
             </div>
         </div>
 
         <?php if (!empty($errors)): ?>
-            <div class="p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs">
+            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
                 <ul class="list-disc list-inside space-y-1">
                     <?php foreach ($errors as $err): ?>
                         <li><?= htmlspecialchars($err) ?></li>
@@ -101,30 +105,30 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <!-- Fine Details Card -->
-        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3 text-xs">
+        <div class="p-5 rounded-2xl bg-[#FAF8F5] border border-[#E9E7FF] space-y-3 text-xs">
             <div class="flex justify-between items-center">
-                <span class="text-slate-400">Rental Product:</span>
-                <span class="font-semibold text-white"><?= htmlspecialchars($request ? $request->getProductTitle() : 'Rental #' . $fine->getRequestID()) ?></span>
+                <span class="text-slate-500">Rental Product:</span>
+                <span class="font-semibold text-midnight"><?= htmlspecialchars($request ? $request->getProductTitle() : 'Rental #' . $fine->getRequestID()) ?></span>
             </div>
             <div class="flex justify-between items-center">
-                <span class="text-slate-400">Fine Type:</span>
-                <span class="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                <span class="text-slate-500">Fine Type:</span>
+                <span class="px-2.5 py-0.5 rounded-full font-semibold text-[11px] bg-rose-50 text-rose-700 border border-rose-200">
                     <?= str_replace('_', ' ', $fine->getFineType()) ?>
                 </span>
             </div>
             <?php if ($fine->getLateDays()): ?>
                 <div class="flex justify-between items-center">
-                    <span class="text-slate-400">Late Duration:</span>
-                    <span class="text-slate-200"><?= $fine->getLateDays() ?> days @ ₹<?= number_format($fine->getRatePerDay() ?? 0, 2) ?>/day</span>
+                    <span class="text-slate-500">Late Duration:</span>
+                    <span class="text-midnight"><?= $fine->getLateDays() ?> days @ ₹<?= number_format($fine->getRatePerDay() ?? 0, 2) ?>/day</span>
                 </div>
             <?php endif; ?>
             <div class="flex justify-between items-center">
-                <span class="text-slate-400">Issued On:</span>
-                <span class="text-slate-200"><?= date('M d, Y H:i', strtotime($fine->getIssueDate())) ?></span>
+                <span class="text-slate-500">Issued On:</span>
+                <span class="text-midnight"><?= date('M d, Y H:i', strtotime($fine->getIssueDate())) ?></span>
             </div>
-            <div class="pt-2 border-t border-slate-800 flex justify-between items-center font-bold text-sm">
-                <span class="text-white">Amount Due:</span>
-                <span class="text-rose-400 font-mono text-base">₹<?= number_format($fine->getAmount(), 2) ?></span>
+            <div class="pt-3 border-t border-[#E9E7FF] flex justify-between items-center font-bold text-sm">
+                <span class="text-midnight">Amount Due:</span>
+                <span class="text-rose-600 font-display font-extrabold text-lg">₹<?= number_format($fine->getAmount(), 2) ?></span>
             </div>
         </div>
 
@@ -134,44 +138,44 @@ require_once __DIR__ . '/../includes/header.php';
             <input type="hidden" name="fine_id" value="<?= $fineId ?>">
 
             <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-3">
-                    Select Payment Mode (Academic Simulation)
+                <label class="block text-xs font-semibold text-midnight mb-3">
+                    Select Payment Mode
                 </label>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <?php
                     $modes = [
-                        'UPI'          => ['label' => 'UPI / QR',     'desc' => 'Instant UPI transfer',     'icon' => '📱'],
-                        'Debit Card'   => ['label' => 'Debit Card',   'desc' => 'Visa / Mastercard / RuPay','icon' => '💳'],
-                        'Credit Card'  => ['label' => 'Credit Card',  'desc' => 'Credit card checkout',     'icon' => '💳'],
-                        'Net Banking'  => ['label' => 'Net Banking',  'desc' => 'All Indian banks',         'icon' => '🏦']
+                        'UPI'          => ['label' => 'UPI / QR',     'desc' => 'Instant UPI transfer',     'icon' => 'ri-smartphone-line'],
+                        'Debit Card'   => ['label' => 'Debit Card',   'desc' => 'Visa / Mastercard / RuPay','icon' => 'ri-bank-card-2-line'],
+                        'Credit Card'  => ['label' => 'Credit Card',  'desc' => 'Credit card checkout',     'icon' => 'ri-vip-diamond-line'],
+                        'Net Banking'  => ['label' => 'Net Banking',  'desc' => 'All Indian banks',         'icon' => 'ri-government-line']
                     ];
                     foreach ($modes as $key => $m):
                         $checked = ($paymentMode === $key) ? 'checked' : '';
                     ?>
-                        <label class="relative flex items-start p-3.5 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                        <label class="relative flex items-start p-3.5 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                             <input type="radio" name="payment_mode" value="<?= $key ?>" <?= $checked ?> class="sr-only peer">
                             <div class="flex-1">
                                 <div class="flex items-center justify-between mb-0.5">
-                                    <span class="text-xs font-bold text-slate-200 peer-checked:text-blue-400 flex items-center space-x-1.5">
-                                        <span><?= $m['icon'] ?></span>
+                                    <span class="text-xs font-bold text-midnight peer-checked:text-coral flex items-center space-x-1.5">
+                                        <i class="<?= $m['icon'] ?> text-base"></i>
                                         <span><?= $m['label'] ?></span>
                                     </span>
-                                    <span class="w-3.5 h-3.5 rounded-full border border-slate-700 peer-checked:border-blue-500 peer-checked:bg-blue-500"></span>
+                                    <span class="w-3.5 h-3.5 rounded-full border border-slate-300 peer-checked:border-coral peer-checked:bg-coral"></span>
                                 </div>
-                                <span class="text-[10px] text-slate-400"><?= $m['desc'] ?></span>
+                                <span class="text-[10px] text-slate-500"><?= $m['desc'] ?></span>
                             </div>
                         </label>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="pt-4 border-t border-[#E9E7FF] flex items-center justify-between">
                 <a href="<?= base_url('renter/my_rentals.php') ?>" 
-                   class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+                   class="px-5 py-2.5 rounded-full text-xs font-semibold text-slate-600 hover:text-midnight bg-slate-100 transition">
                     &larr; Back to Rentals
                 </a>
                 <button type="submit" 
-                        class="px-6 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-rose-600/20 transition flex items-center space-x-2">
+                        class="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-sm transition flex items-center space-x-2">
                     <span>Pay ₹<?= number_format($fine->getAmount(), 2) ?></span>
                     <span>&rarr;</span>
                 </button>

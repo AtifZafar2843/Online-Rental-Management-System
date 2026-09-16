@@ -2,9 +2,6 @@
 /**
  * Online Rental Management System (ORMS)
  * Owner — Confirm Return & Assess Fines
- * 
- * Project: BCSP-064 (IGNOU BCA Final Project)
- * Specification: Prompt Guide Section 3.9, 4, 5 (Rule 8 & 9)
  */
 
 declare(strict_types=1);
@@ -128,30 +125,38 @@ $page_title = "Confirm Return & Assess Fines — #" . $requestId;
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-4xl mx-auto px-4 py-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <div class="mb-6 flex items-center space-x-2 text-xs text-slate-400">
-        <a href="<?= base_url('owner/dashboard.php') ?>" class="hover:text-white transition">Dashboard</a>
-        <span>&rsaquo;</span>
-        <a href="<?= base_url('owner/manage_requests.php?status=Active') ?>" class="hover:text-white transition">Manage Requests</a>
-        <span>&rsaquo;</span>
-        <span class="text-slate-200">Confirm Return #<?= $requestId ?></span>
-    </div>
+    <nav class="flex text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-2">
+            <li><a href="<?= base_url('index.php') ?>" class="hover:text-coral transition">Home</a></li>
+            <li><span>/</span></li>
+            <li><a href="<?= base_url('owner/dashboard.php') ?>" class="hover:text-coral transition">Dashboard</a></li>
+            <li><span>/</span></li>
+            <li><a href="<?= base_url('owner/manage_requests.php?status=Active') ?>" class="hover:text-coral transition">Active Rentals</a></li>
+            <li><span>/</span></li>
+            <li class="text-midnight font-semibold">Confirm Return #<?= $requestId ?></li>
+        </ol>
+    </nav>
 
     <!-- Header -->
     <div class="mb-8">
-        <div class="flex items-center space-x-3">
-            <span class="p-2.5 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 text-xl">📦</span>
-            <div>
-                <h1 class="text-2xl font-bold text-white tracking-tight">Confirm Product Return & Fine Assessment</h1>
-                <p class="text-xs text-slate-400 mt-1">Review rental completion, verify scheduled vs actual return dates, and assess any damages or late fees.</p>
-            </div>
+        <div class="flex items-center space-x-2 text-coral text-xs font-semibold uppercase tracking-wider mb-1">
+            <i class="ri-box-3-line text-sm"></i>
+            <span>Inspection & Escrow Settlement</span>
         </div>
+        <h1 class="text-2xl sm:text-3xl font-display font-bold text-midnight tracking-tight">Confirm Return & Assess Fines</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Verify product return date, evaluate physical condition, and settle escrow security deposit deductions or full refunds.
+        </p>
     </div>
 
     <?php if (!empty($errors)): ?>
-        <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-sm">
-            <div class="font-bold mb-1">Please correct the following errors:</div>
+        <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+            <div class="font-bold mb-1 flex items-center space-x-2 text-rose-800">
+                <i class="ri-error-warning-line text-base"></i>
+                <span>Please correct the following errors:</span>
+            </div>
             <ul class="list-disc list-inside space-y-1 text-xs">
                 <?php foreach ($errors as $err): ?>
                     <li><?= htmlspecialchars($err) ?></li>
@@ -163,78 +168,86 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left: Product & Rental Summary -->
         <div class="space-y-6">
-            <div class="card p-5 border border-slate-800 rounded-2xl bg-slate-900/60 space-y-4">
-                <h2 class="text-sm font-bold text-white border-b border-slate-800 pb-2 flex items-center justify-between">
-                    <span>Rental Details</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
-                </h2>
+            <div class="p-6 border border-[#E9E7FF] rounded-3xl bg-white shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-[#E9E7FF] pb-3">
+                    <span class="text-xs font-semibold text-midnight uppercase tracking-wider">Rental Details</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Active
+                    </span>
+                </div>
 
                 <div>
-                    <h3 class="font-semibold text-slate-200 text-sm"><?= htmlspecialchars($request->getProductTitle()) ?></h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Rented by: <span class="text-white font-medium"><?= htmlspecialchars($request->getRenterName()) ?></span></p>
+                    <h3 class="font-display font-bold text-midnight text-base"><?= htmlspecialchars($request->getProductTitle()) ?></h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Renter: <span class="text-midnight font-semibold"><?= htmlspecialchars($request->getRenterName()) ?></span></p>
                 </div>
 
-                <div class="space-y-2 text-xs pt-2 border-t border-slate-800">
-                    <div class="flex justify-between text-slate-400">
+                <div class="space-y-2 text-xs pt-3 border-t border-[#E9E7FF]">
+                    <div class="flex justify-between text-slate-500">
                         <span>Start Date:</span>
-                        <span class="font-semibold text-white"><?= date('M d, Y', strtotime($request->getStartDate())) ?></span>
+                        <span class="font-semibold text-midnight"><?= date('M d, Y', strtotime($request->getStartDate())) ?></span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-slate-500">
                         <span>Scheduled End:</span>
-                        <span class="font-semibold text-white"><?= date('M d, Y', strtotime($request->getEndDate())) ?></span>
+                        <span class="font-semibold text-midnight"><?= date('M d, Y', strtotime($request->getEndDate())) ?></span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-slate-500">
                         <span>Rent Per Day:</span>
-                        <span class="font-semibold text-white">₹<?= number_format($request->getRentPerDay(), 2) ?></span>
+                        <span class="font-semibold text-midnight">₹<?= number_format($request->getRentPerDay(), 2) ?></span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
-                        <span>Security Deposit Held:</span>
-                        <span class="font-bold text-emerald-400">₹<?= number_format($depositHeld, 2) ?></span>
+                    <div class="flex justify-between text-slate-500">
+                        <span>Deposit Held:</span>
+                        <span class="font-bold text-emerald-600">₹<?= number_format($depositHeld, 2) ?></span>
                     </div>
                 </div>
 
-                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
-                    <div class="font-medium text-slate-300">Rule 8 Escrow Terms:</div>
-                    <div>• Clean Return: 100% deposit refunded to renter.</div>
-                    <div>• Fine $\le$ Deposit: Deducted from deposit, balance refunded.</div>
-                    <div>• Fine $>$ Deposit: Deposit forfeited; renter pays remaining.</div>
+                <div class="p-4 bg-[#FAF8F5] rounded-2xl border border-[#E9E7FF] text-[11px] text-slate-600 space-y-1.5">
+                    <div class="font-semibold text-midnight flex items-center space-x-1.5">
+                        <i class="ri-shield-check-line text-coral text-sm"></i>
+                        <span>Escrow Settlement Policy:</span>
+                    </div>
+                    <div>• Clean Return: 100% deposit released back to renter.</div>
+                    <div>• Fine &le; Deposit: Deducted directly from deposit; balance refunded.</div>
+                    <div>• Fine &gt; Deposit: Full deposit forfeited; remaining balance invoiced to renter.</div>
                 </div>
             </div>
         </div>
 
         <!-- Right: Assessment Form -->
         <div class="lg:col-span-2">
-            <form method="POST" action="" class="card p-6 border border-slate-800 rounded-2xl bg-slate-900/60 space-y-6">
+            <form method="POST" action="" class="p-6 sm:p-8 border border-[#E9E7FF] rounded-3xl bg-white shadow-sm space-y-6">
                 <?= csrf_field() ?>
                 <input type="hidden" name="request_id" value="<?= $requestId ?>">
 
                 <!-- 1. Actual Return Date -->
                 <div>
-                    <label for="actual_return_date" class="block text-xs font-semibold text-slate-300 mb-2">
-                        Actual Return Date <span class="text-rose-400">*</span>
+                    <label for="actual_return_date" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                        Actual Return Date <span class="text-coral">*</span>
                     </label>
                     <input type="date" 
                            id="actual_return_date" 
                            name="actual_return_date" 
                            value="<?= htmlspecialchars($actualReturnDate) ?>" 
                            onchange="calculateSummary()"
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                           class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                     <p class="text-[11px] text-slate-400 mt-1.5">
-                        Scheduled End Date was: <strong class="text-white"><?= date('M d, Y', strtotime($request->getEndDate())) ?></strong>. If returned after this date, daily late fees apply automatically.
+                        Scheduled End Date: <strong class="text-midnight"><?= date('M d, Y', strtotime($request->getEndDate())) ?></strong>. Any return after this date incurs daily late fees automatically.
                     </p>
                 </div>
 
                 <!-- Late Return Detection Alert -->
-                <div id="lateAlertBox" class="p-4 rounded-xl border <?= $isLate ? 'bg-amber-950/30 border-amber-800/60 text-amber-300' : 'bg-slate-950 border-slate-800 text-slate-400' ?> text-xs space-y-1">
+                <div id="lateAlertBox" class="p-4 rounded-2xl border <?= $isLate ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-[#FAF8F5] border-[#E9E7FF] text-slate-600' ?> text-xs space-y-1">
                     <div class="font-semibold flex items-center justify-between">
-                        <span>Late Return Fee Status:</span>
+                        <span class="flex items-center space-x-1.5">
+                            <i class="ri-time-line text-sm"></i>
+                            <span>Late Return Fee Status:</span>
+                        </span>
                         <span id="lateDaysBadge" class="font-mono font-bold"><?= $isLate ? "{$lateDays} Day(s) Late" : "On Time" ?></span>
                     </div>
                     <div class="text-[11px]" id="lateDetailsText">
                         <?php if ($isLate): ?>
-                            <?= $lateDays ?> late day(s) × ₹<?= number_format($currentFineRate, 2) ?>/day = <strong class="text-amber-200">₹<?= number_format($lateFee, 2) ?></strong>
+                            <?= $lateDays ?> late day(s) × ₹<?= number_format($currentFineRate, 2) ?>/day = <strong class="text-amber-900">₹<?= number_format($lateFee, 2) ?></strong>
                             <?php if ($lateDetection['is_capped'] ?? false): ?>
-                                <span class="text-rose-300">(Capped at 2× Security Deposit: ₹<?= number_format($maxFineCap, 2) ?>)</span>
+                                <span class="text-rose-600">(Capped at 2× Security Deposit: ₹<?= number_format($maxFineCap, 2) ?>)</span>
                             <?php endif; ?>
                         <?php else: ?>
                             Item is recorded as returned on or before scheduled end date. Zero late fee.
@@ -243,46 +256,46 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <!-- 2. Physical Condition Assessment -->
-                <div class="pt-4 border-t border-slate-800">
-                    <label class="block text-xs font-semibold text-slate-300 mb-3">
-                        Physical Condition Assessment <span class="text-rose-400">*</span>
+                <div class="pt-4 border-t border-[#E9E7FF]">
+                    <label class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-3">
+                        Physical Condition Assessment <span class="text-coral">*</span>
                     </label>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <label id="card_clean" class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                        <label id="card_clean" class="relative flex flex-col p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition">
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-bold text-slate-200">Clean / Good</span>
-                                <input type="radio" name="condition_assessment" value="Clean" <?= $conditionAssessment === 'Clean' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-emerald-500 accent-emerald-500 bg-slate-900 border-slate-700 cursor-pointer">
+                                <span class="text-xs font-bold text-midnight">Clean / Good</span>
+                                <input type="radio" name="condition_assessment" value="Clean" <?= $conditionAssessment === 'Clean' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-emerald-600 accent-emerald-600 cursor-pointer">
                             </div>
-                            <span class="text-[11px] text-slate-400">Normal wear, no damages or missing parts.</span>
+                            <span class="text-[11px] text-slate-500">Normal wear, zero damage or missing parts.</span>
                         </label>
 
-                        <label id="card_damage" class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                        <label id="card_damage" class="relative flex flex-col p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition">
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-bold text-slate-200">Damaged</span>
-                                <input type="radio" name="condition_assessment" value="Damage" <?= $conditionAssessment === 'Damage' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-amber-500 accent-amber-500 bg-slate-900 border-slate-700 cursor-pointer">
+                                <span class="text-xs font-bold text-midnight">Damaged</span>
+                                <input type="radio" name="condition_assessment" value="Damage" <?= $conditionAssessment === 'Damage' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-amber-600 accent-amber-600 cursor-pointer">
                             </div>
-                            <span class="text-[11px] text-slate-400">Repairable scratches, cracks, or broken parts.</span>
+                            <span class="text-[11px] text-slate-500">Repairable scratches, dents, or broken parts.</span>
                         </label>
 
-                        <label id="card_lost" class="relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition">
+                        <label id="card_lost" class="relative flex flex-col p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition">
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-bold text-slate-200">Lost / Total Loss</span>
-                                <input type="radio" name="condition_assessment" value="Lost" <?= $conditionAssessment === 'Lost' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-rose-500 accent-rose-500 bg-slate-900 border-slate-700 cursor-pointer">
+                                <span class="text-xs font-bold text-midnight">Lost / Destroyed</span>
+                                <input type="radio" name="condition_assessment" value="Lost" <?= $conditionAssessment === 'Lost' ? 'checked' : '' ?> onchange="toggleDamageFields()" class="w-4 h-4 text-rose-600 accent-rose-600 cursor-pointer">
                             </div>
-                            <span class="text-[11px] text-slate-400">Item not returned or completely destroyed.</span>
+                            <span class="text-[11px] text-slate-500">Item unreturned or totally beyond repair.</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Damage / Loss Fine Inputs -->
-                <div id="damageFieldsBox" class="<?= in_array($conditionAssessment, ['Damage', 'Lost']) ? '' : 'hidden' ?> space-y-4 p-4 rounded-xl bg-slate-950 border border-slate-800">
+                <div id="damageFieldsBox" class="<?= in_array($conditionAssessment, ['Damage', 'Lost']) ? '' : 'hidden' ?> space-y-4 p-5 rounded-2xl bg-[#FAF8F5] border border-[#E9E7FF]">
                     <div>
-                        <label for="damage_amount" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                            Assessed Repair / Replacement Cost (₹) <span class="text-rose-400">*</span>
+                        <label for="damage_amount" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Assessed Repair / Replacement Cost (₹) <span class="text-coral">*</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">₹</span>
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 text-sm">₹</span>
                             <input type="number" 
                                    id="damage_amount" 
                                    name="damage_amount" 
@@ -291,59 +304,62 @@ require_once __DIR__ . '/../includes/header.php';
                                    value="<?= $damageAmount > 0 ? htmlspecialchars((string) $damageAmount) : '' ?>" 
                                    oninput="calculateSummary()"
                                    placeholder="0.00"
-                                   class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                                   class="w-full bg-white border border-[#E9E7FF] rounded-2xl pl-8 pr-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                         </div>
                     </div>
 
                     <div>
-                        <label for="damage_notes" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                        <label for="damage_notes" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
                             Damage Description / Assessment Notes
                         </label>
                         <textarea id="damage_notes" 
                                   name="damage_notes" 
                                   rows="2" 
-                                  placeholder="Describe the nature of damage, repair invoice details, or missing components..."
-                                  class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"><?= htmlspecialchars($damageNotes) ?></textarea>
+                                  placeholder="Describe the nature of damage, repair estimate, or missing accessories..."
+                                  class="w-full bg-white border border-[#E9E7FF] rounded-2xl px-4 py-3 text-xs text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition"><?= htmlspecialchars($damageNotes) ?></textarea>
                     </div>
                 </div>
 
                 <!-- 3. Financial Settlement Preview Box -->
-                <div class="p-5 rounded-2xl bg-blue-950/20 border border-blue-900/50 space-y-3">
-                    <h4 class="text-xs font-bold text-blue-300 uppercase tracking-wider">Settlement & Deposit Deductions Breakdown</h4>
+                <div class="p-6 rounded-3xl bg-[#FAF8F5] border border-[#E9E7FF] space-y-3">
+                    <h4 class="text-xs font-semibold text-midnight uppercase tracking-wider flex items-center space-x-1.5">
+                        <i class="ri-scales-3-line text-coral text-sm"></i>
+                        <span>Settlement & Deductions Preview</span>
+                    </h4>
                     
-                    <div class="space-y-1.5 text-xs">
-                        <div class="flex justify-between text-slate-400">
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between text-slate-500">
                             <span>Escrow Security Deposit Held:</span>
-                            <span class="font-semibold text-white">₹<?= number_format($depositHeld, 2) ?></span>
+                            <span class="font-semibold text-midnight">₹<?= number_format($depositHeld, 2) ?></span>
                         </div>
-                        <div class="flex justify-between text-slate-400">
+                        <div class="flex justify-between text-slate-500">
                             <span>Late Return Fine:</span>
-                            <span id="summaryLateFine" class="font-semibold text-amber-400">₹<?= number_format($lateFee, 2) ?></span>
+                            <span id="summaryLateFine" class="font-semibold text-amber-600">₹<?= number_format($lateFee, 2) ?></span>
                         </div>
-                        <div class="flex justify-between text-slate-400">
+                        <div class="flex justify-between text-slate-500">
                             <span>Damage / Loss Fine:</span>
-                            <span id="summaryDamageFine" class="font-semibold text-amber-400">₹<?= number_format($damageAmount, 2) ?></span>
+                            <span id="summaryDamageFine" class="font-semibold text-amber-600">₹<?= number_format($damageAmount, 2) ?></span>
                         </div>
-                        <div class="pt-2 border-t border-slate-800 flex justify-between font-bold text-slate-200">
+                        <div class="pt-2 border-t border-[#E9E7FF] flex justify-between font-bold text-midnight">
                             <span>Total Assessed Fines:</span>
-                            <span id="summaryTotalFine" class="text-rose-400">₹<?= number_format($lateFee + $damageAmount, 2) ?></span>
+                            <span id="summaryTotalFine" class="text-rose-600">₹<?= number_format($lateFee + $damageAmount, 2) ?></span>
                         </div>
-                        <div class="pt-1.5 flex justify-between font-extrabold text-sm" id="summaryNetRow">
+                        <div class="pt-2 border-t border-[#E9E7FF] flex justify-between font-extrabold text-sm" id="summaryNetRow">
                             <!-- Populated dynamically via JS -->
                         </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3">
+                <div class="pt-4 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-[#E9E7FF]">
                     <a href="<?= base_url('owner/manage_requests.php?status=Active') ?>" 
-                       class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white text-xs font-semibold text-center transition">
+                       class="w-full sm:w-auto px-5 py-2.5 rounded-full border border-slate-200 text-slate-600 hover:text-midnight text-xs font-semibold text-center transition">
                         Cancel
                     </a>
                     <button type="submit" 
                             onclick="return confirm('Are you sure you want to finalize this return and process deposit deductions/refunds?');"
-                            class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-blue-600/20 transition flex items-center justify-center space-x-2">
-                        <span>✓</span>
+                            class="w-full sm:w-auto px-7 py-3 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs rounded-full shadow-glow-coral transition flex items-center justify-center space-x-1.5">
+                        <i class="ri-check-line"></i>
                         <span>Confirm Return & Finalize Settlement</span>
                     </button>
                 </div>
@@ -373,16 +389,16 @@ function toggleDamageFields() {
     const cardLost = document.getElementById('card_lost');
 
     if (cardClean && cardDamage && cardLost) {
-        cardClean.className = "relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition";
-        cardDamage.className = "relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition";
-        cardLost.className = "relative flex flex-col p-4 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 cursor-pointer transition";
+        cardClean.className = "relative flex flex-col p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition";
+        cardDamage.className = "relative flex flex-col p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition";
+        cardLost.className = "relative flex flex-col p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition";
 
         if (selected === 'Clean') {
-            cardClean.className = "relative flex flex-col p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/30 cursor-pointer transition shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-500/50";
+            cardClean.className = "relative flex flex-col p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/60 cursor-pointer transition shadow-sm";
         } else if (selected === 'Damage') {
-            cardDamage.className = "relative flex flex-col p-4 rounded-xl border-2 border-amber-500 bg-amber-950/30 cursor-pointer transition shadow-lg shadow-amber-950/40 ring-1 ring-amber-500/50";
+            cardDamage.className = "relative flex flex-col p-4 rounded-2xl border-2 border-amber-500 bg-amber-50/60 cursor-pointer transition shadow-sm";
         } else if (selected === 'Lost') {
-            cardLost.className = "relative flex flex-col p-4 rounded-xl border-2 border-rose-500 bg-rose-950/30 cursor-pointer transition shadow-lg shadow-rose-950/40 ring-1 ring-rose-500/50";
+            cardLost.className = "relative flex flex-col p-4 rounded-2xl border-2 border-rose-500 bg-rose-50/60 cursor-pointer transition shadow-sm";
         }
     }
 
@@ -418,14 +434,14 @@ function calculateSummary() {
     const details = document.getElementById('lateDetailsText');
 
     if (lateDays > 0) {
-        alertBox.className = "p-4 rounded-xl border bg-amber-950/30 border-amber-800/60 text-amber-300 text-xs space-y-1";
+        alertBox.className = "p-4 rounded-2xl border bg-amber-50 border-amber-200 text-amber-800 text-xs space-y-1";
         badge.innerText = lateDays + " Day(s) Late";
-        details.innerHTML = lateDays + " late day(s) × ₹" + fineRatePerDay.toFixed(2) + "/day = <strong class='text-amber-200'>₹" + lateFee.toFixed(2) + "</strong>";
+        details.innerHTML = lateDays + " late day(s) × ₹" + fineRatePerDay.toFixed(2) + "/day = <strong class='text-amber-900'>₹" + lateFee.toFixed(2) + "</strong>";
         if (maxCap > 0 && (lateDays * fineRatePerDay) > maxCap) {
-            details.innerHTML += " <span class='text-rose-300'>(Capped at 2× Security Deposit: ₹" + maxCap.toFixed(2) + ")</span>";
+            details.innerHTML += " <span class='text-rose-600'>(Capped at 2× Security Deposit: ₹" + maxCap.toFixed(2) + ")</span>";
         }
     } else {
-        alertBox.className = "p-4 rounded-xl border bg-slate-950 border-slate-800 text-slate-400 text-xs space-y-1";
+        alertBox.className = "p-4 rounded-2xl border bg-[#FAF8F5] border-[#E9E7FF] text-slate-600 text-xs space-y-1";
         badge.innerText = "On Time";
         details.innerText = "Item is recorded as returned on or before scheduled end date. Zero late fee.";
     }
@@ -444,14 +460,14 @@ function calculateSummary() {
     if (totalFine <= depositHeld) {
         const refund = depositHeld - totalFine;
         netRow.innerHTML = `
-            <span class="text-emerald-300">Net Refund to Renter:</span>
-            <span class="text-emerald-400">₹${refund.toFixed(2)}</span>
+            <span class="text-emerald-700">Net Refund Released to Renter:</span>
+            <span class="text-emerald-700 font-bold text-base">₹${refund.toFixed(2)}</span>
         `;
     } else {
         const excess = totalFine - depositHeld;
         netRow.innerHTML = `
-            <span class="text-rose-300">Deposit Forfeited (Renter Owes Difference):</span>
-            <span class="text-rose-400">₹${excess.toFixed(2)}</span>
+            <span class="text-rose-700">Deposit Forfeited (Renter Owes Difference):</span>
+            <span class="text-rose-700 font-bold text-base">₹${excess.toFixed(2)}</span>
         `;
     }
 }

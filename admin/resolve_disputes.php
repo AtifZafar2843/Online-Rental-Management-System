@@ -2,9 +2,6 @@
 /**
  * Online Rental Management System (ORMS)
  * Admin Dispute Resolution Center
- * 
- * Project: BCSP-064 (IGNOU BCA Final Project)
- * Specification: Prompt Guide Section 5 (Rule 13) & Synopsis Section 13.X (Page 31)
  */
 
 declare(strict_types=1);
@@ -77,46 +74,47 @@ $pageTitle = 'Dispute Resolution Center — ORMS Admin';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <nav class="flex text-xs text-slate-400 mb-6" aria-label="Breadcrumb">
+    <nav class="flex text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2">
-            <li><a href="<?= base_url('admin/dashboard.php') ?>" class="hover:text-white transition">Admin Dashboard</a></li>
+            <li><a href="<?= base_url('admin/dashboard.php') ?>" class="hover:text-coral transition">Admin Dashboard</a></li>
             <li><span>/</span></li>
-            <li class="text-slate-200 font-semibold">Dispute Resolution</li>
+            <li class="text-midnight font-semibold">Dispute Resolution</li>
         </ol>
     </nav>
 
     <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E9E7FF] pb-6 mb-8">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
-                <span>⚖️</span>
-                <span>Dispute Resolution Center</span>
-            </h1>
-            <p class="text-sm text-slate-400 mt-1">
-                Neutral adjudication portal &bull; Review evidence, inspect financial and fine records, and record mandatory ruling notes.
+            <div class="flex items-center space-x-2 text-coral text-xs font-semibold uppercase tracking-wider mb-1">
+                <i class="ri-scales-3-line text-sm"></i>
+                <span>Platform Arbitration</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-display font-bold text-midnight tracking-tight">Dispute Resolution Center</h1>
+            <p class="text-sm text-slate-500 mt-1">
+                Neutral adjudication portal &bull; Review evidence, inspect financial and fine records, and record ruling notes.
             </p>
         </div>
 
         <div>
             <a href="<?= base_url('admin/reports.php') ?>" 
-               class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center space-x-2">
-                <span>📊</span>
-                <span>View Compliance Reports</span>
+               class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-midnight text-xs font-semibold rounded-full border border-[#E9E7FF] transition flex items-center space-x-1.5 shadow-sm">
+                <i class="ri-bar-chart-2-line text-coral"></i>
+                <span>Compliance Reports</span>
             </a>
         </div>
     </div>
 
     <?php if ($error): ?>
-        <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-sm flex items-center space-x-3 shadow-lg">
-            <span class="text-xl flex-shrink-0">⚠️</span>
+        <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-center space-x-3 shadow-sm">
+            <i class="ri-error-warning-line text-lg text-rose-600 flex-shrink-0"></i>
             <span><?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 
     <!-- Status Tabs -->
-    <div class="flex flex-wrap items-center gap-2 mb-8 bg-slate-900 border border-slate-800 p-2 rounded-2xl">
+    <div class="flex flex-wrap items-center gap-2 mb-8 bg-white border border-[#E9E7FF] p-2 rounded-full shadow-sm">
         <?php
             $tabs = [
                 'All'          => ['label' => 'All Disputes', 'count' => $counts['All']],
@@ -130,9 +128,9 @@ require_once __DIR__ . '/../includes/header.php';
                 $url = base_url('admin/resolve_disputes.php' . ($key !== 'All' ? '?status=' . urlencode($key) : ''));
         ?>
             <a href="<?= $url ?>" 
-               class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 <?= $isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800' ?>">
+               class="px-4 py-2 rounded-full text-xs font-semibold transition flex items-center space-x-2 <?= $isActive ? 'bg-coral text-white shadow-glow-coral' : 'text-slate-600 hover:text-midnight hover:bg-slate-50' ?>">
                 <span><?= $tab['label'] ?></span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono <?= $isActive ? 'bg-blue-800 text-white' : 'bg-slate-800 text-slate-300' ?>">
+                <span class="px-2 py-0.5 rounded-full text-[10px] <?= $isActive ? 'bg-white/25 text-white' : 'bg-[#FAF8F5] text-slate-500' ?>">
                     <?= $tab['count'] ?>
                 </span>
             </a>
@@ -141,13 +139,13 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Disputes List -->
     <?php if (empty($disputes)): ?>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center shadow-xl">
-            <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-800/80 flex items-center justify-center text-3xl mb-4">
-                🎉
+        <div class="bg-white border border-[#E9E7FF] rounded-3xl p-12 text-center shadow-sm">
+            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mb-4">
+                <i class="ri-checkbox-circle-line"></i>
             </div>
-            <h3 class="text-base font-bold text-white">No disputes found</h3>
+            <h3 class="text-base font-bold font-display text-midnight">No disputes found</h3>
             <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-                There are no dispute cases matching the selected filter status.
+                There are currently no dispute cases matching the selected filter status.
             </p>
         </div>
     <?php else: ?>
@@ -168,57 +166,59 @@ require_once __DIR__ . '/../includes/header.php';
                 $firstFine = $hasFines ? $fines[0] : null;
 
                 $statusColors = [
-                    'Open'         => 'bg-amber-950/80 text-amber-300 border-amber-700',
-                    'Under_Review' => 'bg-blue-950/80 text-blue-300 border-blue-700',
-                    'Escalated'    => 'bg-rose-950/80 text-rose-300 border-rose-700',
-                    'Resolved'     => 'bg-emerald-950/80 text-emerald-300 border-emerald-700'
+                    'Open'         => 'bg-amber-50 text-amber-700 border-amber-200',
+                    'Under_Review' => 'bg-blue-50 text-blue-700 border-blue-200',
+                    'Escalated'    => 'bg-rose-50 text-rose-700 border-rose-200',
+                    'Resolved'     => 'bg-emerald-50 text-emerald-700 border-emerald-200'
                 ];
-                $badgeColor = $statusColors[$disp->getStatus()] ?? 'bg-slate-800 text-slate-300 border-slate-700';
+                $badgeColor = $statusColors[$disp->getStatus()] ?? 'bg-slate-50 text-slate-700 border-slate-200';
             ?>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                <div class="bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-7 shadow-sm space-y-5">
                     <!-- Case Header -->
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E9E7FF] pb-4">
                         <div class="flex items-center space-x-3">
-                            <span class="text-xl">⚖️</span>
+                            <div class="w-10 h-10 rounded-2xl bg-[#FAF8F5] border border-[#E9E7FF] flex items-center justify-center text-coral text-lg flex-shrink-0">
+                                <i class="ri-scales-3-line"></i>
+                            </div>
                             <div>
-                                <h3 class="font-bold text-white text-base">
+                                <h3 class="font-bold font-display text-midnight text-base">
                                     Dispute #<?= $disp->getDisputeID() ?> &bull; Rental #<?= $disp->getRequestID() ?>
                                 </h3>
-                                <span class="text-xs text-slate-400">
-                                    Item: <strong class="text-slate-200"><?= htmlspecialchars($disp->getProductTitle() ?? 'Product') ?></strong>
+                                <span class="text-xs text-slate-500">
+                                    Item: <strong class="text-midnight"><?= htmlspecialchars($disp->getProductTitle() ?? 'Product') ?></strong>
                                 </span>
                             </div>
                         </div>
 
                         <div class="flex items-center space-x-3">
-                            <span class="px-3 py-1 text-xs font-bold rounded-full border <?= $badgeColor ?>">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full border <?= $badgeColor ?>">
                                 <?= str_replace('_', ' ', $disp->getStatus()) ?>
                             </span>
-                            <span class="text-xs text-slate-500 font-mono">
+                            <span class="text-xs text-slate-400 font-mono">
                                 <?= date('M d, Y • h:i A', strtotime($disp->getCreatedDate())) ?>
                             </span>
                         </div>
                     </div>
 
                     <!-- Case Parties & Financial Context -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-5 bg-[#FAF8F5] rounded-2xl border border-[#E9E7FF] text-xs">
                         <div>
-                            <span class="text-slate-500 block">Raised By</span>
-                            <span class="text-indigo-400 font-bold"><?= htmlspecialchars($disp->getRaisedByName() ?? 'User #' . $disp->getRaisedByID()) ?></span>
+                            <span class="text-slate-400 block mb-0.5">Raised By</span>
+                            <span class="text-midnight font-bold"><?= htmlspecialchars($disp->getRaisedByName() ?? 'User #' . $disp->getRaisedByID()) ?></span>
                         </div>
                         <div>
-                            <span class="text-slate-500 block">Against</span>
-                            <span class="text-amber-400 font-bold"><?= htmlspecialchars($disp->getAgainstName() ?? 'User #' . $disp->getAgainstID()) ?></span>
+                            <span class="text-slate-400 block mb-0.5">Against</span>
+                            <span class="text-midnight font-bold"><?= htmlspecialchars($disp->getAgainstName() ?? 'User #' . $disp->getAgainstID()) ?></span>
                         </div>
                         <div>
-                            <span class="text-slate-500 block">Rental Escrow / Deposit</span>
-                            <span class="text-slate-200 font-semibold">
+                            <span class="text-slate-400 block mb-0.5">Escrow Security Deposit</span>
+                            <span class="text-emerald-700 font-semibold">
                                 <?= $tx ? "₹" . number_format($tx->getDepositAmount(), 2) . " (" . $tx->getDepositStatus() . ")" : "No deposit logged" ?>
                             </span>
                         </div>
                         <div>
-                            <span class="text-slate-500 block">Assessed Fines</span>
-                            <span class="text-rose-300 font-semibold">
+                            <span class="text-slate-400 block mb-0.5">Assessed Penalties</span>
+                            <span class="text-rose-600 font-semibold">
                                 <?php if ($hasFines): ?>
                                     ₹<?= number_format($totalFineAmt, 2) ?> 
                                     <span class="text-[10px] text-slate-400 font-normal">
@@ -233,25 +233,26 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <!-- Raiser Statement -->
                     <div>
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                        <span class="text-xs font-semibold text-midnight uppercase tracking-wider block mb-2">
                             Filing Party Claim & Details:
                         </span>
-                        <div class="p-4 bg-slate-950/80 rounded-xl border border-slate-800/80 text-slate-200 text-sm leading-relaxed">
+                        <div class="p-4 bg-[#FAF8F5] rounded-2xl border border-[#E9E7FF] text-slate-700 text-sm leading-relaxed">
                             <?= nl2br(htmlspecialchars($disp->getReason())) ?>
                         </div>
                     </div>
 
                     <!-- Existing Admin Ruling (If any) -->
                     <?php if ($disp->getAdminNotes()): ?>
-                        <div class="p-4 bg-emerald-950/20 border border-emerald-800/40 rounded-xl space-y-1">
-                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block">
-                                🛡️ Previous / Current Administrator Ruling:
+                        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-1">
+                            <span class="text-xs font-semibold text-emerald-800 uppercase tracking-wider block flex items-center space-x-1.5">
+                                <i class="ri-shield-check-line text-emerald-600"></i>
+                                <span>Recorded Administrator Ruling:</span>
                             </span>
-                            <p class="text-emerald-200 text-sm leading-relaxed">
+                            <p class="text-emerald-900 text-sm leading-relaxed">
                                 <?= nl2br(htmlspecialchars($disp->getAdminNotes())) ?>
                             </p>
                             <?php if ($disp->getResolvedDate()): ?>
-                                <span class="text-[11px] text-slate-500 block pt-1 font-mono">
+                                <span class="text-[11px] text-emerald-700 block pt-1 font-mono">
                                     Resolved on <?= date('M d, Y • h:i A', strtotime($disp->getResolvedDate())) ?>
                                 </span>
                             <?php endif; ?>
@@ -259,7 +260,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php endif; ?>
 
                     <!-- Action & Resolution Form -->
-                    <div class="pt-4 border-t border-slate-800">
+                    <div class="pt-4 border-t border-[#E9E7FF]">
                         <form action="<?= base_url('admin/resolve_disputes.php') ?>" method="POST" class="space-y-4">
                             <?= csrf_field() ?>
                             <input type="hidden" name="dispute_id" value="<?= $disp->getDisputeID() ?>">
@@ -267,8 +268,8 @@ require_once __DIR__ . '/../includes/header.php';
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Target Status</label>
-                                    <select name="status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <label class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">Target Status</label>
+                                    <select name="status" class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-2.5 text-xs text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                                         <option value="Resolved" <?= $disp->getStatus() === 'Resolved' ? 'selected' : '' ?>>Resolved (Close Case)</option>
                                         <option value="Under_Review" <?= $disp->getStatus() === 'Under_Review' ? 'selected' : '' ?>>Under Review</option>
                                         <option value="Escalated" <?= $disp->getStatus() === 'Escalated' ? 'selected' : '' ?>>Escalate Case</option>
@@ -276,20 +277,20 @@ require_once __DIR__ . '/../includes/header.php';
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">
-                                        Administrative Notes <span class="text-rose-400">* (Mandatory on Resolve per Rule 13)</span>
+                                    <label class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                                        Administrative Notes <span class="text-coral">* (Mandatory on Resolve)</span>
                                     </label>
                                     <textarea name="admin_notes" 
                                               rows="2" 
                                               placeholder="Document formal justification, ruling outcome, and required actions..."
-                                              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"><?= htmlspecialchars($disp->getAdminNotes() ?? '') ?></textarea>
+                                              class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-2.5 text-xs text-midnight placeholder-slate-400 focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition leading-relaxed"><?= htmlspecialchars($disp->getAdminNotes() ?? '') ?></textarea>
                                 </div>
                             </div>
 
                             <?php if ($hasWaivableFine): ?>
                                 <div class="flex items-center space-x-2 pt-1">
-                                    <input type="checkbox" id="waive_fine_<?= $disp->getDisputeID() ?>" name="waive_fine" value="1" class="rounded border-slate-700 bg-slate-950 text-blue-600 focus:ring-blue-500 w-4 h-4">
-                                    <label for="waive_fine_<?= $disp->getDisputeID() ?>" class="text-xs text-amber-300 font-medium">
+                                    <input type="checkbox" id="waive_fine_<?= $disp->getDisputeID() ?>" name="waive_fine" value="1" class="rounded border-[#E9E7FF] text-coral focus:ring-coral w-4 h-4">
+                                    <label for="waive_fine_<?= $disp->getDisputeID() ?>" class="text-xs text-amber-700 font-medium">
                                         Waive assessed penalty / fine (₹<?= number_format($totalFineAmt, 2) ?>) for Renter on case resolution
                                     </label>
                                 </div>
@@ -297,9 +298,9 @@ require_once __DIR__ . '/../includes/header.php';
 
                             <div class="flex items-center justify-end space-x-3 pt-2">
                                 <button type="submit" 
-                                        class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/30 transition flex items-center space-x-1.5">
-                                    <span>💾</span>
-                                    <span>Submit Ruling & Update</span>
+                                        class="px-6 py-2.5 bg-coral hover:bg-[#e04e53] text-white text-xs font-semibold rounded-full shadow-glow-coral transition flex items-center space-x-1.5">
+                                    <i class="ri-check-line"></i>
+                                    <span>Submit Ruling &amp; Update</span>
                                 </button>
                             </div>
                         </form>

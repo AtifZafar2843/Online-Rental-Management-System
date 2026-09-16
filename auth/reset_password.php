@@ -87,28 +87,24 @@ $pageTitle = 'Choose New Password — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="py-16 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+<div class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
+    <div class="bg-white border border-stone-200/80 rounded-3xl shadow-soft overflow-hidden">
         <!-- Header Banner -->
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-8 text-center border-b border-slate-800">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center mb-3 shadow-inner">
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-white tracking-tight">Set New Password</h2>
-            <p class="mt-1 text-xs text-blue-200">
-                <?= $isValidToken ? 'Resetting password for: ' . htmlspecialchars($userRecord['email']) : 'Invalid Link' ?>
+        <div class="p-8 pb-6 text-center border-b border-stone-100 bg-[#FAF8F5]">
+            <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-9 mx-auto mb-3 object-contain">
+            <h2 class="font-display text-2xl font-bold text-midnight tracking-tight">Set New Password</h2>
+            <p class="mt-1 text-xs text-stone-500">
+                <?= $isValidToken ? 'Resetting password for: <strong class="text-midnight">' . htmlspecialchars($userRecord['email']) . '</strong>' : 'Password Reset Verification' ?>
             </p>
         </div>
 
         <div class="p-8">
             <!-- Errors Alert -->
             <?php if (!empty($errors)): ?>
-                <div class="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-600/70 text-rose-200 text-xs space-y-1">
+                <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
                     <?php foreach ($errors as $error): ?>
                         <div class="flex items-center space-x-2">
-                            <span>⚠️</span>
+                            <i class="ri-error-warning-fill text-rose-500 text-base flex-shrink-0"></i>
                             <span><?= htmlspecialchars($error) ?></span>
                         </div>
                     <?php endforeach; ?>
@@ -121,44 +117,59 @@ require_once __DIR__ . '/../includes/header.php';
                     <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
                     <div>
-                        <label for="new_password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            New Password <span class="text-rose-500">*</span>
+                        <label for="new_password" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                            New Password <span class="text-coral">*</span>
                         </label>
-                        <input type="password" id="new_password" name="new_password" required minlength="6" autofocus
-                               placeholder="Minimum 6 characters"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="ri-lock-password-line text-base"></i>
+                            </span>
+                            <input type="password" id="new_password" name="new_password" required minlength="6" autofocus
+                                   placeholder="Minimum 6 characters"
+                                   class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                        </div>
                     </div>
 
                     <div>
-                        <label for="confirm_password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Confirm New Password <span class="text-rose-500">*</span>
+                        <label for="confirm_password" class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+                            Confirm New Password <span class="text-coral">*</span>
                         </label>
-                        <input type="password" id="confirm_password" name="confirm_password" required minlength="6"
-                               placeholder="Re-enter new password"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="ri-lock-check-line text-base"></i>
+                            </span>
+                            <input type="password" id="confirm_password" name="confirm_password" required minlength="6"
+                                   placeholder="Re-enter new password"
+                                   class="w-full bg-white border border-stone-200/90 rounded-2xl pl-10 pr-4 py-3 text-sm text-midnight placeholder-stone-400 focus:outline-none focus:border-coral focus:ring-4 focus:ring-coral-50 transition font-medium">
+                        </div>
                     </div>
 
-                    <div>
+                    <div class="pt-2">
                         <button type="submit" 
-                                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/25 transition duration-150">
-                            Update Password
+                                class="w-full bg-coral hover:bg-coral-600 text-white font-semibold py-3.5 px-6 rounded-full shadow-glow-coral transition duration-150 transform hover:-translate-y-0.5">
+                            Update Password &rarr;
                         </button>
                     </div>
                 </form>
             <?php else: ?>
-                <div class="text-center space-y-4">
-                    <p class="text-xs text-slate-400">
+                <div class="text-center space-y-4 py-4">
+                    <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-500 mx-auto flex items-center justify-center text-2xl">
+                        <i class="ri-close-circle-line"></i>
+                    </div>
+                    <p class="text-xs text-stone-500">
                         Please request a fresh password reset link from the forgot password page.
                     </p>
-                    <a href="<?= base_url('auth/forgot_password.php') ?>" class="inline-block px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition">
-                        Request New Reset Link
+                    <a href="<?= base_url('auth/forgot_password.php') ?>" class="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-coral hover:bg-coral-600 text-white text-xs font-semibold rounded-full shadow-glow-coral transition">
+                        <span>Request New Link</span>
+                        <i class="ri-arrow-right-line"></i>
                     </a>
                 </div>
             <?php endif; ?>
 
-            <div class="text-center mt-6 pt-4 border-t border-slate-800">
-                <a href="<?= base_url('auth/login.php') ?>" class="text-xs text-slate-400 hover:text-white transition">
-                    &larr; Back to Sign In
+            <div class="text-center mt-6 pt-4 border-t border-stone-100">
+                <a href="<?= base_url('auth/login.php') ?>" class="text-xs text-stone-500 hover:text-midnight transition inline-flex items-center space-x-1 font-medium">
+                    <i class="ri-arrow-left-line"></i>
+                    <span>Back to Sign In</span>
                 </a>
             </div>
         </div>

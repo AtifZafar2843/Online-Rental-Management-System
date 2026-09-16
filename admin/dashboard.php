@@ -2,9 +2,6 @@
 /**
  * Online Rental Management System (ORMS)
  * Admin Dashboard & Command Center
- * 
- * Project: BCSP-064 (IGNOU BCA Final Project)
- * Specification: Prompt Guide Section 4 & Synopsis Section 11.1, 13.I (Page 29)
  */
 
 declare(strict_types=1);
@@ -53,24 +50,27 @@ $pageTitle = 'Administrator Command Center — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-red-700 via-rose-700 to-slate-900 rounded-2xl p-8 shadow-xl text-white mb-8 border border-rose-600/40 relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="bg-gradient-to-br from-midnight via-[#131b33] to-midnight rounded-3xl p-6 sm:p-10 shadow-sm text-white mb-8 border border-[#E9E7FF] relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
-                <span class="px-3 py-1 bg-red-500/30 rounded-full text-xs font-semibold tracking-wide uppercase border border-red-400/30">
-                    System Administration &bull; Level <?= $admin->getSecurityLevel() ?>
+                <span class="inline-flex items-center space-x-1 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase border border-white/20 text-coral">
+                    <i class="ri-shield-star-line text-sm"></i>
+                    <span>System Administration &bull; Level <?= $admin->getSecurityLevel() ?></span>
                 </span>
-                <h1 class="text-3xl font-extrabold mt-3">Admin Portal &bull; <?= htmlspecialchars(current_user_name()) ?></h1>
-                <p class="text-rose-200 text-sm mt-1">Platform management, dispute adjudication, user governance, category taxonomy, and audit reports.</p>
+                <h1 class="text-2xl sm:text-3xl font-display font-bold mt-3">Admin Portal &bull; <?= htmlspecialchars(current_user_name()) ?></h1>
+                <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl">
+                    Platform management, dispute adjudication, user governance, category taxonomy, and business intelligence reports.
+                </p>
             </div>
-            <div class="flex items-center space-x-3">
-                <a href="<?= base_url('admin/reports.php') ?>" class="px-4 py-2.5 bg-white text-slate-900 font-bold text-xs rounded-xl shadow hover:bg-slate-100 transition flex items-center space-x-2">
-                    <span>📊</span>
-                    <span>View Audit Reports</span>
+            <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+                <a href="<?= base_url('admin/reports.php') ?>" class="px-5 py-2.5 bg-white text-midnight font-semibold text-xs rounded-full shadow-sm hover:bg-slate-50 transition flex items-center space-x-1.5">
+                    <i class="ri-bar-chart-2-line text-coral text-sm"></i>
+                    <span>Audit Reports</span>
                 </a>
-                <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="px-4 py-2.5 bg-red-950/60 text-white font-bold text-xs rounded-xl border border-red-400/40 hover:bg-red-900/60 transition flex items-center space-x-2">
-                    <span>⚖️</span>
+                <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="px-5 py-2.5 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs rounded-full shadow-glow-coral transition flex items-center space-x-1.5">
+                    <i class="ri-scales-3-line text-sm"></i>
                     <span>Dispute Center <?= $openDisputesCount > 0 ? "({$openDisputesCount})" : '' ?></span>
                 </a>
             </div>
@@ -79,17 +79,19 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Dispute Alert Banner if any pending -->
     <?php if ($openDisputesCount > 0): ?>
-    <div class="mb-8 p-4 bg-rose-950/60 border border-rose-500/40 rounded-2xl flex items-center justify-between shadow-lg">
+    <div class="mb-8 p-5 bg-rose-50 border border-rose-200 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center space-x-3">
-            <span class="text-2xl animate-pulse">⚠️</span>
+            <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl flex-shrink-0">
+                <i class="ri-alarm-warning-line"></i>
+            </div>
             <div>
-                <p class="text-sm font-bold text-rose-200">
+                <p class="text-sm font-bold text-rose-900 font-display">
                     <?= $openDisputesCount ?> Active Dispute Case<?= $openDisputesCount > 1 ? 's' : '' ?> Awaiting Adjudication
                 </p>
-                <p class="text-xs text-rose-300/80">Parties have filed formal claims requiring review, admin findings, and settlement resolution.</p>
+                <p class="text-xs text-rose-700 mt-0.5">Parties have filed formal claims requiring review, admin findings, and settlement resolution.</p>
             </div>
         </div>
-        <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition shadow">
+        <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-full transition shadow-sm self-start sm:self-auto whitespace-nowrap">
             Adjudicate Now &rarr;
         </a>
     </div>
@@ -97,40 +99,55 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Metric Counters Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Registered Users</span>
-            <div class="text-3xl font-bold text-white mt-2"><?= $userCount ?></div>
-            <a href="<?= base_url('admin/manage_users.php') ?>" class="text-xs text-blue-400 hover:text-blue-300 mt-2 block font-medium">
+        <div class="bg-white border border-[#E9E7FF] p-6 rounded-3xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Registered Users</span>
+                <i class="ri-group-line text-lg text-slate-400"></i>
+            </div>
+            <div class="text-3xl font-display font-bold text-midnight"><?= $userCount ?></div>
+            <a href="<?= base_url('admin/manage_users.php') ?>" class="text-xs text-coral hover:underline mt-2 inline-block font-medium">
                 Manage Directory &rarr;
             </a>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Catalog Taxonomy</span>
-            <div class="text-3xl font-bold text-white mt-2"><?= $catCount ?></div>
-            <a href="<?= base_url('admin/manage_categories.php') ?>" class="text-xs text-emerald-400 hover:text-emerald-300 mt-2 block font-medium">
-                Manage Categories &rarr;
+        <div class="bg-white border border-[#E9E7FF] p-6 rounded-3xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Taxonomy</span>
+                <i class="ri-price-tag-3-line text-lg text-slate-400"></i>
+            </div>
+            <div class="text-3xl font-display font-bold text-midnight"><?= $catCount ?></div>
+            <a href="<?= base_url('admin/manage_categories.php') ?>" class="text-xs text-coral hover:underline mt-2 inline-block font-medium">
+                Categories &rarr;
             </a>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Inventory Items</span>
-            <div class="text-3xl font-bold text-white mt-2"><?= $productCount ?></div>
-            <span class="text-xs text-slate-500 mt-2 block">Across all owners</span>
+        <div class="bg-white border border-[#E9E7FF] p-6 rounded-3xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inventory</span>
+                <i class="ri-box-3-line text-lg text-slate-400"></i>
+            </div>
+            <div class="text-3xl font-display font-bold text-midnight"><?= $productCount ?></div>
+            <span class="text-xs text-slate-400 mt-2 block">Across all owners</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Rentals</span>
-            <div class="text-3xl font-bold text-indigo-400 mt-2"><?= $activeRentals ?></div>
-            <a href="<?= base_url('admin/reports.php?type=rentals') ?>" class="text-xs text-indigo-400 hover:text-indigo-300 mt-2 block font-medium">
-                View Rentals &rarr;
+        <div class="bg-white border border-[#E9E7FF] p-6 rounded-3xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Rentals</span>
+                <i class="ri-time-line text-lg text-blue-500"></i>
+            </div>
+            <div class="text-3xl font-display font-bold text-blue-600"><?= $activeRentals ?></div>
+            <a href="<?= base_url('admin/reports.php?type=rentals') ?>" class="text-xs text-blue-600 hover:underline mt-2 inline-block font-medium">
+                Live Bookings &rarr;
             </a>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gross Volume</span>
-            <div class="text-2xl font-bold text-emerald-400 mt-2">₹<?= number_format($grossRevenue, 2) ?></div>
-            <a href="<?= base_url('admin/reports.php?type=revenue') ?>" class="text-xs text-emerald-400 hover:text-emerald-300 mt-2 block font-medium">
+        <div class="bg-white border border-[#E9E7FF] p-6 rounded-3xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Gross Revenue</span>
+                <i class="ri-money-rupee-circle-line text-lg text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-display font-bold text-emerald-600">₹<?= number_format($grossRevenue, 2) ?></div>
+            <a href="<?= base_url('admin/reports.php?type=revenue') ?>" class="text-xs text-emerald-600 hover:underline mt-2 inline-block font-medium">
                 Financial Audit &rarr;
             </a>
         </div>
@@ -139,119 +156,131 @@ require_once __DIR__ . '/../includes/header.php';
     <!-- Quick Tools & Recent Disputes -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <!-- Administrative Actions Command Cards (1 col) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl h-fit">
-            <h2 class="text-base font-bold text-white mb-4 flex items-center space-x-2">
-                <span>⚡</span>
-                <span>Administrative Actions</span>
+        <div class="bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-7 shadow-sm h-fit">
+            <h2 class="text-base font-bold font-display text-midnight mb-4 flex items-center space-x-2">
+                <i class="ri-flashlight-line text-coral text-lg"></i>
+                <span>Platform Controls</span>
             </h2>
             <div class="space-y-3">
-                <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="p-3.5 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 flex items-center justify-between group transition">
+                <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="p-4 bg-[#FAF8F5] hover:bg-slate-100/80 rounded-2xl border border-[#E9E7FF] flex items-center justify-between group transition">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">⚖️</span>
+                        <div class="w-9 h-9 rounded-xl bg-coral/10 text-coral flex items-center justify-center text-lg">
+                            <i class="ri-scales-3-line"></i>
+                        </div>
                         <div>
-                            <div class="text-xs font-bold text-white group-hover:text-red-400 transition">Dispute Adjudication</div>
-                            <div class="text-[11px] text-slate-400">Hear claims, waive fines, resolve cases</div>
+                            <div class="text-xs font-bold text-midnight group-hover:text-coral transition">Dispute Adjudication</div>
+                            <div class="text-[11px] text-slate-500">Hear claims, waive fines, arbitrate cases</div>
                         </div>
                     </div>
                     <?php if ($openDisputesCount > 0): ?>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                             <?= $openDisputesCount ?>
                         </span>
                     <?php endif; ?>
                 </a>
 
-                <a href="<?= base_url('admin/manage_users.php') ?>" class="p-3.5 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 flex items-center justify-between group transition">
+                <a href="<?= base_url('admin/manage_users.php') ?>" class="p-4 bg-[#FAF8F5] hover:bg-slate-100/80 rounded-2xl border border-[#E9E7FF] flex items-center justify-between group transition">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">👥</span>
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+                            <i class="ri-user-settings-line"></i>
+                        </div>
                         <div>
-                            <div class="text-xs font-bold text-white group-hover:text-blue-400 transition">User Governance</div>
-                            <div class="text-[11px] text-slate-400">View roster, toggle Active / Inactive / Banned</div>
+                            <div class="text-xs font-bold text-midnight group-hover:text-coral transition">User Governance</div>
+                            <div class="text-[11px] text-slate-500">Manage accounts, toggle Active / Inactive</div>
                         </div>
                     </div>
-                    <span class="text-slate-500 text-xs">&rarr;</span>
+                    <i class="ri-arrow-right-s-line text-slate-400 group-hover:text-midnight transition"></i>
                 </a>
 
-                <a href="<?= base_url('admin/manage_categories.php') ?>" class="p-3.5 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 flex items-center justify-between group transition">
+                <a href="<?= base_url('admin/manage_categories.php') ?>" class="p-4 bg-[#FAF8F5] hover:bg-slate-100/80 rounded-2xl border border-[#E9E7FF] flex items-center justify-between group transition">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">🏷️</span>
+                        <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
+                            <i class="ri-folder-settings-line"></i>
+                        </div>
                         <div>
-                            <div class="text-xs font-bold text-white group-hover:text-emerald-400 transition">Category Taxonomy</div>
-                            <div class="text-[11px] text-slate-400">Manage categories, subcategories, counts</div>
+                            <div class="text-xs font-bold text-midnight group-hover:text-coral transition">Category Taxonomy</div>
+                            <div class="text-[11px] text-slate-500">Add, edit, or remove catalog categories</div>
                         </div>
                     </div>
-                    <span class="text-slate-500 text-xs">&rarr;</span>
+                    <i class="ri-arrow-right-s-line text-slate-400 group-hover:text-midnight transition"></i>
                 </a>
 
-                <a href="<?= base_url('admin/reports.php') ?>" class="p-3.5 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 flex items-center justify-between group transition">
+                <a href="<?= base_url('admin/reports.php') ?>" class="p-4 bg-[#FAF8F5] hover:bg-slate-100/80 rounded-2xl border border-[#E9E7FF] flex items-center justify-between group transition">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">📊</span>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                            <i class="ri-file-chart-line"></i>
+                        </div>
                         <div>
-                            <div class="text-xs font-bold text-white group-hover:text-indigo-400 transition">Reports &amp; Audits</div>
-                            <div class="text-[11px] text-slate-400">Rentals, transactions, fine ledgers, print</div>
+                            <div class="text-xs font-bold text-midnight group-hover:text-coral transition">Audit &amp; Intelligence</div>
+                            <div class="text-[11px] text-slate-500">Rentals, revenue, inventory, print/export</div>
                         </div>
                     </div>
-                    <span class="text-slate-500 text-xs">&rarr;</span>
+                    <i class="ri-arrow-right-s-line text-slate-400 group-hover:text-midnight transition"></i>
                 </a>
 
-                <a href="<?= base_url('admin/configure_fine_rate.php') ?>" class="p-3.5 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 flex items-center justify-between group transition">
+                <a href="<?= base_url('admin/configure_fine_rate.php') ?>" class="p-4 bg-[#FAF8F5] hover:bg-slate-100/80 rounded-2xl border border-[#E9E7FF] flex items-center justify-between group transition">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xl">⚙️</span>
+                        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                            <i class="ri-settings-3-line"></i>
+                        </div>
                         <div>
-                            <div class="text-xs font-bold text-white group-hover:text-amber-400 transition">Configure Fine Rate</div>
-                            <div class="text-[11px] text-slate-400">Adjust late-return penalty rate per day</div>
+                            <div class="text-xs font-bold text-midnight group-hover:text-coral transition">Configure Fine Rate</div>
+                            <div class="text-[11px] text-slate-500">Adjust daily late-return penalty rate</div>
                         </div>
                     </div>
-                    <span class="text-slate-500 text-xs">&rarr;</span>
+                    <i class="ri-arrow-right-s-line text-slate-400 group-hover:text-midnight transition"></i>
                 </a>
             </div>
         </div>
 
         <!-- Recent Open Disputes Triage (2 cols) -->
-        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-            <div class="flex items-center justify-between mb-4">
+        <div class="lg:col-span-2 bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-7 shadow-sm">
+            <div class="flex items-center justify-between mb-5">
                 <div>
-                    <h2 class="text-base font-bold text-white flex items-center space-x-2">
-                        <span>⚖️</span>
+                    <h2 class="text-base font-bold font-display text-midnight flex items-center space-x-2">
+                        <i class="ri-scales-3-line text-coral text-lg"></i>
                         <span>Pending Disputes for Triage</span>
                     </h2>
-                    <p class="text-xs text-slate-400">Most recently filed cases requiring administrator intervention.</p>
+                    <p class="text-xs text-slate-500">Recent claim submissions requiring administrator arbitration.</p>
                 </div>
-                <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="text-xs text-red-400 hover:text-red-300 font-semibold">
+                <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="text-xs text-coral hover:underline font-semibold">
                     View All Cases &rarr;
                 </a>
             </div>
 
             <?php if (empty($recentDisputes)): ?>
-                <div class="p-12 text-center text-slate-500 border border-slate-800/80 rounded-xl bg-slate-950/40">
-                    <span class="text-4xl block mb-2">🎉</span>
-                    <p class="text-sm font-semibold text-slate-300">All disputes resolved!</p>
-                    <p class="text-xs text-slate-500 mt-1">There are no pending dispute claims in the system.</p>
+                <div class="p-12 text-center text-slate-400 border border-[#E9E7FF] rounded-2xl bg-[#FAF8F5]">
+                    <div class="w-14 h-14 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-3">
+                        <i class="ri-checkbox-circle-line"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-midnight">All disputes resolved!</p>
+                    <p class="text-xs text-slate-400 mt-1">There are currently zero pending dispute claims requiring triage.</p>
                 </div>
             <?php else: ?>
                 <div class="space-y-3">
                     <?php foreach ($recentDisputes as $disp): ?>
-                        <div class="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:border-slate-700 transition">
+                        <div class="p-4 bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:shadow-sm transition">
                             <div>
                                 <div class="flex items-center space-x-2 mb-1">
-                                    <span class="font-mono text-xs font-bold text-white">#DISP-<?= $disp['dispute_id'] ?></span>
+                                    <span class="font-mono text-xs font-bold text-midnight">#DISP-<?= $disp['dispute_id'] ?></span>
                                     <span class="text-xs text-slate-400">&bull; Req #<?= $disp['request_id'] ?></span>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold <?= $disp['status'] === 'Escalated' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : ($disp['status'] === 'Under_Review' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30') ?>">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold <?= $disp['status'] === 'Escalated' ? 'bg-rose-50 text-rose-700 border border-rose-200' : ($disp['status'] === 'Under_Review' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-red-50 text-red-700 border border-red-200') ?>">
                                         <?= str_replace('_', ' ', htmlspecialchars($disp['status'])) ?>
                                     </span>
                                 </div>
-                                <p class="text-xs font-semibold text-slate-200">
-                                    <span class="text-blue-400"><?= htmlspecialchars($disp['raised_by_name']) ?></span> vs. <span class="text-indigo-400"><?= htmlspecialchars($disp['against_name']) ?></span>
-                                    <span class="text-slate-500 font-normal">on <?= htmlspecialchars($disp['product_title']) ?></span>
+                                <p class="text-xs font-semibold text-midnight">
+                                    <span class="text-blue-600"><?= htmlspecialchars($disp['raised_by_name']) ?></span> vs. <span class="text-purple-600"><?= htmlspecialchars($disp['against_name']) ?></span>
+                                    <span class="text-slate-400 font-normal">on <?= htmlspecialchars($disp['product_title']) ?></span>
                                 </p>
-                                <p class="text-xs text-slate-400 mt-1 line-clamp-1 italic">
+                                <p class="text-xs text-slate-500 mt-1 line-clamp-1 italic">
                                     &ldquo;<?= htmlspecialchars($disp['reason']) ?>&rdquo;
                                 </p>
                             </div>
                             <div class="flex sm:flex-col items-end justify-between sm:justify-center gap-2 flex-shrink-0">
-                                <span class="text-[10px] text-slate-500 font-mono">
+                                <span class="text-[10px] text-slate-400 font-mono">
                                     <?= date('d M, H:i', strtotime($disp['created_date'])) ?>
                                 </span>
-                                <a href="<?= base_url('admin/resolve_disputes.php?dispute_id=' . $disp['dispute_id']) ?>" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg transition shadow">
+                                <a href="<?= base_url('admin/resolve_disputes.php?dispute_id=' . $disp['dispute_id']) ?>" class="px-4 py-1.5 bg-coral hover:bg-[#e04e53] text-white text-xs font-semibold rounded-full transition shadow-sm">
                                     Adjudicate &rarr;
                                 </a>
                             </div>
@@ -264,3 +293,4 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+

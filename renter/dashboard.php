@@ -2,9 +2,6 @@
 /**
  * Online Rental Management System (ORMS)
  * Renter Workspace Dashboard
- * 
- * Project: BCSP-064 (IGNOU BCA Final Project)
- * Specification: Prompt Guide Section 6 (Step 6) & Synopsis Section 11.1
  */
 
 declare(strict_types=1);
@@ -40,113 +37,143 @@ $pageTitle = 'Renter Dashboard — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-slate-900 rounded-2xl p-8 shadow-xl text-white mb-8 border border-indigo-600/40 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-            <span class="px-3 py-1 bg-indigo-500/30 rounded-full text-xs font-semibold tracking-wide uppercase border border-indigo-400/30">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Welcome Card -->
+    <div class="bg-gradient-to-br from-midnight via-[#131b33] to-midnight rounded-3xl p-6 sm:p-10 text-white mb-8 sm:mb-10 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-coral/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 text-lilac rounded-full text-xs font-semibold tracking-wider uppercase backdrop-blur-sm border border-white/10">
+                <i class="ri-user-smile-line text-coral"></i>
                 Renter Workspace
             </span>
-            <h1 class="text-3xl font-extrabold mt-3">Welcome, <?= htmlspecialchars(current_user_name()) ?>!</h1>
-            <p class="text-indigo-200 text-sm mt-1">Discover items to rent, track active bookings, manage payments, and write reviews.</p>
+            <h1 class="text-2xl sm:text-4xl font-display font-bold mt-3 tracking-tight">
+                Welcome back, <?= htmlspecialchars(current_user_name()) ?>!
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
+                Discover quality equipment, manage live bookings, complete payments, and share your rental reviews.
+            </p>
         </div>
-        <div>
+        <div class="relative z-10 flex-shrink-0">
             <a href="<?= base_url('renter/search.php') ?>" 
-               class="inline-flex items-center space-x-2 px-6 py-3.5 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg transition">
-                <span>🔍</span>
-                <span>Browse Rental Catalog</span>
+               class="inline-flex items-center gap-2 px-6 py-3.5 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition transform hover:-translate-y-0.5">
+                <i class="ri-search-line text-base"></i>
+                <span>Explore Catalog</span>
             </a>
         </div>
     </div>
 
     <!-- Quick Metrics Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Pending Requests</span>
-            <div class="text-3xl font-bold text-amber-400 mt-2"><?= $pendingCount ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Awaiting owner review</span>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending</span>
+                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i class="ri-time-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3"><?= $pendingCount ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Awaiting owner review</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Approved Requests</span>
-            <div class="text-3xl font-bold text-blue-400 mt-2"><?= $approvedCount ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Ready for payment</span>
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approved</span>
+                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="ri-checkbox-circle-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3"><?= $approvedCount ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Ready for checkout</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Active Rentals</span>
-            <div class="text-3xl font-bold text-emerald-400 mt-2"><?= $activeCount ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Currently with you</span>
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active</span>
+                <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i class="ri-key-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3"><?= $activeCount ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Currently with you</span>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg">
-            <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Total Spent</span>
-            <div class="text-3xl font-bold text-white mt-2">₹<?= number_format($totalSpent, 2) ?></div>
-            <span class="text-xs text-slate-500 mt-1 block">Lifetime rentals</span>
+        <div class="bg-white border border-[#E9E7FF] p-5 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Spent</span>
+                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <i class="ri-wallet-3-line text-base"></i>
+                </div>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-midnight mt-3">₹<?= number_format($totalSpent, 2) ?></div>
+            <span class="text-xs text-slate-400 mt-1 block">Completed rentals</span>
         </div>
     </div>
 
     <!-- Recent Bookings Section -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <div class="p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="bg-white border border-[#E9E7FF] rounded-3xl shadow-sm overflow-hidden">
+        <div class="p-6 sm:p-8 border-b border-[#E9E7FF] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h2 class="text-lg font-bold text-white tracking-tight">Recent Rental Requests</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Your most recent rental inquiries and bookings.</p>
+                <h2 class="text-lg sm:text-xl font-display font-bold text-midnight tracking-tight">Recent Rental Requests</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Your most recent rental inquiries, bookings, and active contracts.</p>
             </div>
             <div>
-                <a href="<?= base_url('renter/my_rentals.php') ?>" class="text-xs font-semibold text-blue-400 hover:text-blue-300">
-                    View All Bookings (<?= count($requests) ?>) &rarr;
+                <a href="<?= base_url('renter/my_rentals.php') ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-coral hover:text-[#e04e53] transition">
+                    <span>View All Bookings (<?= count($requests) ?>)</span>
+                    <i class="ri-arrow-right-line"></i>
                 </a>
             </div>
         </div>
 
         <?php if (empty($requests)): ?>
-            <div class="p-10 text-center text-slate-400">
-                <div class="text-3xl mb-2">📦</div>
-                <div class="text-sm font-semibold text-slate-300">No rental requests submitted yet</div>
-                <p class="text-xs text-slate-500 mt-1">Browse our verified catalog to request cameras, laptops, furniture, and more.</p>
-                <a href="<?= base_url('renter/search.php') ?>" class="inline-block mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition">
-                    Browse Catalog &rarr;
+            <div class="p-12 sm:p-16 text-center text-slate-500">
+                <div class="w-16 h-16 mx-auto rounded-full bg-lilac/40 flex items-center justify-center text-coral mb-4">
+                    <i class="ri-archive-line text-3xl"></i>
+                </div>
+                <h3 class="text-base font-display font-bold text-midnight">No rental requests submitted yet</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Browse our verified catalog to request cameras, laptops, furniture, and more.</p>
+                <a href="<?= base_url('renter/search.php') ?>" class="inline-flex items-center gap-2 mt-5 px-6 py-2.5 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition">
+                    <i class="ri-compass-3-line"></i>
+                    <span>Browse Catalog</span>
                 </a>
             </div>
         <?php else: ?>
-            <div class="divide-y divide-slate-800">
+            <div class="divide-y divide-[#E9E7FF]">
                 <?php foreach (array_slice($requests, 0, 5) as $req): 
                     $st = $req->getStatus();
                     switch ($st) {
-                        case 'Pending':   $stColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30'; break;
-                        case 'Approved':  $stColor = 'text-blue-400 bg-blue-500/10 border-blue-500/30'; break;
-                        case 'Active':    $stColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'; break;
-                        case 'Completed': $stColor = 'text-purple-400 bg-purple-500/10 border-purple-500/30'; break;
-                        default:          $stColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30'; break;
+                        case 'Pending':   $stBadge = 'bg-amber-50 text-amber-700 border-amber-200'; break;
+                        case 'Approved':  $stBadge = 'bg-blue-50 text-blue-700 border-blue-200'; break;
+                        case 'Active':    $stBadge = 'bg-emerald-50 text-emerald-700 border-emerald-200'; break;
+                        case 'Completed': $stBadge = 'bg-purple-50 text-purple-700 border-purple-200'; break;
+                        default:          $stBadge = 'bg-rose-50 text-rose-700 border-rose-200'; break;
                     }
                 ?>
-                    <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-850/50 transition">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-14 h-14 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0">
+                    <div class="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#FAF8F5] transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-[#E9E7FF] flex-shrink-0">
                                 <img src="<?= base_url($req->getPrimaryImage()) ?>" alt="" class="w-full h-full object-cover">
                             </div>
                             <div>
-                                <h3 class="font-bold text-white text-sm">
-                                    <a href="<?= base_url('renter/product_details.php?id=' . $req->getProductID()) ?>" class="hover:text-blue-400">
+                                <h3 class="font-display font-bold text-midnight text-sm sm:text-base">
+                                    <a href="<?= base_url('renter/product_details.php?id=' . $req->getProductID()) ?>" class="hover:text-coral transition">
                                         <?= htmlspecialchars($req->getProductTitle()) ?>
                                     </a>
                                 </h3>
-                                <div class="text-xs text-slate-400 mt-0.5">
-                                    <span><?= date('M d', strtotime($req->getStartDate())) ?> &rarr; <?= date('M d, Y', strtotime($req->getEndDate())) ?></span>
+                                <div class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-2">
+                                    <span><i class="ri-calendar-line text-slate-400"></i> <?= date('M d', strtotime($req->getStartDate())) ?> &rarr; <?= date('M d, Y', strtotime($req->getEndDate())) ?></span>
                                     <span>&bull;</span>
                                     <span><?= $req->getTotalDays() ?> days</span>
                                     <span>&bull;</span>
-                                    <span class="text-slate-200 font-semibold">₹<?= number_format($req->getTotalAmount(), 2) ?></span>
+                                    <span class="text-midnight font-bold">₹<?= number_format($req->getTotalAmount(), 2) ?></span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-3 self-end sm:self-auto">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold border <?= $stColor ?>">
+                        <div class="flex items-center gap-3 self-end sm:self-auto">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold border <?= $stBadge ?>">
                                 <?= htmlspecialchars($st) ?>
                             </span>
-                            <a href="<?= base_url('renter/my_rentals.php') ?>" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 rounded-lg transition">
+                            <a href="<?= base_url('renter/my_rentals.php') ?>" class="px-4 py-2 bg-slate-100 hover:bg-lilac/30 text-xs font-semibold text-midnight rounded-full border border-[#E9E7FF] transition">
                                 Details &rarr;
                             </a>
                         </div>

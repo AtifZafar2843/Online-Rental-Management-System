@@ -2,9 +2,6 @@
 /**
  * Online Rental Management System (ORMS)
  * Edit Existing Product Listing (Owner Module)
- * 
- * Project: BCSP-064 (IGNOU BCA Final Project)
- * Specification: Prompt Guide Section 6 (Step 4)
  */
 
 declare(strict_types=1);
@@ -50,7 +47,7 @@ if (isset($_GET['set_primary'])) {
         $pdo->prepare("UPDATE `PRODUCT_IMAGES` SET is_primary = 0 WHERE product_id = :pid")->execute(['pid' => $productId]);
         $pdo->prepare("UPDATE `PRODUCT_IMAGES` SET is_primary = 1 WHERE image_id = :img_id")->execute(['img_id' => $targetImageId]);
         $pdo->commit();
-        set_flash('success', 'Primary display image updated successfully.');
+        set_flash('success', 'Primary display photo updated successfully.');
     }
     header("Location: " . base_url("owner/edit_product.php?id={$productId}"));
     exit;
@@ -64,7 +61,7 @@ if (isset($_GET['delete_image'])) {
     $totalImgs = (int) $imgCountStmt->fetchColumn();
 
     if ($totalImgs <= 1) {
-        set_flash('error', 'Cannot delete this image. Every product must retain at least one photo.');
+        set_flash('error', 'Cannot delete this photo. Every listing must retain at least one image.');
     } else {
         $fetchImg = $pdo->prepare("SELECT image_path, is_primary FROM `PRODUCT_IMAGES` WHERE image_id = :img_id AND product_id = :pid");
         $fetchImg->execute(['img_id' => $targetImageId, 'pid' => $productId]);
@@ -87,7 +84,7 @@ if (isset($_GET['delete_image'])) {
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
-            set_flash('success', 'Image was removed successfully.');
+            set_flash('success', 'Photo removed successfully from listing.');
         }
     }
     header("Location: " . base_url("owner/edit_product.php?id={$productId}"));
@@ -157,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $validation = validate_file_upload($singleFile, $allowedMimes, 5242880);
             if (!$validation['valid']) {
-                $errors[] = "New image #" . ($i + 1) . " error: " . $validation['error'];
+                $errors[] = "New photo #" . ($i + 1) . " error: " . $validation['error'];
                 break;
             }
 
@@ -167,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($singleFile['tmp_name'], $targetPath)) {
                 $newUploadedPaths[] = 'uploads/products/' . $randomName;
             } else {
-                $errors[] = "Failed to save new image #" . ($i + 1);
+                $errors[] = "Failed to save new photo #" . ($i + 1);
                 break;
             }
         }
@@ -195,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->commit();
 
-            set_flash('success', "Product \"{$title}\" has been updated successfully!");
+            set_flash('success', "Listing \"{$title}\" updated successfully!");
             header("Location: " . base_url('owner/dashboard.php'));
             exit;
 
@@ -216,33 +213,40 @@ $pageTitle = 'Edit Product — ' . htmlspecialchars($product->getTitle());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Breadcrumbs -->
     <div class="mb-6 flex items-center justify-between">
-        <a href="<?= base_url('owner/dashboard.php') ?>" class="text-xs text-slate-400 hover:text-white flex items-center space-x-1 transition">
-            <span>&larr;</span>
+        <a href="<?= base_url('owner/dashboard.php') ?>" class="text-xs text-slate-500 hover:text-coral flex items-center space-x-1.5 transition">
+            <i class="ri-arrow-left-line"></i>
             <span>Back to Owner Dashboard</span>
         </a>
-        <span class="text-xs text-blue-400 font-medium">Product ID: #<?= $product->getProductID() ?></span>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-midnight/5 text-midnight">
+            Product #<?= $product->getProductID() ?>
+        </span>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+    <div class="bg-white border border-[#E9E7FF] rounded-3xl shadow-sm overflow-hidden">
         <!-- Banner Header -->
-        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-8 border-b border-slate-800">
-            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Edit Product Listing</h1>
-            <p class="mt-1 text-xs sm:text-sm text-blue-200">
-                Update details, manage gallery photos, or adjust rental rates and availability.
+        <div class="bg-gradient-to-br from-midnight via-[#131b33] to-midnight p-6 sm:p-10 text-white border-b border-[#E9E7FF]">
+            <div class="flex items-center space-x-2 text-coral text-xs font-semibold uppercase tracking-wider mb-2">
+                <i class="ri-edit-circle-line text-sm"></i>
+                <span>Listing Editor</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-display font-bold tracking-tight">Edit Product Listing</h1>
+            <p class="mt-1 text-xs sm:text-sm text-slate-300">
+                Update specifications, manage gallery photos, or adjust rental rates and availability status.
             </p>
         </div>
 
-        <div class="p-6 sm:p-8">
+        <div class="p-6 sm:p-10">
             <!-- Errors Alert -->
             <?php if (!empty($errors)): ?>
-                <div class="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-600/70 text-rose-200 text-xs space-y-1">
-                    <div class="font-semibold flex items-center space-x-2 text-rose-300">
-                        <span>⚠️</span>
+                <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs space-y-1">
+                    <div class="font-semibold flex items-center space-x-2 text-rose-800">
+                        <i class="ri-error-warning-line text-base"></i>
                         <span>Please correct the following errors:</span>
                     </div>
-                    <ul class="list-disc list-inside space-y-1 pl-1 text-rose-300/90">
+                    <ul class="list-disc list-inside space-y-1 pl-1 text-rose-700">
                         <?php foreach ($errors as $err): ?>
                             <li><?= htmlspecialchars($err) ?></li>
                         <?php endforeach; ?>
@@ -250,34 +254,40 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
             <?php endif; ?>
 
-            <!-- Existing Gallery Section -->
-            <div class="mb-8 pb-8 border-b border-slate-800">
-                <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center space-x-2">
-                    <span>🖼️</span>
-                    <span>Current Photos (<?= count($existingImages) ?>)</span>
-                </h3>
+            <!-- Existing Photos Gallery Section -->
+            <div class="mb-8 pb-8 border-b border-[#E9E7FF]">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-semibold text-midnight uppercase tracking-wider flex items-center space-x-2">
+                        <i class="ri-image-2-line text-coral text-base"></i>
+                        <span>Current Photos (<?= count($existingImages) ?>)</span>
+                    </h3>
+                    <span class="text-xs text-slate-400">Select star to designate primary photo</span>
+                </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <?php foreach ($existingImages as $img): ?>
-                        <div class="relative group rounded-xl overflow-hidden border <?= $img['is_primary'] ? 'border-blue-500 ring-2 ring-blue-500/50' : 'border-slate-800' ?> bg-slate-950">
+                        <div class="relative group rounded-2xl overflow-hidden border <?= $img['is_primary'] ? 'border-coral ring-2 ring-coral/20' : 'border-[#E9E7FF]' ?> bg-[#FAF8F5]">
                             <img src="<?= base_url($img['image_path']) ?>" alt="Product image" class="w-full h-32 object-cover">
                             
                             <?php if ($img['is_primary']): ?>
-                                <span class="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-[10px] font-bold text-white rounded-md shadow">
-                                    Primary
+                                <span class="absolute top-2 left-2 px-2.5 py-1 bg-coral text-[10px] font-semibold text-white rounded-full shadow-sm flex items-center space-x-1">
+                                    <i class="ri-star-fill text-[10px]"></i>
+                                    <span>Primary</span>
                                 </span>
                             <?php else: ?>
                                 <a href="<?= base_url("owner/edit_product.php?id={$productId}&set_primary={$img['image_id']}") ?>" 
-                                   class="absolute top-2 left-2 px-2 py-0.5 bg-slate-900/80 hover:bg-blue-600 text-[10px] font-semibold text-white rounded-md transition shadow">
-                                    Make Primary
+                                   class="absolute top-2 left-2 px-2.5 py-1 bg-white/90 hover:bg-coral hover:text-white text-[10px] font-semibold text-midnight rounded-full shadow-sm transition flex items-center space-x-1">
+                                    <i class="ri-star-line text-[10px]"></i>
+                                    <span>Make Primary</span>
                                 </a>
                             <?php endif; ?>
 
                             <?php if (count($existingImages) > 1): ?>
                                 <a href="<?= base_url("owner/edit_product.php?id={$productId}&delete_image={$img['image_id']}") ?>" 
-                                   onclick="return confirm('Remove this image from listing?');"
-                                   class="absolute top-2 right-2 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white text-xs flex items-center justify-center transition shadow">
-                                    &times;
+                                   onclick="return confirm('Remove this photo from the listing?');"
+                                   title="Delete photo"
+                                   class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-500 hover:text-white text-slate-600 text-xs flex items-center justify-center shadow-sm transition">
+                                    <i class="ri-delete-bin-line"></i>
                                 </a>
                             <?php endif; ?>
                         </div>
@@ -293,20 +303,20 @@ require_once __DIR__ . '/../includes/header.php';
                 <!-- Title & Category -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div class="sm:col-span-2">
-                        <label for="title" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Product Title <span class="text-rose-500">*</span>
+                        <label for="title" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Product Title <span class="text-coral">*</span>
                         </label>
                         <input type="text" id="title" name="title" required
                                value="<?= htmlspecialchars($product->getTitle()) ?>"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                               class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                     </div>
 
                     <div>
-                        <label for="category_id" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Category <span class="text-rose-500">*</span>
+                        <label for="category_id" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Category <span class="text-coral">*</span>
                         </label>
                         <select id="category_id" name="category_id" required
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                                class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?= $cat['category_id'] ?>" <?= ($product->getCategoryID() === (int)$cat['category_id']) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($cat['category_name']) ?>
@@ -318,48 +328,48 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <!-- Description -->
                 <div>
-                    <label for="description" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Detailed Description <span class="text-rose-500">*</span>
+                    <label for="description" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                        Detailed Description <span class="text-coral">*</span>
                     </label>
                     <textarea id="description" name="description" rows="4" required
-                              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"><?= htmlspecialchars($product->getDescription()) ?></textarea>
+                              class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition"><?= htmlspecialchars($product->getDescription()) ?></textarea>
                 </div>
 
                 <!-- Financial Rates, Location & Availability -->
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div>
-                        <label for="rent_per_day" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Daily Rent (₹) <span class="text-rose-500">*</span>
+                        <label for="rent_per_day" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Daily Rent (₹) <span class="text-coral">*</span>
                         </label>
                         <input type="number" step="0.01" min="1" id="rent_per_day" name="rent_per_day" required
                                value="<?= htmlspecialchars((string)$product->getRentPerDay()) ?>"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                               class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                     </div>
 
                     <div>
-                        <label for="security_deposit" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Deposit (₹) <span class="text-rose-500">*</span>
+                        <label for="security_deposit" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Deposit (₹) <span class="text-coral">*</span>
                         </label>
                         <input type="number" step="0.01" min="0" id="security_deposit" name="security_deposit" required
                                value="<?= htmlspecialchars((string)$product->getSecurityDeposit()) ?>"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                               class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                     </div>
 
                     <div>
-                        <label for="location" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Location <span class="text-rose-500">*</span>
+                        <label for="location" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Location <span class="text-coral">*</span>
                         </label>
                         <input type="text" id="location" name="location" required
                                value="<?= htmlspecialchars($product->getLocation()) ?>"
-                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                               class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                     </div>
 
                     <div>
-                        <label for="avail_status" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                            Status <span class="text-rose-500">*</span>
+                        <label for="avail_status" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                            Status <span class="text-coral">*</span>
                         </label>
                         <select id="avail_status" name="avail_status" required
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                                class="w-full bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl px-4 py-3 text-sm text-midnight focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral transition">
                             <option value="Available" <?= $product->getAvailStatus() === 'Available' ? 'selected' : '' ?>>Available</option>
                             <option value="Rented" <?= $product->getAvailStatus() === 'Rented' ? 'selected' : '' ?>>Rented</option>
                             <option value="Unavailable" <?= $product->getAvailStatus() === 'Unavailable' ? 'selected' : '' ?>>Unavailable</option>
@@ -369,41 +379,42 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <!-- Condition -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                        Physical Condition <span class="text-rose-500">*</span>
+                    <label class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
+                        Physical Condition <span class="text-coral">*</span>
                     </label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <?php foreach (['New', 'Good', 'Fair', 'Poor'] as $c): ?>
-                            <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-slate-800 bg-slate-950/70 hover:border-slate-700 cursor-pointer transition">
+                            <label class="flex items-center space-x-2.5 p-3 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral/40 cursor-pointer transition">
                                 <input type="radio" name="condition" value="<?= $c ?>" 
                                        <?= ($product->getCondition() === $c) ? 'checked' : '' ?>
-                                       class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
-                                <span class="text-xs font-medium text-slate-200"><?= $c ?></span>
+                                       class="text-coral focus:ring-coral">
+                                <span class="text-xs font-medium text-midnight"><?= $c ?></span>
                             </label>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
                 <!-- Upload Additional Photos -->
-                <div class="pt-4 border-t border-slate-800">
-                    <label for="new_images" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                <div class="pt-4 border-t border-[#E9E7FF]">
+                    <label for="new_images" class="block text-xs font-semibold text-midnight uppercase tracking-wider mb-2">
                         Add More Photos (Optional)
                     </label>
                     <input type="file" id="new_images" name="new_images[]" multiple accept=".jpg,.jpeg,.png,.webp"
-                           class="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 file:cursor-pointer bg-slate-950 border border-slate-800 rounded-xl p-2 focus:outline-none">
-                    <p class="text-[11px] text-slate-500 mt-1.5">
-                        New photos will be appended to the current gallery with magic-byte verification.
+                           class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#E9E7FF] file:text-midnight hover:file:bg-[#d8d5ff] file:cursor-pointer bg-[#FAF8F5] border border-[#E9E7FF] rounded-2xl p-2 focus:outline-none">
+                    <p class="text-[11px] text-slate-400 mt-1.5">
+                        New photos will be appended to the current gallery with magic-byte verification. Max 5MB per file.
                     </p>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="pt-6 border-t border-slate-800 flex items-center justify-end space-x-3">
-                    <a href="<?= base_url('owner/dashboard.php') ?>" class="px-5 py-2.5 rounded-xl border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                <div class="pt-6 border-t border-[#E9E7FF] flex items-center justify-end space-x-3">
+                    <a href="<?= base_url('owner/dashboard.php') ?>" class="px-5 py-2.5 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:text-midnight hover:bg-slate-50 transition">
                         Cancel
                     </a>
                     <button type="submit" 
-                            class="px-7 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-blue-500/20 transition">
-                        Save Changes
+                            class="px-7 py-3 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs rounded-full shadow-glow-coral transition flex items-center space-x-1.5">
+                        <i class="ri-check-line"></i>
+                        <span>Save Changes</span>
                     </button>
                 </div>
             </form>
@@ -412,3 +423,4 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+

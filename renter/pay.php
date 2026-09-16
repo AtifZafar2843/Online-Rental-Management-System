@@ -99,31 +99,31 @@ $pageTitle = 'Checkout & Payment — ORMS';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
     <!-- Breadcrumb -->
-    <nav class="flex text-xs text-slate-400 mb-6" aria-label="Breadcrumb">
+    <nav class="flex text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2">
-            <li><a href="<?= base_url('index.php') ?>" class="hover:text-white">Home</a></li>
+            <li><a href="<?= base_url('index.php') ?>" class="hover:text-coral transition">Home</a></li>
             <li><span>/</span></li>
-            <li><a href="<?= base_url('renter/my_rentals.php') ?>" class="hover:text-white">My Rentals</a></li>
+            <li><a href="<?= base_url('renter/my_rentals.php') ?>" class="hover:text-coral transition">My Rentals</a></li>
             <li><span>/</span></li>
-            <li class="text-slate-200 font-semibold">Payment Checkout</li>
+            <li class="text-midnight font-semibold">Payment Checkout</li>
         </ol>
     </nav>
 
     <!-- Page Title -->
     <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center space-x-3">
-            <span>💳</span>
+        <h1 class="text-2xl sm:text-3xl font-display font-bold text-midnight tracking-tight flex items-center space-x-3">
+            <i class="ri-secure-payment-line text-coral text-2xl"></i>
             <span>Secure Rental Checkout</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Review your rental charges, choose a simulated payment option, and confirm your booking.</p>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Review your rental charges, select your payment method, and complete your reservation.</p>
     </div>
 
     <?php if (!empty($errors)): ?>
-        <div class="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-sm">
+        <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
             <div class="font-bold flex items-center space-x-2 mb-1">
-                <span>⚠️</span>
+                <i class="ri-error-warning-line text-lg"></i>
                 <span>Payment Processing Error:</span>
             </div>
             <ul class="list-disc list-inside space-y-1 text-xs">
@@ -137,102 +137,102 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Left Column: Payment Form -->
         <div class="lg:col-span-7 space-y-6">
-            <form action="<?= base_url('renter/pay.php') ?>" method="POST" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+            <form action="<?= base_url('renter/pay.php') ?>" method="POST" class="bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
                 <?= csrf_field() ?>
                 <input type="hidden" name="request_id" value="<?= $requestId ?>">
 
                 <div>
-                    <h2 class="text-base font-bold text-white mb-3 flex items-center space-x-2">
-                        <span>🏷️</span>
+                    <h2 class="text-base font-display font-bold text-midnight mb-2 flex items-center space-x-2">
+                        <i class="ri-bank-card-line text-coral"></i>
                         <span>Select Payment Method</span>
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Choose your preferred academic payment simulation method:</p>
+                    <p class="text-xs text-slate-500 mb-4">Choose your preferred payment gateway:</p>
 
                     <!-- Payment Mode Options -->
                     <div class="space-y-3">
                         <!-- UPI Option -->
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-950 hover:border-blue-500 cursor-pointer transition">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                             <div class="flex items-center space-x-3">
-                                <input type="radio" name="payment_mode" value="UPI" checked class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
+                                <input type="radio" name="payment_mode" value="UPI" checked class="text-coral focus:ring-coral">
                                 <div>
-                                    <div class="font-bold text-sm text-white flex items-center space-x-2">
+                                    <div class="font-bold text-sm text-midnight flex items-center space-x-2">
                                         <span>UPI Instant Transfer</span>
-                                        <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 font-bold border border-emerald-700/60">Fastest</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">Fastest</span>
                                     </div>
-                                    <p class="text-xs text-slate-400 mt-0.5">Google Pay, PhonePe, Paytm, BHIM</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Google Pay, PhonePe, Paytm, BHIM</p>
                                 </div>
                             </div>
-                            <span class="text-xl">📱</span>
+                            <i class="ri-smartphone-line text-xl text-slate-400"></i>
                         </label>
 
                         <!-- Debit Card -->
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-950 hover:border-blue-500 cursor-pointer transition">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                             <div class="flex items-center space-x-3">
-                                <input type="radio" name="payment_mode" value="Debit_Card" class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
+                                <input type="radio" name="payment_mode" value="Debit_Card" class="text-coral focus:ring-coral">
                                 <div>
-                                    <div class="font-bold text-sm text-white">Debit Card (ATM)</div>
-                                    <p class="text-xs text-slate-400 mt-0.5">Visa, Mastercard, RuPay</p>
+                                    <div class="font-bold text-sm text-midnight">Debit Card (ATM)</div>
+                                    <p class="text-xs text-slate-500 mt-0.5">Visa, Mastercard, RuPay</p>
                                 </div>
                             </div>
-                            <span class="text-xl">💳</span>
+                            <i class="ri-bank-card-2-line text-xl text-slate-400"></i>
                         </label>
 
                         <!-- Credit Card -->
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-950 hover:border-blue-500 cursor-pointer transition">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                             <div class="flex items-center space-x-3">
-                                <input type="radio" name="payment_mode" value="Credit_Card" class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
+                                <input type="radio" name="payment_mode" value="Credit_Card" class="text-coral focus:ring-coral">
                                 <div>
-                                    <div class="font-bold text-sm text-white">Credit Card</div>
-                                    <p class="text-xs text-slate-400 mt-0.5">Visa, Mastercard, Amex</p>
+                                    <div class="font-bold text-sm text-midnight">Credit Card</div>
+                                    <p class="text-xs text-slate-500 mt-0.5">Visa, Mastercard, Amex</p>
                                 </div>
                             </div>
-                            <span class="text-xl">💎</span>
+                            <i class="ri-vip-diamond-line text-xl text-slate-400"></i>
                         </label>
 
                         <!-- Net Banking -->
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-950 hover:border-blue-500 cursor-pointer transition">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                             <div class="flex items-center space-x-3">
-                                <input type="radio" name="payment_mode" value="Net_Banking" class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
+                                <input type="radio" name="payment_mode" value="Net_Banking" class="text-coral focus:ring-coral">
                                 <div>
-                                    <div class="font-bold text-sm text-white">Net Banking</div>
-                                    <p class="text-xs text-slate-400 mt-0.5">SBI, HDFC, ICICI, Axis, PNB</p>
+                                    <div class="font-bold text-sm text-midnight">Net Banking</div>
+                                    <p class="text-xs text-slate-500 mt-0.5">SBI, HDFC, ICICI, Axis, PNB</p>
                                 </div>
                             </div>
-                            <span class="text-xl">🏦</span>
+                            <i class="ri-government-line text-xl text-slate-400"></i>
                         </label>
 
                         <!-- Pay on Pickup / COD -->
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-950 hover:border-blue-500 cursor-pointer transition">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-[#E9E7FF] bg-[#FAF8F5] hover:border-coral cursor-pointer transition">
                             <div class="flex items-center space-x-3">
-                                <input type="radio" name="payment_mode" value="COD" class="text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700">
+                                <input type="radio" name="payment_mode" value="COD" class="text-coral focus:ring-coral">
                                 <div>
-                                    <div class="font-bold text-sm text-white">Pay at Pickup / Physical Inspection</div>
-                                    <p class="text-xs text-slate-400 mt-0.5">Verify item condition with owner before cash payment</p>
+                                    <div class="font-bold text-sm text-midnight">Pay at Pickup / Physical Handover</div>
+                                    <p class="text-xs text-slate-500 mt-0.5">Verify item condition with owner before finalizing</p>
                                 </div>
                             </div>
-                            <span class="text-xl">🤝</span>
+                            <i class="ri-hand-coin-line text-xl text-slate-400"></i>
                         </label>
                     </div>
                 </div>
 
-                <!-- Simulation Info Disclaimer -->
-                <div class="p-3.5 rounded-xl bg-blue-950/30 border border-blue-900/50 text-[11px] text-blue-300 space-y-1">
-                    <div class="font-bold flex items-center space-x-1.5">
-                        <span>🔒</span>
-                        <span>Academic Demonstration Environment</span>
+                <!-- Trust Guarantee Box -->
+                <div class="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E9E7FF] text-xs text-slate-600 space-y-1">
+                    <div class="font-bold text-midnight flex items-center space-x-1.5">
+                        <i class="ri-shield-check-line text-emerald-600 text-base"></i>
+                        <span>Secure Escrow Protection</span>
                     </div>
-                    <p>No real money will be deducted from your bank. Clicking authorize will instantly confirm the transaction, transition booking status to <strong>Active</strong>, and generate your tax receipt.</p>
+                    <p>Security deposit is safely held in escrow. Authorizing payment will activate your booking and generate your digital invoice.</p>
                 </div>
 
                 <!-- Authorize Button -->
                 <div class="pt-2">
                     <button type="submit" 
-                            class="w-full py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 text-white font-extrabold text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/25 transition flex items-center justify-center space-x-2">
-                        <span>🔒</span>
-                        <span>Authorize & Confirm Payment of ₹<?= number_format($totalPayable, 2) ?></span>
+                            class="w-full py-4 bg-coral hover:bg-[#e04e53] text-white font-semibold text-xs uppercase tracking-wider rounded-full shadow-glow-coral transition flex items-center justify-center space-x-2">
+                        <i class="ri-lock-2-line text-sm"></i>
+                        <span>Confirm Payment of ₹<?= number_format($totalPayable, 2) ?></span>
                     </button>
                     <div class="text-center mt-3">
-                        <a href="<?= base_url('renter/my_rentals.php') ?>" class="text-xs text-slate-400 hover:text-white underline">
+                        <a href="<?= base_url('renter/my_rentals.php') ?>" class="text-xs text-slate-500 hover:text-coral underline">
                             Cancel and return to My Rentals
                         </a>
                     </div>
@@ -242,68 +242,68 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Right Column: Order Summary & Item Breakdown -->
         <div class="lg:col-span-5 space-y-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block border-b border-slate-800 pb-3">
+            <div class="bg-white border border-[#E9E7FF] rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block border-b border-[#E9E7FF] pb-3">
                     Order Summary
                 </span>
 
                 <!-- Product Mini Card -->
                 <div class="flex items-start space-x-3.5">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0">
+                    <div class="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-[#E9E7FF] flex-shrink-0">
                         <img src="<?= base_url($rentalRequest->getPrimaryImage()) ?>" 
                              alt="<?= htmlspecialchars($rentalRequest->getProductTitle()) ?>" 
                              class="w-full h-full object-cover"
                              onerror="this.src='<?= base_url('assets/img/no-image.svg') ?>'">
                     </div>
                     <div class="min-w-0 flex-1">
-                        <h3 class="font-bold text-white text-sm truncate"><?= htmlspecialchars($rentalRequest->getProductTitle()) ?></h3>
-                        <div class="text-xs text-slate-400 mt-0.5">Owner: <strong class="text-slate-200"><?= htmlspecialchars($rentalRequest->getOwnerName()) ?></strong></div>
-                        <div class="text-[11px] font-mono text-blue-400 mt-0.5">Booking #REQ-<?= $rentalRequest->getRequestID() ?></div>
+                        <h3 class="font-display font-bold text-midnight text-sm truncate"><?= htmlspecialchars($rentalRequest->getProductTitle()) ?></h3>
+                        <div class="text-xs text-slate-500 mt-0.5">Owner: <strong class="text-midnight"><?= htmlspecialchars($rentalRequest->getOwnerName()) ?></strong></div>
+                        <div class="text-[11px] font-mono text-coral mt-0.5">Booking #REQ-<?= $rentalRequest->getRequestID() ?></div>
                     </div>
                 </div>
 
                 <!-- Schedule Box -->
-                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-1.5">
-                    <div class="flex justify-between text-slate-400">
+                <div class="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#E9E7FF] text-xs space-y-1.5">
+                    <div class="flex justify-between text-slate-500">
                         <span>Rental Schedule:</span>
-                        <span class="font-bold text-white"><?= date('M d', strtotime($rentalRequest->getStartDate())) ?> &rarr; <?= date('M d, Y', strtotime($rentalRequest->getEndDate())) ?></span>
+                        <span class="font-bold text-midnight"><?= date('M d', strtotime($rentalRequest->getStartDate())) ?> &rarr; <?= date('M d, Y', strtotime($rentalRequest->getEndDate())) ?></span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-slate-500">
                         <span>Total Duration:</span>
-                        <span class="font-bold text-white"><?= $totalDays ?> day(s)</span>
+                        <span class="font-bold text-midnight"><?= $totalDays ?> day(s)</span>
                     </div>
                 </div>
 
                 <!-- Price Breakdown Table -->
                 <div class="space-y-2.5 text-xs">
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-slate-600">
                         <span>Rental Fee (<?= $totalDays ?>d × ₹<?= number_format($rentalRequest->getRentPerDay(), 2) ?>/d):</span>
-                        <span class="font-bold text-white">₹<?= number_format($rentAmount, 2) ?></span>
+                        <span class="font-bold text-midnight">₹<?= number_format($rentAmount, 2) ?></span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-slate-600">
                         <span>Security Deposit (Refundable):</span>
-                        <span class="font-bold text-emerald-400">₹<?= number_format($depositAmount, 2) ?></span>
+                        <span class="font-bold text-emerald-600">₹<?= number_format($depositAmount, 2) ?></span>
                     </div>
-                    <div class="flex justify-between text-slate-400">
+                    <div class="flex justify-between text-slate-600">
                         <span>Platform Convenience Fee:</span>
-                        <span class="text-slate-500">₹0.00 (Free)</span>
+                        <span class="text-slate-400">₹0.00 (Free)</span>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-800 flex justify-between items-baseline">
+                    <div class="pt-3 border-t border-[#E9E7FF] flex justify-between items-baseline">
                         <div>
-                            <span class="text-sm font-bold text-white">Grand Total:</span>
-                            <span class="text-[10px] text-slate-500 block">All taxes & deposit included</span>
+                            <span class="text-sm font-bold text-midnight">Grand Total:</span>
+                            <span class="text-[10px] text-slate-400 block">All taxes & deposit included</span>
                         </div>
-                        <div class="text-2xl font-black text-emerald-400">
+                        <div class="text-2xl font-display font-extrabold text-coral">
                             ₹<?= number_format($totalPayable, 2) ?>
                         </div>
                     </div>
                 </div>
 
                 <!-- Deposit Trust Guarantee -->
-                <div class="pt-4 border-t border-slate-800 space-y-2 text-[11px] text-slate-400">
-                    <div class="flex items-center space-x-2 text-emerald-400 font-bold">
-                        <span>🛡️</span>
+                <div class="pt-4 border-t border-[#E9E7FF] space-y-2 text-[11px] text-slate-500">
+                    <div class="flex items-center space-x-2 text-emerald-600 font-bold">
+                        <i class="ri-shield-check-line text-base"></i>
                         <span>100% Security Deposit Protection</span>
                     </div>
                     <p>Your deposit of ₹<?= number_format($depositAmount, 2) ?> is securely held in escrow throughout the rental and is refunded upon clean item return.</p>
