@@ -9,6 +9,9 @@
 
 declare(strict_types=1);
 
+// Set default timezone to match system / project region (Asia/Kolkata)
+date_default_timezone_set('Asia/Kolkata');
+
 // Ensure session is started with secure cookie parameters
 if (session_status() === PHP_SESSION_NONE) {
     // Configure session cookie params for security

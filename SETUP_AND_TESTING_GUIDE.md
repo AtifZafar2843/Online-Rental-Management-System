@@ -3,7 +3,7 @@
 > **Project:** Online Rental Management System (BCSP-064, IGNOU BCA Final Project)  
 > **Student:** Atif Zafar  
 > **Tech Stack:** PHP 8.1+, MySQL 8.0 / MariaDB 10.4+, Apache (XAMPP), Tailwind CSS  
-> **Status:** Updated with **Step 11 (Dispute & Admin Management)**
+> **Status:** **COMPLETED (100% — All 12 Steps Finished & Verified)**
 
 ---
 
@@ -41,7 +41,7 @@
 | **9** | **Review & Rating Module (`renter/`, `owner/`)** | **COMPLETED** | Rule 10 post-completion check, duplicate review prevention, dynamic averages & trust score, owner product deletion |
 | **10** | **Notification System (`notifications/`, `classes/`)** | **COMPLETED** | Rule 11 & Synopsis 13.IX event triggers, navbar live polling badge, due-date reminder automation |
 | **11** | **Dispute & Admin Management (`admin/`, `classes/`)** | **COMPLETED** | Rule 13 constraints, auto-opposing assignment, multi-party notifications, admin adjudication with mandatory notes & fine waiver, user governance, category taxonomy CRUD, operational audit reports |
-| 12 | End-to-End Integration & Final Walkthrough | Pending | Complete lifecycle testing across all user roles |
+| **12** | **End-to-End Integration & Final Walkthrough (`test_e2e_integration.php`)** | **COMPLETED** | Complete 12-stage platform integration suite, 100% class diagram method parity, edge-case validation, academic limitations & viva guide |
 
 ---
 
@@ -1080,9 +1080,155 @@ http://localhost/orms/test_dispute_admin.php
 
 ---
 
-## 14. Default Seed Credentials Reference
+## 14. Step 12: Method-by-Method Class Diagram Mapping & Parity Checklist
 
-Save these credentials for future testing during the upcoming modules:
+The Online Rental Management System (ORMS) has been implemented to strictly comply with **Synopsis Section 11 (Class Diagram)** and **Synopsis Section 17 (Glossary & Project Specifications)** for the IGNOU BCA Final Project (BCSP-064). 
+
+Below is the exhaustive, method-by-method verification checklist mapping every model, method, visibility, return type, and custom exception directly to its production implementation:
+
+### 14.1 Class Parity Matrix
+
+| Synopsis Class | Method Signature & Visibility | Return Type | Implementation File | Verification Status |
+|---|---|---|---|:---:|
+| **`User`** (Abstract) | `+register(array $userData)` | `bool` | `classes/User.php` | **VERIFIED** |
+| | `+login(string $email, string $password)` | `bool` | `classes/User.php` | **VERIFIED** |
+| | `+logout()` | `void` | `classes/User.php` | **VERIFIED** |
+| | `+updateProfile(array $data)` | `bool` | `classes/User.php` | **VERIFIED** |
+| | `+resetPassword(string $token, string $newPassword)` | `bool` | `classes/User.php` | **VERIFIED** |
+| **`Owner`** (extends `User`) | `+listProduct(array $productData, array $images)` | `int` | `classes/Owner.php` | **VERIFIED** |
+| | `+editProduct(int $productId, array $data, array $images)` | `bool` | `classes/Owner.php` | **VERIFIED** |
+| | `+removeProduct(int $productId)` | `bool` | `classes/Owner.php` | **VERIFIED** |
+| | `+manageRentalRequest(int $requestId, string $action, ?string $reason)` | `bool` | `classes/Owner.php` | **VERIFIED** |
+| | `+confirmReturn(int $requestId, ?string $returnDate)` | `bool` | `classes/Owner.php` | **VERIFIED** |
+| | `+raiseFine(int $requestId, string $type, float $amount, ?string $reason)` | `array` | `classes/Owner.php` | **VERIFIED** |
+| **`Renter`** (extends `User`) | `+searchProduct(array $criteria, string $sortBy)` | `array` | `classes/Renter.php` | **VERIFIED** |
+| | `+requestRental(int $productId, string $startDate, string $endDate, string $msg)` | `int` | `classes/Renter.php` | **VERIFIED** |
+| | `+makePayment(int $requestId, string $mode)` | `array` | `classes/Renter.php` | **VERIFIED** |
+| | `+returnProduct(int $requestId)` | `bool` | `classes/Renter.php` | **VERIFIED** |
+| | `+submitReview(int $requestId, int $rating, string $comment)` | `bool` | `classes/Renter.php` | **VERIFIED** |
+| | `+cancelRental(int $requestId, string $reason)` | `bool` | `classes/Renter.php` | **VERIFIED** |
+| **`Admin`** | `+login(string $username, string $password)` | `bool` | `classes/Admin.php` | **VERIFIED** |
+| | `+manageUsers(array $filters)` | `array` | `classes/Admin.php` | **VERIFIED** |
+| | `+updateUserStatus(int $userId, string $status)` | `bool` | `classes/Admin.php` | **VERIFIED** |
+| | `+manageCategories(string $action, array $data)` | `mixed` | `classes/Admin.php` | **VERIFIED** |
+| | `+resolveDispute(int $disputeId, string $resolution, ?string $notes, bool $waiveFine)` | `bool` | `classes/Admin.php` | **VERIFIED** |
+| | `+setFineRate(float $rate)` | `bool` | `classes/Admin.php` | **VERIFIED** |
+| | `+generateReport(string $type, array $params)` | `array` | `classes/Admin.php` | **VERIFIED** |
+| **`Product`** | `+create(array $data)` | `int` | `classes/Product.php` | **VERIFIED** |
+| | `+edit(array $data)` | `bool` | `classes/Product.php` | **VERIFIED** |
+| | `+delete(int $productId)` | `bool` | `classes/Product.php` | **VERIFIED** |
+| | `+checkAvailability(string $startDate, string $endDate)` | `bool` | `classes/Product.php` | **VERIFIED** |
+| | `+updateStatus(string $status)` | `bool` | `classes/Product.php` | **VERIFIED** |
+| | `+getImages()` | `array` | `classes/Product.php` | **VERIFIED** |
+| | `+search(array $filters, string $sortBy, int $limit, int $offset)` | `array` | `classes/Product.php` | **VERIFIED** |
+| | `+findById(int $productId)` | `?Product` | `classes/Product.php` | **VERIFIED** |
+| | `+findByOwner(int $ownerId)` | `array` | `classes/Product.php` | **VERIFIED** |
+| **`RentalRequest`** | `+create(array $data)` | `int` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+approve(int $ownerId)` | `bool` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+reject(int $ownerId, string $reason)` | `bool` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+cancel(int $userId, string $reason)` | `bool` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+complete()` | `bool` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+calculateTotal()` | `float` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+getDays()` | `int` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+isOverlapping(int $productId, string $startDate, string $endDate)` | `bool` | `classes/RentalRequest.php` | **VERIFIED** |
+| | `+findById(int $requestId)` | `?RentalRequest` | `classes/RentalRequest.php` | **VERIFIED** |
+| **`Transaction`** | `+processPayment(int $requestId, int $payerId, string $mode)` | `array` | `classes/Transaction.php` | **VERIFIED** |
+| | `+processRefund(int $transactionId, float $amount, string $status)` | `bool` | `classes/Transaction.php` | **VERIFIED** |
+| | `+getReceipt()` | `array` | `classes/Transaction.php` | **VERIFIED** |
+| | `+findById(int $transactionId)` | `?Transaction` | `classes/Transaction.php` | **VERIFIED** |
+| | `+findByRequest(int $requestId)` | `?Transaction` | `classes/Transaction.php` | **VERIFIED** |
+| **`Fine`** | `+calcLateReturnAmount(int $lateDays, float $ratePerDay)` | `float` | `classes/Fine.php` | **VERIFIED** |
+| | `+autoDetectLateReturn(RentalRequest $req, ?string $actualReturnDate)` | `?array` | `classes/Fine.php` | **VERIFIED** |
+| | `+processPay(string $paymentMode)` | `bool` | `classes/Fine.php` | **VERIFIED** |
+| | `+waive(int $fineId, int $adminId, string $notes)` | `bool` | `classes/Fine.php` | **VERIFIED** |
+| | `+findById(int $fineId)` | `?Fine` | `classes/Fine.php` | **VERIFIED** |
+| | `+findByRequest(int $requestId)` | `array` | `classes/Fine.php` | **VERIFIED** |
+| **`Review`** | `+submit(int $requestId, int $renterId, int $rating, string $comment)` | `int` | `classes/Review.php` | **VERIFIED** |
+| | `+calculateProductAverage(int $productId)` | `float` | `classes/Review.php` | **VERIFIED** |
+| | `+calculateOwnerTrustScore(int $ownerId)` | `float` | `classes/Review.php` | **VERIFIED** |
+| | `+findByProduct(int $productId)` | `array` | `classes/Review.php` | **VERIFIED** |
+| | `+findById(int $reviewId)` | `?Review` | `classes/Review.php` | **VERIFIED** |
+| **`Notification`** | `+create(int $userId, string $msg, string $type, ?int $relId)` | `int` | `classes/Notification.php` | **VERIFIED** |
+| | `+markAsRead(int $notificationId, int $userId)` | `bool` | `classes/Notification.php` | **VERIFIED** |
+| | `+markAllReadByUser(int $userId)` | `bool` | `classes/Notification.php` | **VERIFIED** |
+| | `+countUnread(int $userId)` | `int` | `classes/Notification.php` | **VERIFIED** |
+| | `+sendDueDateReminders()` | `int` | `classes/Notification.php` | **VERIFIED** |
+| | `+delete(int $notificationId, int $userId)` | `bool` | `classes/Notification.php` | **VERIFIED** |
+| | `+findByUser(int $userId, ?string $type, ?string $status)` | `array` | `classes/Notification.php` | **VERIFIED** |
+| **`Dispute`** | `+create(int $reqId, int $raisedBy, string $reason, ?string $evidence)` | `int` | `classes/Dispute.php` | **VERIFIED** |
+| | `+resolve(int $adminId, string $resolution, ?string $notes, bool $waiveFine)` | `bool` | `classes/Dispute.php` | **VERIFIED** |
+| | `+findByRental(int $requestId)` | `?Dispute` | `classes/Dispute.php` | **VERIFIED** |
+| | `+findById(int $disputeId)` | `?Dispute` | `classes/Dispute.php` | **VERIFIED** |
+| | `+getAll(?string $status, int $limit, int $offset)` | `array` | `classes/Dispute.php` | **VERIFIED** |
+
+### 14.2 Custom Academic Exceptions
+
+All custom exceptions defined in `classes/exceptions/ORMSException.php` inherit from `ORMSException` (which extends `\Exception`):
+- `ORMSException`: Base domain exception for rental business logic violations.
+- `InvalidDateRangeException`: Thrown when start date is in the past, or end date $\le$ start date.
+- `ProductUnavailableException`: Thrown when a product is deactivated or overlapping active/pending rental bookings exist.
+- `PaymentFailedException`: Thrown when a payment is attempted on an unapproved or invalid booking.
+- `DuplicateReviewException`: Thrown when a renter attempts to review a rental request more than once.
+- `UnauthorizedActionException`: Thrown when a user attempts an action outside their role or on records they do not own.
+
+---
+
+## 15. Master End-to-End Automated Test Suite (`test_e2e_integration.php`)
+
+The **Master End-to-End (E2E) Integration Test Suite** executes a complete, uninterrupted rental lifecycle from user registration to administrative dispute adjudication in a single automated flow.
+
+### 15.1 The 12 Integration Stages
+
+1. **Stage 1 — User Registration & Dual-Role Ingestion:** Tests magic-byte identity verification, secure password hashing (`bcrypt`), and dual `Owner` & `Renter` role assignment in the `USER_ROLES` junction table.
+2. **Stage 2 — Authentication & Session Verification:** Tests credential verification (`password_verify`), active role switching, and session regeneration.
+3. **Stage 3 — Owner Product Listing & Media Storage:** Ingests product with validated pricing, security deposit, physical condition, and primary gallery photo.
+4. **Stage 4 — Catalog Search & Date Availability:** Public guest search by keyword and category, validating `checkAvailability()` against calendar intervals.
+5. **Stage 5 — Concurrency-Safe Booking Submission:** Verifies 3NF compliance (dynamically calculating days and rental fee) and locks rows with `SELECT ... FOR UPDATE`.
+6. **Stage 6 — Double-Booking Prevention Race Test:** Submits an overlapping date request to prove strict concurrency rejection with `ProductUnavailableException`.
+7. **Stage 7 — Owner Approval Workflow:** Owner reviews booking and accepts; multi-party notification triggers instant notification to renter to pay.
+8. **Stage 8 — Financial Settlement & Escrow Snapshot:** Executes payment, records immutable fee snapshot (Rule 7), holds deposit in escrow, generates official tax receipt, and transitions product to `Rented`.
+9. **Stage 9 — Return Inspection & Fine Engine:** Simulates return inspection with late and damage penalties; enforces Rule 9 (2× deposit cap) and Rule 8 deposit deductions and partial refund.
+10. **Stage 10 — Post-Completion Review & Trust Score:** Renter rates experience (1–5 stars); Rule 10 verifies reviews only on completed rentals, recalculates dynamic product average & owner trust score, and blocks duplicate reviews.
+11. **Stage 11 — Dispute Filing & Admin Adjudication:** Renter raises dispute against penalty; admin reviews claim, records mandatory ruling notes, waives fine, and notifies both parties.
+12. **Stage 12 — Admin Governance, Taxonomy & Audit Analytics:** Audits registered accounts, verifies foreign key deletion protection on active categories, and generates 4 real-time operational reports (`overview`, `rentals`, `revenue`, `fines`).
+
+### 15.2 Running the Master E2E Suite
+
+#### Via Command Line (CLI):
+```powershell
+C:\xampp\php\php.exe test_e2e_integration.php
+```
+
+#### Via Web Browser:
+Open your browser and navigate to:
+```
+http://localhost/orms/test_e2e_integration.php
+```
+The browser view renders an interactive visual dashboard displaying test pass/fail badges, execution durations, diagnostic outputs, and an overall health badge.
+
+---
+
+## 16. Academic Project Scope, Assumptions & Limitations
+
+As part of the **BCSP-064 (IGNOU BCA Final Project)** curriculum, the following academic boundaries, technical assumptions, and real-world scope limitations apply:
+
+### 16.1 Scope & Design Boundaries
+1. **Academic Simulated Payment Gateway:**
+   - Real payment gateways (e.g. Razorpay, Stripe, PayU) require active business merchant accounts, GST numbers, and HTTPS webhooks. For academic project evaluation, payment processing is simulated using synchronous sandbox logic while preserving 100% of real-world gateway requirements: unique transaction identifiers (`ORMS-TXN-...`), official tax receipts (`ORMS-REC-...`), immutable escrow snapshots, and refund accounting.
+2. **Escrow Deposit Accounting:**
+   - The security deposit is logically held in escrow under the `TRANSACTION` table (`deposit_status = 'Held'`). In a live corporate platform, funds would be placed in a designated escrow bank account; in ORMS, this is tracked via transactional state machines with atomic deductions, partial refunds, and full forfeitures.
+3. **Database Concurrency & Locking:**
+   - Double-booking prevention uses InnoDB row-level locking (`SELECT ... FOR UPDATE`) within ACID database transactions. This satisfies enterprise safety within a single MySQL node. Distributed multi-region lock managers (e.g. Redis Redlock) are beyond the syllabus scope.
+4. **Physical Asset Logistics & Shipping:**
+   - ORMS manages the legal, financial, and digital lifecycle of the rental agreement. Physical pickup, courier tracking, and GPS telemetry are assumed to be handled directly between the verified Owner and Renter.
+5. **Simulated Notification Delivery:**
+   - Notifications are stored relationally in the `NOTIFICATION` table and delivered via polling and navbar badges. Third-party SMS/WhatsApp APIs (Twilio, Gupshup) are represented via database notifications to avoid paid third-party API dependencies during university examination.
+
+---
+
+## 17. Default Seed Credentials Reference
+
+Save these credentials for testing and evaluation across all user interfaces:
 
 | Role | Username / Email | Password | Intended Use |
 |---|---|---|---|
@@ -1092,10 +1238,10 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 15. Troubleshooting Common Issues
+## 18. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
-   - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.
+   - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it in `config/database.php`.
 2. **Error: "Table already exists"**
    - The script contains `DROP TABLE IF EXISTS` in safe order with `FOREIGN_KEY_CHECKS = 0`. Re-importing will cleanly recreate the database.
 3. **Foreign key error on import:**
@@ -1106,7 +1252,5 @@ Save these credentials for future testing during the upcoming modules:
    - Ensure `uploads/products/` exists and has standard read permissions. Relative paths are stored as `uploads/products/filename.jpg` and resolved via `base_url()`.
 6. **Booking Error ("The product has already been reserved or rented for the selected dates"):**
    - This indicates that `SELECT ... FOR UPDATE` concurrency protection is actively working. Check existing bookings under `RENTAL_REQUEST` or choose non-overlapping dates.
-
-
-
-
+7. **Timezone consistency between PHP and MySQL:**
+   - Both `config/database.php` and `includes/functions.php` enforce `Asia/Kolkata` (`date_default_timezone_set('Asia/Kolkata')`) to ensure automatic return date detection matches MySQL's `CURDATE()`.

@@ -331,4 +331,15 @@ class Review {
         $stmt->execute(['owner_id' => $ownerId]);
         return (float) $stmt->fetchColumn();
     }
+
+    /**
+     * Aliases for dynamic rating computations
+     */
+    public static function calculateProductAverage(int $productId): float {
+        return self::getAverageRatingForProduct($productId);
+    }
+
+    public static function calculateOwnerTrustScore(int $ownerId): float {
+        return self::getUserTrustScore($ownerId);
+    }
 }

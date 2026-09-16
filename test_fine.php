@@ -54,6 +54,7 @@ if ($isCli) {
 }
 
 $db = Database::getInstance()->getConnection();
+set_fine_rate(150.00); // Ensure standard baseline fine rate for test calculations
 
 // -------------------------------------------------------------
 // Helper: Create a fresh active rental request with completed payment

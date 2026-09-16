@@ -178,7 +178,7 @@ try {
     // -------------------------------------------------------------
     // Test 7: Sorting Ascending vs Descending
     // -------------------------------------------------------------
-    $ascResults = Product::search(['status' => 'Available'], 'price_asc');
+    $ascResults = Product::search(['status' => 'Available'], 'price_asc', 200);
     $pidsInAsc = array_column(array_map(fn($r) => ['id' => $r['product']->getProductID(), 'rent' => $r['product']->getRentPerDay()], $ascResults), 'id');
 
     // Find indices of our test items

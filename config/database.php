@@ -12,6 +12,9 @@
 
 declare(strict_types=1);
 
+// Set default timezone to match system / project region (Asia/Kolkata)
+date_default_timezone_set('Asia/Kolkata');
+
 class Database {
     private static ?Database $instance = null;
     private ?PDO $connection = null;
