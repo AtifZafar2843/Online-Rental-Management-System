@@ -3,7 +3,7 @@
 > **Project:** Online Rental Management System (BCSP-064, IGNOU BCA Final Project)  
 > **Student:** Atif Zafar  
 > **Tech Stack:** PHP 8.1+, MySQL 8.0 / MariaDB 10.4+, Apache (XAMPP), Tailwind CSS  
-> **Status:** Updated with **Step 8 (Fine & Return Management Module)**
+> **Status:** Updated with **Step 9 (Review & Rating Module & Owner Product Deletion)**
 
 ---
 
@@ -38,7 +38,7 @@
 | **6** | **Rental Request Module (`renter/`, `owner/`)** | **COMPLETED** | Concurrency-safe `SELECT ... FOR UPDATE`, approve/reject, free cancel, 3NF compliant |
 | **7** | **Financial / Transaction Module (`renter/`, `owner/`)** | **COMPLETED** | Dynamic snapshot amounts (Rule 7), escrow deposit, academic simulated checkout, tax receipts |
 | **8** | **Fine Module (`owner/`, `admin/`, `renter/`)** | **COMPLETED** | Late auto-detection, Rule 9 2× deposit cap, Rule 8 deposit deductions, Rule 12 auto-refund |
-| 9 | Review & Rating Module (`renter/`) | Pending | Post-completion check, duplicate review prevention |
+| **9** | **Review & Rating Module (`renter/`, `owner/`)** | **COMPLETED** | Rule 10 post-completion check, duplicate review prevention, dynamic averages & trust score, owner product deletion |
 | 10 | Notification System (`notifications/`) | Pending | Event-driven notifications, polling UI |
 | 11 | Dispute & Admin Management (`admin/`) | Pending | Dispute resolution, fine rate config, reports |
 | 12 | End-to-End Integration & Final Walkthrough | Pending | Complete lifecycle testing across all user roles |
@@ -802,7 +802,89 @@ You will see an emerald badge: **"Ready for Step 9"** with all 8 tests passing w
 
 ---
 
-## 11. Default Seed Credentials Reference
+## 11. Step 9: Review & Rating Module & Owner Product Deletion Testing Guide
+
+### 11.1 Features Implemented
+1. **Rule 10 Verified Review Constraint:** Reviews can only be submitted for rental requests in `Completed` status (`validateRentalCompleted()`).
+2. **Duplicate Review Prevention:** A database-level `UNIQUE KEY uk_review_request (request_id)` prevents multiple reviews per rental. Second attempts throw `DuplicateReviewException`.
+3. **1–5 Star Rating & Feedback:** Comprehensive star rating widget with hover animation, validation, and optional text feedback.
+4. **Dynamic Computed Averages (3NF Compliant):**
+   - Product average rating: `AVG(rating)` computed dynamically via query, never stored as a static column.
+   - Owner trust score: `AVG(r.rating)` across all reviews for products owned by that user.
+5. **Real-Time Notification:** Owner receives an immediate in-app notification when a renter submits a review for their product.
+6. **Owner Product Deletion (User-Requested Feature):**
+   - Owners can permanently delete products they own directly from their dashboard.
+   - **Safety Protection:** Products currently marked `Rented` or having `Pending`/`Approved`/`Active` rental requests cannot be deleted (`ORMSException`).
+   - Image file cleanup: Associated product images uploaded to disk are automatically deleted.
+
+### 11.2 Automated Verification Script
+Run the automated 9-assertion verification suite via CLI:
+```powershell
+C:\xampp\php\php.exe test_review.php
+```
+
+Or run via browser:
+```
+http://localhost/orms/test_review.php
+```
+
+Expected output:
+```
+=======================================================
+  ORMS Automated Verification — Step 9: Review Module
+=======================================================
+1. [ PASS ] Uncompleted Rental Review Rejection (Rule 10)
+2. [ PASS ] Unauthorized Reviewer Rejection
+3. [ PASS ] Valid Review Submission & Persistence
+4. [ PASS ] Duplicate Review Prevention (DuplicateReviewException)
+5. [ PASS ] Out-of-Range Star Rating Rejection
+6. [ PASS ] Dynamic Product Average Rating Calculation (Rule 10)
+7. [ PASS ] Dynamic Owner Trust Score Calculation (Rule 10)
+8. [ PASS ] Automated Notification to Owner on Review Submission
+9. [ PASS ] Owner Product Deletion & Disk Image Cleanup
+-------------------------------------------------------
+OVERALL RESULT: ALL 9 TESTS PASSED! Review & Product Deletion module is 100% operational.
+=======================================================
+```
+
+### 11.3 Manual Walkthrough & Testing
+
+#### Scenario A: Submitting a Verified Review (Renter Flow)
+1. Log in as Renter Priya: `priya@example.com` / `Password@123`.
+2. Go to **My Rentals** (`http://localhost/orms/renter/my_rentals.php`).
+3. Locate any rental card in the **Completed Rentals** section.
+4. If not yet reviewed, click the amber **"⭐ Write Review"** button.
+5. On the review page (`renter/submit_review.php`):
+   - Hover and click on the stars to select a rating (1 to 5).
+   - Enter feedback in the text area (e.g., *"Excellent condition, well maintained and very helpful host!"*).
+   - Click **"Submit Verified Review"**.
+6. You will be redirected back to My Rentals with a success message, and the card now displays **"Reviewed (★ X/5)"**.
+7. Try opening `renter/submit_review.php?request_id=<completed_id>` again: it will open in read-only mode showing your previously submitted review and preventing duplicates.
+
+#### Scenario B: Checking Dynamic Star Ratings & Owner Trust Score
+1. Go to the public catalog (`http://localhost/orms/index.php` or `renter/search.php`).
+2. Click on the product that was just reviewed to open its details (`renter/product_details.php?id=<product_id>`).
+3. Observe:
+   - Dynamic star rating (e.g., ★ 5.0) and review count.
+   - Individual verified customer reviews listed with star ratings, reviewer names, dates, and comments.
+   - Owner trust badge showing the dynamically computed average score across all products.
+
+#### Scenario C: Owner Product Deletion Feature
+1. Log in as Owner Rahul: `rahul@example.com` / `Password@123`.
+2. Go to **Owner Dashboard** (`http://localhost/orms/owner/dashboard.php`).
+3. Scroll to the **"My Listed Products"** section.
+4. For any product that is `Available` or `Inactive`:
+   - Click the red **"🗑️ Delete"** button.
+   - A confirmation modal appears asking: *"Are you sure you want to permanently delete this product?"*
+   - Confirm deletion.
+   - The product is permanently removed from the database and its images are cleared from `uploads/products/`.
+5. For any product that is currently **Rented**:
+   - The Delete button is disabled with a tooltip: *"Cannot delete a currently rented product"*.
+   - Direct POST requests to `owner/delete_product.php` for rented items are strictly blocked with an error.
+
+---
+
+## 12. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -814,7 +896,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 12. Troubleshooting Common Issues
+## 13. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.

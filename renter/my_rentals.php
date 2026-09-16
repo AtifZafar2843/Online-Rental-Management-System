@@ -306,11 +306,23 @@ require_once __DIR__ . '/../includes/header.php';
                                 </a>
                             <?php endif; ?>
 
-                            <a href="<?= base_url('renter/submit_review.php?request_id=' . $req->getRequestID()) ?>" 
-                               class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold text-xs rounded-xl border border-slate-700 transition flex items-center space-x-1">
-                                <span>⭐</span>
-                                <span>Write Review</span>
-                            </a>
+                            <?php
+                                require_once __DIR__ . '/../classes/Review.php';
+                                $rev = Review::findByRequest($req->getRequestID());
+                                if ($rev):
+                            ?>
+                                <a href="<?= base_url('renter/submit_review.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-semibold text-xs rounded-xl transition flex items-center space-x-1.5">
+                                    <span>★ <?= $rev->getRating() ?>/5</span>
+                                    <span class="text-[10px] text-slate-400">Reviewed</span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= base_url('renter/submit_review.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 transition flex items-center space-x-1">
+                                    <span>⭐</span>
+                                    <span>Write Review</span>
+                                </a>
+                            <?php endif; ?>
 
                         <?php else: ?>
                             <span class="text-xs text-slate-500 italic">Booking Closed</span>

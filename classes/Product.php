@@ -113,6 +113,7 @@ class Product {
     public function getOwnerEmail(): ?string { return $this->ownerEmail; }
     public function setOwnerEmail(?string $e): void { $this->ownerEmail = $e; }
 
+
     /**
      * Check if product is available for booking within the requested date range.
      * Validates that status is 'Available' and no active/approved overlapping rentals exist.
@@ -575,5 +576,78 @@ class Product {
         $stmt = $db->prepare("SELECT COUNT(*) FROM `PRODUCT` p {$whereSql}");
         $stmt->execute($params);
         return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Delete product from database and remove associated image files.
+     * Prevents deletion if product is currently rented or has active/pending requests.
+     */
+    public function delete(): bool {
+        if (!$this->productID) {
+            return false;
+        }
+
+        if ($this->availStatus === 'Rented') {
+            throw new ORMSException("Cannot delete product while it is currently rented out.");
+        }
+
+        $stmtCheck = $this->db->prepare("
+            SELECT COUNT(*) FROM `RENTAL_REQUEST` 
+            WHERE product_id = :id AND status IN ('Pending', 'Approved', 'Active')
+        ");
+        $stmtCheck->execute(['id' => $this->productID]);
+        if ((int)$stmtCheck->fetchColumn() > 0) {
+            throw new ORMSException("Cannot delete product with pending, approved, or active rental bookings.");
+        }
+
+        // Get images to delete from disk later
+        $images = $this->getImages();
+
+        $this->db->beginTransaction();
+        try {
+            // Find historical request IDs to clean up associated records
+            $stmtReqs = $this->db->prepare("SELECT request_id FROM `RENTAL_REQUEST` WHERE product_id = :id");
+            $stmtReqs->execute(['id' => $this->productID]);
+            $reqIds = $stmtReqs->fetchAll(PDO::FETCH_COLUMN);
+
+            if (!empty($reqIds)) {
+                $inReqs = implode(',', array_map('intval', $reqIds));
+                $this->db->exec("DELETE FROM `DISPUTE` WHERE request_id IN ($inReqs)");
+                $this->db->exec("DELETE FROM `FINE` WHERE request_id IN ($inReqs)");
+                $this->db->exec("DELETE FROM `TRANSACTION` WHERE request_id IN ($inReqs)");
+                $this->db->exec("DELETE FROM `REVIEW` WHERE request_id IN ($inReqs) OR product_id = {$this->productID}");
+                $this->db->exec("DELETE FROM `RENTAL_REQUEST` WHERE product_id = {$this->productID}");
+            } else {
+                $this->db->exec("DELETE FROM `REVIEW` WHERE product_id = {$this->productID}");
+            }
+
+            // Delete product images DB rows
+            $stmtDelImgs = $this->db->prepare("DELETE FROM `PRODUCT_IMAGES` WHERE product_id = :id");
+            $stmtDelImgs->execute(['id' => $this->productID]);
+
+            // Delete product row
+            $stmtDelProd = $this->db->prepare("DELETE FROM `PRODUCT` WHERE product_id = :id");
+            $stmtDelProd->execute(['id' => $this->productID]);
+
+            $this->db->commit();
+
+            // Clean up physical image files from disk
+            foreach ($images as $img) {
+                $relPath = $img['image_path'] ?? '';
+                if ($relPath) {
+                    $absPath = __DIR__ . '/../' . ltrim($relPath, '/');
+                    if (file_exists($absPath) && is_file($absPath)) {
+                        @unlink($absPath);
+                    }
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
     }
 }

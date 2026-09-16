@@ -181,4 +181,15 @@ class Owner extends BaseUser {
             $actualReturnDate
         );
     }
+
+    public function deleteProduct(int $productId): bool {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Owner must be authenticated to delete products.");
+        }
+        $product = Product::findById($productId);
+        if (!$product || $product->getOwnerID() !== $this->userID) {
+            throw new UnauthorizedActionException("You do not have permission to delete this product.");
+        }
+        return $product->delete();
+    }
 }

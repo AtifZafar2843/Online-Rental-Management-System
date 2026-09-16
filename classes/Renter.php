@@ -93,9 +93,21 @@ class Renter extends BaseUser {
         return $request->cancel($reason);
     }
 
-    public function submitReview(int $requestId, int $rating, string $comment): mixed {
-        // Implemented in Step 9
-        return null;
+    public function submitReview(int $requestId, int $rating, string $comment): Review {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Renter must be authenticated to submit reviews.");
+        }
+        require_once __DIR__ . '/Review.php';
+        $review = new Review(
+            null,
+            $requestId,
+            0,
+            $this->userID,
+            $rating,
+            $comment
+        );
+        $review->submitReview();
+        return $review;
     }
 
     public function payFine(int $fineId, string $paymentMode = 'UPI'): bool {

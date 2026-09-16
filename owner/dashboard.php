@@ -219,10 +219,25 @@ require_once __DIR__ . '/../includes/header.php';
                                         <!-- Toggle Status Link -->
                                         <?php if ($status !== 'Rented'): ?>
                                             <a href="<?= base_url("owner/toggle_status.php?id={$prod->getProductID()}") ?>" 
-                                               title="Toggle Available / Unavailable"
-                                               class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">
+                                                title="Toggle Available / Unavailable"
+                                                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">
                                                 <?= ($status === 'Available') ? 'Deactivate' : 'Activate' ?>
                                             </a>
+
+                                            <!-- Delete Button -->
+                                            <button type="button" 
+                                                    onclick="openDeleteModal(<?= $prod->getProductID() ?>, '<?= htmlspecialchars(addslashes($prod->getTitle())) ?>')"
+                                                    title="Permanently Delete Listing"
+                                                    class="px-2.5 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/50 font-medium transition">
+                                                Delete
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="button" 
+                                                    disabled 
+                                                    title="Cannot delete item while rented"
+                                                    class="px-2.5 py-1.5 rounded-lg bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed font-medium text-xs">
+                                                Delete
+                                            </button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -234,5 +249,43 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Delete Product Modal -->
+<div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
+    <div class="card max-w-md w-full p-6 border border-slate-800 bg-slate-900 rounded-2xl shadow-2xl space-y-4">
+        <div class="flex items-center space-x-3 text-rose-400">
+            <span class="text-2xl">🗑️</span>
+            <h3 class="text-lg font-bold text-white">Delete Product Listing</h3>
+        </div>
+        <p class="text-xs text-slate-300">
+            Are you sure you want to permanently delete <strong id="deleteProdTitle" class="text-white"></strong>?
+        </p>
+        <div class="p-3 bg-rose-950/30 border border-rose-800/50 rounded-xl text-[11px] text-rose-300 space-y-1">
+            <div>• This action will permanently remove the product and its uploaded images from disk.</div>
+            <div>• Deletion will fail if there are any active, pending, or approved rental requests.</div>
+        </div>
+        <form method="POST" action="<?= base_url('owner/delete_product.php') ?>" class="flex items-center justify-end space-x-3 pt-2">
+            <?= csrf_field() ?>
+            <input type="hidden" name="product_id" id="deleteProdId" value="">
+            <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+                Cancel
+            </button>
+            <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition shadow-lg shadow-rose-600/20">
+                Delete Permanently
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openDeleteModal(id, title) {
+    document.getElementById('deleteProdId').value = id;
+    document.getElementById('deleteProdTitle').innerText = title;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
