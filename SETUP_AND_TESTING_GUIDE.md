@@ -3,7 +3,7 @@
 > **Project:** Online Rental Management System (BCSP-064, IGNOU BCA Final Project)  
 > **Student:** Atif Zafar  
 > **Tech Stack:** PHP 8.1+, MySQL 8.0 / MariaDB 10.4+, Apache (XAMPP), Tailwind CSS  
-> **Status:** Updated with **Step 9 (Review & Rating Module & Owner Product Deletion)**
+> **Status:** Updated with **Step 10 (Notification System)**
 
 ---
 
@@ -39,7 +39,7 @@
 | **7** | **Financial / Transaction Module (`renter/`, `owner/`)** | **COMPLETED** | Dynamic snapshot amounts (Rule 7), escrow deposit, academic simulated checkout, tax receipts |
 | **8** | **Fine Module (`owner/`, `admin/`, `renter/`)** | **COMPLETED** | Late auto-detection, Rule 9 2× deposit cap, Rule 8 deposit deductions, Rule 12 auto-refund |
 | **9** | **Review & Rating Module (`renter/`, `owner/`)** | **COMPLETED** | Rule 10 post-completion check, duplicate review prevention, dynamic averages & trust score, owner product deletion |
-| 10 | Notification System (`notifications/`) | Pending | Event-driven notifications, polling UI |
+| **10** | **Notification System (`notifications/`, `classes/`)** | **COMPLETED** | Rule 11 & Synopsis 13.IX event triggers, navbar live polling badge, due-date reminder automation |
 | 11 | Dispute & Admin Management (`admin/`) | Pending | Dispute resolution, fine rate config, reports |
 | 12 | End-to-End Integration & Final Walkthrough | Pending | Complete lifecycle testing across all user roles |
 
@@ -884,7 +884,95 @@ OVERALL RESULT: ALL 9 TESTS PASSED! Review & Product Deletion module is 100% ope
 
 ---
 
-## 12. Default Seed Credentials Reference
+## 12. Step 10: Notification System Testing Guide
+
+### 12.1 Features Implemented
+1. **Rule 11 & Synopsis Section 13.IX Event Triggers**:
+   - New rental request submitted $\to$ Owner notified (`type = 'Rental'`).
+   - Request Approved / Rejected $\to$ Renter notified (`type = 'Rental'`).
+   - Payment Successful $\to$ Both Renter and Owner notified (`type = 'Payment'`).
+   - Return Confirmed & Fine Issued $\to$ Renter notified (`type = 'Fine'`).
+   - Deposit Refunded $\to$ Renter notified (`type = 'Payment'`).
+   - New Review Received $\to$ Owner notified (`type = 'Rental'`).
+2. **Rental Due Date Reminder Automation (`scripts/check_due_reminders.php`)**:
+   - Scans for `Active` rentals ending tomorrow (`end_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY)`).
+   - Automatically dispatches reminder notifications with scheduled return date.
+   - Built-in idempotency protection prevents duplicate reminders for the same rental.
+3. **Live Polling AJAX Endpoint (`notifications/poll.php`)**:
+   - Returns unread count and latest notifications as JSON.
+   - Enables real-time UI updates without WebSockets, conforming to the academic tech stack.
+4. **Interactive Navbar Bell with Real-Time Badge**:
+   - Live badge counter displaying current unread count with a pulsating highlight.
+   - Dropdown preview on click/hover displaying recent unread items and direct navigation links.
+   - Periodic client-side polling every 15 seconds to update badge dynamically across any page.
+5. **Comprehensive Notification Center (`notifications/view_notifications.php`)**:
+   - Category filtering: **All**, **Rental**, **Payment**, **Fine**, **Dispute**, **System**.
+   - Read status toggle: **All Notifications** vs **Unread Only**.
+   - Actions: Single "Mark as Read", Single "Delete" (with user isolation), and "Mark All as Read".
+   - Contextual action links directing users straight to the relevant order, receipt, or payment page.
+
+### 12.2 Automated Verification Script
+Run the automated 9-assertion verification suite via CLI:
+```powershell
+C:\xampp\php\php.exe test_notification.php
+```
+
+Or run via browser:
+```
+http://localhost/orms/test_notification.php
+```
+
+Expected output:
+```
+=======================================================
+  ORMS Automated Verification — Step 10: Notification System
+=======================================================
+1. [ PASS ] Notification Model Persistence & Schema Validation
+2. [ PASS ] Unread Counter Accuracy (countUnread)
+3. [ PASS ] Single Notification Mark As Read (markAsRead)
+4. [ PASS ] Bulk Mark All Read (markAllReadByUser)
+5. [ PASS ] Type-Based & Status-Based Filtering (findByUser)
+6. [ PASS ] User Isolation & Deletion (delete)
+7. [ PASS ] Rental Due Date Reminder Engine (sendDueDateReminders)
+8. [ PASS ] Multi-Party Event Notification Triggers (Rule 11 / Synopsis 13.IX)
+9. [ PASS ] Polling Endpoint Serialization & Format (toArray)
+-------------------------------------------------------
+OVERALL RESULT: ALL 9 TESTS PASSED! Notification System is 100% operational.
+=======================================================
+```
+
+### 12.3 Manual Walkthrough & Testing
+
+#### Scenario A: Live Navbar Polling & Dropdown Preview
+1. Open two browser windows:
+   - Window 1: Log in as Owner Rahul (`rahul@example.com` / `Password@123`).
+   - Window 2: Log in as Renter Priya (`priya@example.com` / `Password@123`).
+2. In Window 2 (Priya), request a rental for one of Rahul's available items.
+3. In Window 1 (Rahul), watch the top navigation bar: within 15 seconds, the bell icon will display a red badge counter without refreshing the page.
+4. Click on the bell icon in Rahul's navbar:
+   - A dropdown menu opens showing: *"New booking request received from Priya..."*.
+   - Click **"View Details"** or **"Go to Notification Center"**.
+
+#### Scenario B: Notification Center Filtering & Actions
+1. Go to `http://localhost/orms/notifications/view_notifications.php`.
+2. Click the category pills (**Rentals**, **Payments**, **Fines**, **System**):
+   - Only notifications matching that category are displayed.
+3. Click **"Unread Only"** to filter out read notifications.
+4. Click **"✓ Mark All as Read"**: observe the unread badge resets to 0.
+5. Click **"🗑️"** on any notification: confirm deletion to permanently remove the item.
+
+#### Scenario C: Due Date Reminder Script Execution
+1. Open terminal and run:
+   ```powershell
+   C:\xampp\php\php.exe scripts/check_due_reminders.php
+   ```
+2. The script identifies any active rentals due tomorrow and creates reminder notifications for renters.
+3. Or view as Admin in browser:
+   `http://localhost/orms/scripts/check_due_reminders.php`
+
+---
+
+## 13. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -896,7 +984,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 13. Troubleshooting Common Issues
+## 14. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.

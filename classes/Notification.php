@@ -4,7 +4,7 @@
  * Notification Class
  * 
  * Project: BCSP-064 (IGNOU BCA Final Project)
- * Specification: Prompt Guide Section 4 & Synopsis Section 11.1
+ * Specification: Prompt Guide Section 3.11, 4, 5 (Rule 11) & Synopsis Section 11.1, 13.IX (Page 31)
  */
 
 declare(strict_types=1);
@@ -52,7 +52,7 @@ class Notification {
     public function getCreatedAt(): ?string { return $this->createdAt; }
 
     /**
-     * Mark notification as read.
+     * Mark notification as read (Synopsis Section 11.1).
      */
     public function markAsRead(): void {
         if ($this->notifID) {
@@ -63,7 +63,7 @@ class Notification {
     }
 
     /**
-     * Persist notification into database.
+     * Persist notification into database (Synopsis Section 11.1: send()).
      */
     public function send(): bool {
         $stmt = $this->db->prepare("
@@ -79,8 +79,18 @@ class Notification {
         ]);
         if ($success) {
             $this->notifID = (int) $this->db->lastInsertId();
+            $this->createdAt = date('Y-m-d H:i:s');
         }
         return $success;
+    }
+
+    /**
+     * Delete a single notification with user isolation.
+     */
+    public static function delete(int $notifId, int $userId): bool {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("DELETE FROM `NOTIFICATION` WHERE notif_id = :nid AND user_id = :uid");
+        return $stmt->execute(['nid' => $notifId, 'uid' => $userId]);
     }
 
     /**
@@ -95,6 +105,27 @@ class Notification {
     }
 
     /**
+     * Find a notification by its ID.
+     */
+    public static function findById(int $id): ?Notification {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT * FROM `NOTIFICATION` WHERE notif_id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        if (!$row) return null;
+
+        return new self(
+            (int) $row['notif_id'],
+            (int) $row['user_id'],
+            $row['message'],
+            $row['type'],
+            $row['related_id'] ? (int) $row['related_id'] : null,
+            (bool) $row['is_read'],
+            $row['created_at']
+        );
+    }
+
+    /**
      * Fetch unread notifications count for a user.
      */
     public static function countUnread(int $userId): int {
@@ -105,17 +136,33 @@ class Notification {
     }
 
     /**
-     * Fetch all notifications for a user.
+     * Fetch notifications for a user with optional type and read-status filtering.
      */
-    public static function findByUser(int $userId, int $limit = 30): array {
+    public static function findByUser(int $userId, ?string $type = null, ?bool $isRead = null, int $limit = 50, ?int $sinceId = null): array {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("
-            SELECT * FROM `NOTIFICATION` 
-            WHERE user_id = :uid 
-            ORDER BY notif_id DESC 
-            LIMIT {$limit}
-        ");
-        $stmt->execute(['uid' => $userId]);
+        
+        $sql = "SELECT * FROM `NOTIFICATION` WHERE user_id = :uid";
+        $params = ['uid' => $userId];
+
+        if ($type !== null && $type !== 'All' && in_array($type, ['Rental', 'Payment', 'Fine', 'Dispute', 'System'], true)) {
+            $sql .= " AND type = :type";
+            $params['type'] = $type;
+        }
+
+        if ($isRead !== null) {
+            $sql .= " AND is_read = :is_read";
+            $params['is_read'] = $isRead ? 1 : 0;
+        }
+
+        if ($sinceId !== null && $sinceId > 0) {
+            $sql .= " AND notif_id > :since_id";
+            $params['since_id'] = $sinceId;
+        }
+
+        $sql .= " ORDER BY notif_id DESC LIMIT " . (int) $limit;
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
         $rows = $stmt->fetchAll();
 
         $notifications = [];
@@ -140,5 +187,109 @@ class Notification {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("UPDATE `NOTIFICATION` SET is_read = 1 WHERE user_id = :uid AND is_read = 0");
         return $stmt->execute(['uid' => $userId]);
+    }
+
+    /**
+     * Rule 11 & Synopsis Section 13.IX:
+     * Automated Rental Due Date Reminder (1 day before scheduled end_date).
+     * Scans for Active rentals ending tomorrow, sends reminder to Renter if not already sent.
+     */
+    public static function sendDueDateReminders(): int {
+        $db = Database::getInstance()->getConnection();
+        
+        // Find Active rentals ending tomorrow
+        $stmt = $db->prepare("
+            SELECT r.request_id, r.renter_id, r.end_date, p.title AS product_title
+            FROM `RENTAL_REQUEST` r
+            JOIN `PRODUCT` p ON r.product_id = p.product_id
+            WHERE r.status = 'Active' 
+              AND r.end_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+        ");
+        $stmt->execute();
+        $dueRentals = $stmt->fetchAll();
+
+        $sentCount = 0;
+        foreach ($dueRentals as $rental) {
+            $reqId = (int) $rental['request_id'];
+            $renterId = (int) $rental['renter_id'];
+            $prodTitle = $rental['product_title'];
+            $endDate = date('M d, Y', strtotime($rental['end_date']));
+
+            // Idempotency: Verify if reminder was already dispatched for this request
+            $chkStmt = $db->prepare("
+                SELECT COUNT(*) FROM `NOTIFICATION` 
+                WHERE user_id = :uid 
+                  AND type = 'Rental' 
+                  AND related_id = :req_id 
+                  AND message LIKE '%due tomorrow%'
+            ");
+            $chkStmt->execute(['uid' => $renterId, 'req_id' => $reqId]);
+            if ((int) $chkStmt->fetchColumn() === 0) {
+                $msg = "Reminder: Your rental for '{$prodTitle}' (Request #{$reqId}) is due tomorrow on {$endDate}. Please ensure the item is inspected and returned on time.";
+                self::create($renterId, $msg, 'Rental', $reqId);
+                $sentCount++;
+            }
+        }
+
+        return $sentCount;
+    }
+
+    /**
+     * Format created_at to human-readable relative time (e.g. "Just now", "10m ago", "2h ago", "Yesterday").
+     */
+    public function getFormattedTime(): string {
+        if (!$this->createdAt) return 'Just now';
+        
+        $timestamp = strtotime($this->createdAt);
+        $diff = time() - $timestamp;
+
+        if ($diff < 60) {
+            return 'Just now';
+        } elseif ($diff < 3600) {
+            $mins = max(1, (int) floor($diff / 60));
+            return "{$mins}m ago";
+        } elseif ($diff < 86400) {
+            $hours = (int) floor($diff / 3600);
+            return "{$hours}h ago";
+        } elseif ($diff < 172800) {
+            return 'Yesterday';
+        } else {
+            return date('M d, Y', $timestamp);
+        }
+    }
+
+    /**
+     * Compute contextual target URL based on notification type and current user role.
+     */
+    public function getTargetUrl(?string $userRole = null): string {
+        switch ($this->type) {
+            case 'Rental':
+                return ($userRole === 'Owner') ? 'owner/manage_requests.php' : 'renter/my_rentals.php';
+            case 'Payment':
+                return 'renter/my_rentals.php';
+            case 'Fine':
+                return 'renter/my_rentals.php';
+            case 'Dispute':
+                return ($userRole === 'Admin') ? 'admin/resolve_disputes.php' : 'renter/my_rentals.php';
+            default:
+                return 'notifications/view_notifications.php';
+        }
+    }
+
+    /**
+     * Convert notification object to array representation for JSON API serialization.
+     */
+    public function toArray(?string $userRole = null): array {
+        return [
+            'notif_id'        => $this->notifID,
+            'user_id'         => $this->userID,
+            'message'         => $this->message,
+            'type'            => $this->type,
+            'related_id'      => $this->relatedID,
+            'is_read'         => $this->isRead,
+            'created_at'      => $this->createdAt,
+            'formatted_time'  => $this->getFormattedTime(),
+            'target_url'      => $this->getTargetUrl($userRole)
+        ];
     }
 }

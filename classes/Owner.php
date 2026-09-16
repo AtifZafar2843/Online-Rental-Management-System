@@ -142,9 +142,10 @@ class Owner extends BaseUser {
             throw new UnauthorizedActionException("You do not have permission to manage this rental request.");
         }
 
-        if (strtolower($decision) === 'approve') {
+        $dec = strtolower(trim($decision));
+        if ($dec === 'approve' || $dec === 'approved') {
             return $request->approve();
-        } elseif (strtolower($decision) === 'reject') {
+        } elseif ($dec === 'reject' || $dec === 'rejected') {
             return $request->reject($reason);
         }
 
