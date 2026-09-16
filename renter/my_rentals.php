@@ -13,6 +13,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../classes/RentalRequest.php';
 require_once __DIR__ . '/../classes/Renter.php';
+require_once __DIR__ . '/../classes/Dispute.php';
 
 require_role('Renter');
 
@@ -269,6 +270,25 @@ require_once __DIR__ . '/../includes/header.php';
                                 </a>
                             <?php endif; ?>
 
+                            <?php
+                                $dispList = Dispute::findByRequest($req->getRequestID());
+                                $hasDispute = !empty($dispList);
+                                $activeDisp = $hasDispute ? end($dispList) : null;
+                            ?>
+                            <?php if ($hasDispute): ?>
+                                <a href="<?= base_url('renter/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center space-x-1.5 <?= $activeDisp->getStatus() === 'Resolved' ? 'bg-purple-950/40 border-purple-800 text-purple-300' : 'bg-rose-950/60 border-rose-700 text-rose-300' ?>">
+                                    <span>⚖️</span>
+                                    <span>Dispute: <?= str_replace('_', ' ', $activeDisp->getStatus()) ?></span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= base_url('renter/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 bg-slate-800/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1">
+                                    <span>⚖️</span>
+                                    <span>Dispute</span>
+                                </a>
+                            <?php endif; ?>
+
                         <?php elseif ($st === 'Completed'): ?>
                             <?php
                                 require_once __DIR__ . '/../classes/Transaction.php';
@@ -321,6 +341,25 @@ require_once __DIR__ . '/../includes/header.php';
                                    class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 transition flex items-center space-x-1">
                                     <span>⭐</span>
                                     <span>Write Review</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php
+                                $dispList = Dispute::findByRequest($req->getRequestID());
+                                $hasDispute = !empty($dispList);
+                                $activeDisp = $hasDispute ? end($dispList) : null;
+                            ?>
+                            <?php if ($hasDispute): ?>
+                                <a href="<?= base_url('renter/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center space-x-1.5 <?= $activeDisp->getStatus() === 'Resolved' ? 'bg-purple-950/40 border-purple-800 text-purple-300' : 'bg-rose-950/60 border-rose-700 text-rose-300' ?>">
+                                    <span>⚖️</span>
+                                    <span>Dispute: <?= str_replace('_', ' ', $activeDisp->getStatus()) ?></span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= base_url('renter/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 bg-slate-800/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1">
+                                    <span>⚖️</span>
+                                    <span>Dispute</span>
                                 </a>
                             <?php endif; ?>
 

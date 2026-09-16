@@ -122,8 +122,11 @@ class Renter extends BaseUser {
         return $fine->processPay($paymentMode);
     }
 
-    public function fileDispute(int $requestId, string $reason): mixed {
-        // Implemented in Step 11
-        return null;
+    public function fileDispute(int $requestId, string $reason): Dispute {
+        if (!$this->userID) {
+            throw new UnauthorizedActionException("Renter must be authenticated to file disputes.");
+        }
+        require_once __DIR__ . '/Dispute.php';
+        return Dispute::fileDispute($requestId, $this->userID, $reason);
     }
 }

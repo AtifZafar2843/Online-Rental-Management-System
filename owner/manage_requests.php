@@ -13,6 +13,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../classes/Owner.php';
 require_once __DIR__ . '/../classes/RentalRequest.php';
+require_once __DIR__ . '/../classes/Dispute.php';
 require_once __DIR__ . '/../classes/exceptions/ORMSException.php';
 require_once __DIR__ . '/../classes/exceptions/UnauthorizedActionException.php';
 
@@ -326,7 +327,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <div class="text-[10px] text-slate-400 mt-0.5">Due: <?= date('M d, Y', strtotime($req->getEndDate())) ?></div>
                             </div>
                             <a href="<?= base_url('owner/raise_fine.php?request_id=' . $req->getRequestID()) ?>" 
-                               class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-blue-600/20 transition flex items-center justify-center space-x-1.5">
+                                class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-blue-600/20 transition flex items-center justify-center space-x-1.5">
                                 <span>📦</span>
                                 <span>Confirm Return</span>
                             </a>
@@ -340,6 +341,60 @@ require_once __DIR__ . '/../includes/header.php';
                                     View Receipt &rarr;
                                 </a>
                             <?php endif; ?>
+
+                            <?php
+                                $dispList = Dispute::findByRequest($req->getRequestID());
+                                $hasDispute = !empty($dispList);
+                                $activeDisp = $hasDispute ? end($dispList) : null;
+                            ?>
+                            <?php if ($hasDispute): ?>
+                                <a href="<?= base_url('owner/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center space-x-1.5 <?= $activeDisp->getStatus() === 'Resolved' ? 'bg-purple-950/40 border-purple-800 text-purple-300' : 'bg-rose-950/60 border-rose-700 text-rose-300' ?>">
+                                    <span>⚖️</span>
+                                    <span>Dispute: <?= str_replace('_', ' ', $activeDisp->getStatus()) ?></span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= base_url('owner/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 bg-slate-800/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1">
+                                    <span>⚖️</span>
+                                    <span>Dispute</span>
+                                </a>
+                            <?php endif; ?>
+
+                        <?php elseif ($st === 'Completed'): ?>
+                            <div class="text-center px-4 py-2 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
+                                <div class="font-bold text-emerald-400">Rental Completed</div>
+                            </div>
+                            <?php 
+                                require_once __DIR__ . '/../classes/Transaction.php';
+                                $ownerTx = Transaction::findByRequest($req->getRequestID());
+                                if ($ownerTx):
+                            ?>
+                                <a href="<?= base_url('renter/receipt.php?id=' . $ownerTx->getTransactionID()) ?>" 
+                                   class="text-xs text-blue-400 hover:text-blue-300 font-medium underline">
+                                    View Receipt &rarr;
+                                </a>
+                            <?php endif; ?>
+
+                            <?php
+                                $dispList = Dispute::findByRequest($req->getRequestID());
+                                $hasDispute = !empty($dispList);
+                                $activeDisp = $hasDispute ? end($dispList) : null;
+                            ?>
+                            <?php if ($hasDispute): ?>
+                                <a href="<?= base_url('owner/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center space-x-1.5 <?= $activeDisp->getStatus() === 'Resolved' ? 'bg-purple-950/40 border-purple-800 text-purple-300' : 'bg-rose-950/60 border-rose-700 text-rose-300' ?>">
+                                    <span>⚖️</span>
+                                    <span>Dispute: <?= str_replace('_', ' ', $activeDisp->getStatus()) ?></span>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= base_url('owner/file_dispute.php?request_id=' . $req->getRequestID()) ?>" 
+                                   class="px-3 py-1.5 bg-slate-800/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1">
+                                    <span>⚖️</span>
+                                    <span>Dispute</span>
+                                </a>
+                            <?php endif; ?>
+
                         <?php else: ?>
                             <span class="text-xs text-slate-500 italic">No actions pending</span>
                         <?php endif; ?>

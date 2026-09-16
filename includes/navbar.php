@@ -41,6 +41,8 @@ $hasDualRole = count($roles) > 1;
                             <a href="<?= base_url('admin/dashboard.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">Admin Panel</a>
                             <a href="<?= base_url('admin/manage_users.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">Users</a>
                             <a href="<?= base_url('admin/manage_categories.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">Categories</a>
+                            <a href="<?= base_url('admin/resolve_disputes.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">Disputes</a>
+                            <a href="<?= base_url('admin/reports.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">Reports</a>
                         <?php elseif ($activeRole === 'Owner'): ?>
                             <a href="<?= base_url('owner/dashboard.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">Owner Dashboard</a>
                             <a href="<?= base_url('owner/add_product.php') ?>" class="px-3 py-2 rounded-lg text-sm font-medium hover:text-white hover:bg-slate-800 transition">+ List Product</a>
@@ -199,8 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 'System': '🔔'
             };
             const icon = iconMap[item.type] || '🔔';
+            const cleanTarget = item.target_url ? item.target_url.replace(/^\/+/, '') : 'notifications/view_notifications.php';
+            const fullUrl = '<?= rtrim(base_url(), "/") ?>/' + cleanTarget;
             return `
-                <a href="${'<?= base_url() ?>' + item.target_url}" class="block p-3 hover:bg-slate-800/60 transition group">
+                <a href="${fullUrl}" class="block p-3 hover:bg-slate-800/60 transition group">
                     <div class="flex items-start space-x-2.5">
                         <span class="text-base mt-0.5 flex-shrink-0">${icon}</span>
                         <div class="flex-1 min-w-0">

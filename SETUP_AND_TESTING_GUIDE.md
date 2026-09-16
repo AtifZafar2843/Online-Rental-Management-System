@@ -3,7 +3,7 @@
 > **Project:** Online Rental Management System (BCSP-064, IGNOU BCA Final Project)  
 > **Student:** Atif Zafar  
 > **Tech Stack:** PHP 8.1+, MySQL 8.0 / MariaDB 10.4+, Apache (XAMPP), Tailwind CSS  
-> **Status:** Updated with **Step 10 (Notification System)**
+> **Status:** Updated with **Step 11 (Dispute & Admin Management)**
 
 ---
 
@@ -40,7 +40,7 @@
 | **8** | **Fine Module (`owner/`, `admin/`, `renter/`)** | **COMPLETED** | Late auto-detection, Rule 9 2× deposit cap, Rule 8 deposit deductions, Rule 12 auto-refund |
 | **9** | **Review & Rating Module (`renter/`, `owner/`)** | **COMPLETED** | Rule 10 post-completion check, duplicate review prevention, dynamic averages & trust score, owner product deletion |
 | **10** | **Notification System (`notifications/`, `classes/`)** | **COMPLETED** | Rule 11 & Synopsis 13.IX event triggers, navbar live polling badge, due-date reminder automation |
-| 11 | Dispute & Admin Management (`admin/`) | Pending | Dispute resolution, fine rate config, reports |
+| **11** | **Dispute & Admin Management (`admin/`, `classes/`)** | **COMPLETED** | Rule 13 constraints, auto-opposing assignment, multi-party notifications, admin adjudication with mandatory notes & fine waiver, user governance, category taxonomy CRUD, operational audit reports |
 | 12 | End-to-End Integration & Final Walkthrough | Pending | Complete lifecycle testing across all user roles |
 
 ---
@@ -972,7 +972,115 @@ OVERALL RESULT: ALL 9 TESTS PASSED! Notification System is 100% operational.
 
 ---
 
-## 13. Default Seed Credentials Reference
+## 13. Step 11: Dispute & Admin Management Setup & Testing Guide
+
+Step 11 implements the complete administrative governance layer, dispute resolution tribunal, user lifecycle controls, category taxonomy management, and comprehensive operational audit reports (Rule 13, Synopsis Sections 11.1, 12.13, 13.I, 13.X).
+
+### 13.1 Key Architectural Highlights & Business Rules
+1. **Rule 13 (Dispute Filing Constraints):**
+   - Either Owner or Renter can file a dispute against the opposing party for any rental in **`Active`** or **`Completed`** status (`status IN ('Active', 'Completed')`).
+   - Filing disputes on `Pending`, `Approved`, or `Rejected` rentals is strictly prohibited (`ORMSException`).
+   - Only direct parties (Owner or Renter of that specific request) can file (`UnauthorizedActionException`).
+2. **Automatic Opposing Party Assignment:**
+   - If Renter files, `against` is automatically set to the Product Owner.
+   - If Owner files, `against` is automatically set to the Renter.
+3. **Multi-Party Event Notifications (Synopsis 13.IX):**
+   - When a dispute is filed: Admin and Opposing User receive real-time notifications (`type = 'Dispute'`).
+   - When Admin resolves a dispute: Both Renter and Owner receive real-time notifications with Admin findings and action summaries.
+4. **Mandatory Admin Notes & Optional Fine Waiver:**
+   - Adjudicating/resolving a dispute strictly requires non-empty `admin_notes` explaining the decision.
+   - Admin can optionally waive any associated penalty/fine (`status = 'Waived'`) if evidence supports the claimant.
+5. **Admin Governance & Category Protection:**
+   - User roster view with status toggle (`Active`, `Inactive`, `Banned`) and instant notification.
+   - Category CRUD with relational safety: categories with active products or child subcategories cannot be deleted.
+   - Multi-tab audit reports (`overview`, `rentals`, `revenue`, `fines`) with print-ready layouts.
+
+---
+
+### 13.2 Automated CLI & Web Test Suite
+
+Run the automated 10-assertion test suite:
+
+#### Method A: Command Line Interface (CLI)
+```powershell
+C:\xampp\php\php.exe test_dispute_admin.php
+```
+
+#### Method B: Web Browser Interface
+Open your browser and navigate to:
+```
+http://localhost/orms/test_dispute_admin.php
+```
+
+#### Summary of the 10 Assertions:
+| # | Test Assertion | Expected Behavior |
+|:---:|:---|:---|
+| **1** | **Completed Rental Dispute** | Renter files dispute on Completed rental; records with status `Open` and correct party mapping. |
+| **2** | **Active Rental Dispute** | Owner files dispute on Active rental; records with status `Open` and opposing Renter assigned. |
+| **3** | **Rule 13 Constraint Enforcement** | Filing on `Pending` or `Rejected` rentals throws `ORMSException`. |
+| **4** | **Non-Party Access Control** | Non-party user attempting to file dispute throws `UnauthorizedActionException`. |
+| **5** | **Auto-Opposing Assignment** | Automatically assigns Owner when Renter files, and Renter when Owner files. |
+| **6** | **Dispute Filing Notification** | Dispatches real-time notification to Opposing user (`type = 'Dispute'`). |
+| **7** | **Admin Adjudication & Fine Waiver** | Mandatory `admin_notes` enforced, dispute marked `Resolved`, fine marked `Waived`, both parties notified. |
+| **8** | **Admin User Governance** | `manageUsers()` retrieves user roster with roles; `updateUserStatus()` toggles status with user notification. |
+| **9** | **Category CRUD & Protection** | Adds category, edits category, blocks deletion when products exist, deletes empty category safely. |
+| **10** | **Operational & Financial Reports** | Generates `overview` (8 KPIs), `rentals` activity log, `revenue` ledger, and `fines` audit table. |
+
+---
+
+### 13.3 Manual Testing Walkthrough
+
+#### Scenario A: Filing a Dispute as Renter or Owner
+1. Log in as **Priya** (`priya@example.com` / `Password@123`).
+2. Navigate to **"My Rentals"** (`http://localhost/orms/renter/my_rentals.php`).
+3. For any rental in **Active** or **Completed** status, click the **"⚖️ Dispute"** button.
+4. On `renter/file_dispute.php?request_id=X`:
+   - Inspect the rental transaction summary, owner name, and rental window.
+   - Enter a dispute reason (e.g. *"Owner is unfairly claiming physical scratches on the tripod legs."*).
+   - Click **"Submit Formal Dispute Claim"**.
+5. Observe the success message and live dispute status banner (`Status: Open`).
+6. Log in as **Rahul** (Owner): notice the real-time notification alert in the top navigation bar.
+
+#### Scenario B: Admin Command Center & Dispute Adjudication
+1. Log in as **Admin** (`admin` / `Admin@123`).
+2. Go to **Admin Panel** (`http://localhost/orms/admin/dashboard.php`).
+   - Observe the metric counters: Registered Users, Catalog Taxonomy, Inventory Items, Active Rentals, Gross Revenue.
+   - Notice the **Active Dispute Alert Banner** and the **Pending Disputes for Triage** table.
+3. Click **"Adjudicate &rarr;"** or open `http://localhost/orms/admin/resolve_disputes.php`.
+4. Inspect the dispute card: Claimant, Opposing party, Rental request ID, Transaction fee & deposit, Reason.
+5. In the Adjudication panel:
+   - Enter Administrative Findings (e.g. *"Reviewed photos; scratches were pre-existing per listing inspection. Waiving fine."*).
+   - If a fine exists, check **"Waive Associated Fine / Penalty"**.
+   - Click **"Resolve & Finalize Settlement"**.
+6. Observe status updates to **Resolved** and both parties receive notifications.
+
+#### Scenario C: User Governance Console
+1. As Admin, navigate to **Users** (`http://localhost/orms/admin/manage_users.php`).
+2. Search users by name or email, or filter by status (`Active`, `Inactive`, `Banned`) or role (`Owner`, `Renter`).
+3. Under the **Actions** column:
+   - Click **"Suspend"** to change status to `Inactive`.
+   - Click **"Ban"** for critical violations.
+   - Click **"Activate"** to restore account access.
+4. Observe immediate feedback and user notification dispatched.
+
+#### Scenario D: Category Taxonomy Console
+1. As Admin, navigate to **Categories** (`http://localhost/orms/admin/manage_categories.php`).
+2. Add a new category using the **"Add New Category"** card on the left.
+3. Try deleting **"Electronics"** (Category #1): observe the deletion protection error ("Cannot delete category: products are actively listed under this category").
+4. Delete the newly created empty category: observe smooth deletion.
+
+#### Scenario E: Operational & Financial Audit Reports
+1. As Admin, navigate to **Reports** (`http://localhost/orms/admin/reports.php`).
+2. Switch between the 4 report views:
+   - **Executive Overview:** High-level KPIs (Gross Revenue, Deposits Held, Fines Collected, Active Rentals).
+   - **Rental Activity Log:** Detailed table of all rental bookings, rental window dates, duration, rent/day, and status.
+   - **Financial Transactions:** Gateway payments, escrow security deposits, deposit status (`Held`, `Refunded`, `Deducted`).
+   - **Fine & Penalty Collections:** Records of late-return penalties, damages assessments, and deposit deductions.
+3. Click **"Print / Save PDF"** to trigger a clean printable report view.
+
+---
+
+## 14. Default Seed Credentials Reference
 
 Save these credentials for future testing during the upcoming modules:
 
@@ -984,7 +1092,7 @@ Save these credentials for future testing during the upcoming modules:
 
 ---
 
-## 14. Troubleshooting Common Issues
+## 15. Troubleshooting Common Issues
 
 1. **Error: "Access denied for user 'root'@'localhost'"**
    - In XAMPP, the default MySQL user is `root` with an empty password. If you set a root password, supply it when connecting.
