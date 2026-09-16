@@ -131,7 +131,7 @@ class Product {
             SELECT COUNT(*) 
             FROM `RENTAL_REQUEST` 
             WHERE product_id = :product_id 
-              AND status IN ('Approved', 'Active') 
+              AND status IN ('Pending', 'Approved', 'Active') 
               AND (start_date <= :end_date AND end_date >= :start_date)
         ");
         $stmt->execute([

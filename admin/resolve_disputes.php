@@ -25,7 +25,7 @@ $error = '';
 $success = '';
 
 // Handle Dispute Resolution / Status Update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_dispute'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['update_dispute'])) {
     if (!csrf_verify()) {
         $error = 'Security token expired. Please try again.';
     } else {
@@ -155,7 +155,17 @@ require_once __DIR__ . '/../includes/header.php';
             <?php foreach ($disputes as $disp): 
                 $req = RentalRequest::findById($disp->getRequestID());
                 $tx = Transaction::findByRequest($disp->getRequestID());
-                $fine = Fine::findByRequest($disp->getRequestID());
+                $fines = Fine::findByRequest($disp->getRequestID());
+                $hasFines = !empty($fines);
+                $totalFineAmt = 0.0;
+                $hasWaivableFine = false;
+                foreach ($fines as $fn) {
+                    $totalFineAmt += $fn->getAmount();
+                    if (in_array($fn->getStatus(), ['Unpaid', 'Pending', 'Deducted_From_Deposit'], true)) {
+                        $hasWaivableFine = true;
+                    }
+                }
+                $firstFine = $hasFines ? $fines[0] : null;
 
                 $statusColors = [
                     'Open'         => 'bg-amber-950/80 text-amber-300 border-amber-700',
@@ -209,7 +219,14 @@ require_once __DIR__ . '/../includes/header.php';
                         <div>
                             <span class="text-slate-500 block">Assessed Fines</span>
                             <span class="text-rose-300 font-semibold">
-                                <?= $fine ? "₹" . number_format($fine->getAmount(), 2) . " (" . $fine->getStatus() . ")" : "No fines assessed" ?>
+                                <?php if ($hasFines): ?>
+                                    ₹<?= number_format($totalFineAmt, 2) ?> 
+                                    <span class="text-[10px] text-slate-400 font-normal">
+                                        (<?= count($fines) === 1 ? str_replace('_', ' ', $firstFine->getStatus()) : count($fines) . ' penalties' ?>)
+                                    </span>
+                                <?php else: ?>
+                                    No fines assessed
+                                <?php endif; ?>
                             </span>
                         </div>
                     </div>
@@ -269,11 +286,11 @@ require_once __DIR__ . '/../includes/header.php';
                                 </div>
                             </div>
 
-                            <?php if ($fine && $fine->getStatus() === 'Unpaid'): ?>
+                            <?php if ($hasWaivableFine): ?>
                                 <div class="flex items-center space-x-2 pt-1">
                                     <input type="checkbox" id="waive_fine_<?= $disp->getDisputeID() ?>" name="waive_fine" value="1" class="rounded border-slate-700 bg-slate-950 text-blue-600 focus:ring-blue-500 w-4 h-4">
                                     <label for="waive_fine_<?= $disp->getDisputeID() ?>" class="text-xs text-amber-300 font-medium">
-                                        Waive pending fine of ₹<?= number_format($fine->getAmount(), 2) ?> for Renter on case resolution
+                                        Waive assessed penalty / fine (₹<?= number_format($totalFineAmt, 2) ?>) for Renter on case resolution
                                     </label>
                                 </div>
                             <?php endif; ?>

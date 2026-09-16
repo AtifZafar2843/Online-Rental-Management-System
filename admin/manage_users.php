@@ -20,7 +20,7 @@ $admin = new Admin((int) current_user_id(), current_user_name(), current_user_em
 $error = '';
 
 // Handle Status Update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['update_status'])) {
     if (!csrf_verify()) {
         $error = 'Security token expired. Please try again.';
     } else {

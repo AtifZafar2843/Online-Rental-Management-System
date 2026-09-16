@@ -225,7 +225,7 @@ class Dispute {
                 $stmtWaive = $this->db->prepare("
                     UPDATE `FINE` 
                     SET status = 'Waived' 
-                    WHERE request_id = :rid AND status = 'Unpaid'
+                    WHERE request_id = :rid AND status IN ('Unpaid', 'Pending', 'Deducted_From_Deposit')
                 ");
                 $stmtWaive->execute(['rid' => $this->requestID]);
             }

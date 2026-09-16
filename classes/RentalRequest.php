@@ -288,7 +288,7 @@ class RentalRequest {
                 SELECT request_id 
                 FROM `RENTAL_REQUEST` 
                 WHERE product_id = :pid 
-                  AND status IN ('Approved', 'Active') 
+                  AND status IN ('Pending', 'Approved', 'Active') 
                   AND (start_date <= :end_date AND end_date >= :start_date) 
                 FOR UPDATE
             ");

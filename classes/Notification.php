@@ -262,16 +262,33 @@ class Notification {
      * Compute contextual target URL based on notification type and current user role.
      */
     public function getTargetUrl(?string $userRole = null): string {
+        $role = $userRole ?: current_role();
         switch ($this->type) {
             case 'Rental':
-                return ($userRole === 'Owner') ? 'owner/manage_requests.php' : 'renter/my_rentals.php';
+                return ($role === 'Owner') ? 'owner/manage_requests.php' : 'renter/my_rentals.php';
             case 'Payment':
+                if ($role === 'Admin') {
+                    return 'admin/reports.php?type=revenue';
+                }
+                // If notification indicates payment received by owner or user is in owner mode
+                if ($role === 'Owner' || stripos($this->message, 'received') !== false) {
+                    return 'owner/manage_requests.php';
+                }
                 return 'renter/my_rentals.php';
             case 'Fine':
-                return 'renter/my_rentals.php';
+                if ($role === 'Admin') {
+                    return 'admin/reports.php?type=fines';
+                }
+                return ($role === 'Owner') ? 'owner/manage_requests.php' : 'renter/my_rentals.php';
             case 'Dispute':
-                return ($userRole === 'Admin') ? 'admin/resolve_disputes.php' : 'renter/my_rentals.php';
+                if ($role === 'Admin') {
+                    return 'admin/resolve_disputes.php';
+                }
+                return ($role === 'Owner') ? 'owner/manage_requests.php' : 'renter/my_rentals.php';
             default:
+                if ($role === 'Admin') {
+                    return 'admin/dashboard.php';
+                }
                 return 'notifications/view_notifications.php';
         }
     }

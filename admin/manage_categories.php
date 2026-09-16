@@ -20,7 +20,7 @@ $admin = new Admin((int) current_user_id(), current_user_name(), current_user_em
 $error = '';
 
 // Handle Add Category
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['add_category'])) {
     if (!csrf_verify()) {
         $error = 'Security token expired. Please try again.';
     } else {
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
 }
 
 // Handle Edit Category
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['edit_category'])) {
     if (!csrf_verify()) {
         $error = 'Security token expired. Please try again.';
     } else {
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
 }
 
 // Handle Delete Category
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['delete_category'])) {
     if (!csrf_verify()) {
         $error = 'Security token expired. Please try again.';
     } else {

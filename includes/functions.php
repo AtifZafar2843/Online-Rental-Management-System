@@ -177,6 +177,13 @@ function current_user_name(): string {
 }
 
 /**
+ * Retrieve current user's email address.
+ */
+function current_user_email(): string {
+    return $_SESSION['email'] ?? '';
+}
+
+/**
  * Guard: Require logged-in status. Redirects to login if unauthenticated.
  */
 function require_login(string $redirectAfter = ''): void {
