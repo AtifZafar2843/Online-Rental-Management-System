@@ -47,7 +47,7 @@
             <div class="grid grid-cols-1 md:grid-cols-5 gap-10">
                 <div class="md:col-span-2 space-y-4">
                     <a href="<?= base_url('index.php') ?>" class="inline-block">
-                        <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-9 w-auto brightness-0 invert opacity-95">
+                        <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-11 sm:h-12 w-auto brightness-0 invert opacity-95">
                     </a>
                     <p class="text-xs text-stone-400 leading-relaxed max-w-sm">
                         ORMS is a modern peer-to-peer rental marketplace where people list what they have and rent what they need. Making high-value assets accessible, affordable, and sustainable.

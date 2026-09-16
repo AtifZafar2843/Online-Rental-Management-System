@@ -20,7 +20,7 @@ $hasDualRole = count($roles) > 1;
             <!-- Brand Logo -->
             <div class="flex items-center space-x-8">
                 <a href="<?= base_url('index.php') ?>" class="flex items-center group transition transform hover:scale-[1.02]">
-                    <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS — Rental Marketplace" class="h-9 sm:h-10 w-auto object-contain">
+                    <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS — Rental Marketplace" class="h-10 sm:h-12 w-auto object-contain transition-all duration-200">
                 </a>
 
                 <!-- Desktop Navigation Links -->

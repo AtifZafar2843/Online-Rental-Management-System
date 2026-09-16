@@ -188,8 +188,8 @@ require_once __DIR__ . '/includes/header.php';
                     </div>
 
                     <!-- Central Access Key Emblem -->
-                    <div class="absolute w-24 h-24 rounded-full bg-white/90 shadow-2xl flex items-center justify-center border-4 border-white/60 transform hover:scale-105 transition">
-                        <img src="<?= base_url('assets/img/ORMS Icon.png') ?>" alt="ORMS" class="w-14 h-14 object-contain">
+                    <div class="absolute w-24 h-24 rounded-full bg-white/95 shadow-2xl flex items-center justify-center border-4 border-white/80 transform hover:scale-105 transition">
+                        <img src="<?= base_url('assets/img/ORMS Icon.png') ?>" alt="ORMS" class="w-16 h-16 object-contain">
                     </div>
                 </div>
             </div>

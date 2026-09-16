@@ -72,7 +72,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="flex flex-col sm:flex-row sm:items-start justify-between pb-8 border-b border-[#E9E7FF] print:border-slate-300 gap-6">
             <div>
                 <a href="<?= base_url('index.php') ?>" class="inline-block">
-                    <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-8 w-auto">
+                    <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-10 sm:h-12 w-auto object-contain">
                 </a>
                 <p class="text-xs text-slate-500 print:text-slate-600 mt-3 max-w-xs">
                     Verified Digital Tax Invoice &bull; Trusted Rental Escrow Transaction

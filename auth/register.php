@@ -177,7 +177,7 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="bg-white border border-stone-200/80 rounded-3xl shadow-soft overflow-hidden">
         <!-- Header Banner -->
         <div class="p-8 pb-6 text-center border-b border-stone-100 bg-[#FAF8F5]">
-            <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-9 mx-auto mb-3 object-contain">
+            <img src="<?= base_url('assets/img/ORMS Logo.png') ?>" alt="ORMS" class="h-12 sm:h-14 mx-auto mb-4 object-contain">
             <h2 class="font-display text-2xl sm:text-3xl font-bold text-midnight tracking-tight">Create your account</h2>
             <p class="mt-1 text-xs sm:text-sm text-stone-500">
                 Join our peer-to-peer rental community as an Owner, Renter, or both.
