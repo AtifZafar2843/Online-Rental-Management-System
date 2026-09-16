@@ -1,7 +1,7 @@
 ﻿# Online Rental Management System (ORMS)
 
 <p align="center">
-  <img src="assets/img/ORMS%20Logo.png" alt="ORMS Logo" width="380">
+  <img src="assets/img/ORMS-White-Logo.png" alt="ORMS Logo" width="380">
 </p>
 
 <p align="center">
